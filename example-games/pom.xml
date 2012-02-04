@@ -7,7 +7,8 @@
 	<version>0.1</version>
 	<name>example-games</name>
 	<url>http://maven.apache.org</url>
-
+	<description>This project holds some example multiplayer games that uses the jetserver library. The server part is in src/main/java and the client part of the game is in src/test/java</description>
+	
 	<!-- Shared version number properties -->
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
