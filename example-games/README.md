@@ -1,8 +1,23 @@
 This project holds some example multi-player games that uses the [jetserver](https://github.com/menacher/java-game-server/tree/master/jetserver) library. The server part is in src/main/java and the client part of the games are in src/test/java.
 
+Starting the Server
+==================
+The main class is org.menacheri.GameServer in the src/main/java folder. The game clients are coded in the src/test/java folder. The main class for the zombie game is org.menacheri.zombie.ZombieClient.
+Execution
+---------
+Pointers on main classes, classpaths and command line flags.    
+
+**To start the game server**    
+Set the classpath and provide the log4jconfiguration flag.    
+set serverclasspath = ./jetserver-0.1.jar;./....    
+java -cp $serverclasspath -Dlog4j.configuration=GameServerLog4j.properties org.menacheri.GameServer    
+**To start the zombie client**    
+set clientclasspath = ./jetserver-0.1.jar;./netty-3.2.4.Final.jar....    
+java -cp clientclasspath org.menacheri.ZombieClient   
+
 Jar Dependencies
 ----------------
-The jar dependencies of this project are provided explicitly.    
+The jar dependencies of this project are provided explicitly. Since maven is used these are all down loaded automatically.    
 aopalliance-1.0.jar   
 backport-util-concurrent-3.1.jar    
 blazeds-core-1.0-beta1.jar    
