@@ -2,6 +2,12 @@ This is a java nio based server specifically designed for mutliplayer games. It 
 
 Installation
 ============
+Using pre-built jar files
+-------------------------
+The pre-built jar files of this project are located in the jetserver/build directory. All dependant jars are located in the jetserver/lib directory. You can just add them to your classpath in your favorite IDE and start coding. If you want to compile from source, then follow steps below.
+
+With Maven and using Eclipse
+----------------------------
 **Pre-requisites**: Please have maven 3+ and [Spring source tool suite](http://www.springsource.com/developer/sts "STS") or eclipse installed. If you are using plain vanilla eclipse, then M2Eclipse and EGit plugins need to be installed. If you are using another IDE then the maven-eclipse plugin part in the pom.xml needs to be modified. This project has some AspectJ aspects, but it is not necessary for clients to use them.
 
 Steps
@@ -14,5 +20,9 @@ Steps
 6.  jetserver project in eclipse -> right click on pom.xml -> run as -> maven test - **Takes time the first time!**
 
 If everything works as expected you should see some test cases executed successfully!
+
+With Ant
+--------
+If you are using ant, then the lib folder within the jetserver project contains all the dependent libraries. Just right click and run ant build and it will create the jetserver jar.
 
 *Happy coding!*
