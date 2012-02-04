@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<project name="example-games" default="jar" basedir=".">
+	<!-- Assumption is that server source is in same eclipse workspace -->
+	<property name="jetserver" value="${basedir}/../jetserver" />
+	<property name="ant-dependency" value="${jetserver}" />
+	<property name="src" value="${basedir}/src/main/java" />
+	<property name="beans-dir" value="${basedir}/src/main/resources" />
+	<property name="build" value="${basedir}/build" />
+	<property name="classes" value="${build}/classes" />
+	<property name="binaries" value="binaries" />
+	<property name="lib" value="${jetserver}/lib" />
+	<property name="jar-file" value="${binaries}/${ant.project.name}.jar" />
+	<property name="server-jar" value="${jetserver}/${binaries}/jetserver-0.1.jar" />
+	<property name="aspectj" value="${lib}" />
+	<property name="aspectjrt" value="${aspectj}/aspectjrt-1.6.1.jar" />
+	<property name="aspectjtools" value="${aspectj}/aspectjtools-1.6.1.jar" />
+
+	<!--============================================================== -->
+	<!--======================== JAR FILE LOCATIONS ================== -->
+	<!--============================================================== -->
+	<path id="libraries">
+		<fileset dir="${lib}" includes="*.jar" />
+	</path>
+
+	<path id="aspect-libraries">
+		<!-- For running the program only aspectjrt.jar is required, 
+		other jars like aspectjtools.jar are required during compilation only -->
+		<pathelement location="${aspectjrt}" />
+	</path>
+
+	<!-- Classpath used for compilation -->
+	<path id="classpath">
+		<path refid="libraries" />
+		<path refid="aspect-libraries" />
+	</path>
+
+	<!-- classpath used for execution -->
+	<path id="runpath">
+		<path refid="classpath" />
+		<pathelement location="${jar-file}" />
+	</path>
+
+	<!--============================================================== -->
+	<!--======================= AspectJ TASK DEFINITIONS ============= -->
+	<!--============================================================== -->
+	<taskdef resource="org/aspectj/tools/ant/taskdefs/aspectjTaskdefs.properties">
+		<classpath>
+			<pathelement location="${aspectjtools}" />
+		</classpath>
+	</taskdef>
+
+	<!--============================================================== -->
+	<!--=========================== TARGETS ========================== -->
+	<!--============================================================== -->
+	<target name="clean">
+		<delete dir="${build}" />
+		<delete dir="${binaries}" />
+	</target>
+
+	<target name="prepare" depends="clean">
+		<mkdir dir="${build}" />
+		<mkdir dir="${classes}" />
+		<mkdir dir="${binaries}" />
+		<!-- Only necessary if working from source. Otherwise use downloaded jetserver jar  
+		<ant dir="${ant-dependency}" inheritAll="false" />
+		-->
+	</target>
+
+	<!--Not the noraml javac, it is iajc. The source level of 1.6 is important -->
+	<target name="compile" depends="prepare">
+		<!-- <javac srcdir="${src}" destdir="${classes}" classpathref="classpath" /> -->
+		<iajc debug="true" destdir="${classes}" source="1.6" classpathRef="classpath">
+			<!-- Location of the source diretory(ies) -->
+			<sourceroots>
+				<pathelement location="${src}" />
+			</sourceroots>
+			<!-- IMP: Location of the jar file which contains the compile aspect -->
+			<aspectpath>
+				<pathelement location="${server-jar}" />
+			</aspectpath>
+		</iajc>
+	</target>
+
+	<!-- create the jar file from the iajc compiled classes -->
+	<target name="jar" depends="compile">
+		<jar jarfile="${jar-file}">
+			<fileset dir="${classes}">
+				<include name="**/*.class" />
+			</fileset>
+
+			<fileset dir="${beans-dir}">
+				<patternset>
+					<include name="**/*.properties" />
+					<include name="**/*.xml" />
+				</patternset>
+			</fileset>
+		</jar>
+	</target>
+
+	<!-- Execute the application from ant, note the use of jvm arg to provide log4j props -->
+	<target name="ExampleGamesServer" depends="jar">
+		<java classname="org.menacheri.GameServer" failonerror="true" fork="yes">
+			<jvmarg line="-Dlog4j.configuration=GameServerLog4j.properties" />
+			<classpath refid="runpath" />
+		</java>
+	</target>
+
+</project>

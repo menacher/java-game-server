@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+	<!-- Netty and decoders encoders and handlers -->
+	<bean id="stringDecoder" class="org.jboss.netty.handler.codec.string.StringDecoder"></bean>
+	<bean id="stringEncoder" class="org.jboss.netty.handler.codec.string.StringEncoder"></bean>
+	<bean id="base64Decoder" class="org.jboss.netty.handler.codec.base64.Base64Decoder"></bean>
+	<bean id="base64Encoder" class="org.jboss.netty.handler.codec.base64.Base64Encoder"></bean>
+	<bean id="nulEncoder" class="org.menacheri.handlers.netty.NulEncoder"></bean>
+	<bean id="byteArrayToChannelBufferEncoder"
+		class="org.menacheri.handlers.netty.ByteArrayToChannelBufferEncoder"></bean>
+	<bean id="lengthFieldPrepender"
+		class="org.jboss.netty.handler.codec.frame.LengthFieldPrepender">
+		<constructor-arg type="int" index="0" value="2"></constructor-arg>
+		<constructor-arg type="boolean" index="1" value="false"></constructor-arg>
+	</bean>
+	<bean id="lengthFieldBasedFrameDecoder"
+		class="org.jboss.netty.handler.codec.frame.LengthFieldBasedFrameDecoder"
+		scope="prototype">
+		<constructor-arg type="int" index="0" value="4096"></constructor-arg>
+		<constructor-arg type="int" index="1" value="0"></constructor-arg>
+		<constructor-arg type="int" index="2" value="2"></constructor-arg>
+		<constructor-arg type="int" index="3" value="0"></constructor-arg>
+		<constructor-arg type="int" index="4" value="2"></constructor-arg>
+	</bean>
+	<bean id="idleCheckHandler" class="org.menacheri.handlers.netty.IdleStateCheckHandler"></bean>
+	<bean id="byteArrayStreamDecoder" class="org.menacheri.handlers.netty.ByteArrayStreamDecoder"></bean>
+	<bean id="byteArrayDecoder" class="org.menacheri.handlers.netty.ByteArrayDecoder"></bean>
+	<bean id="flashPolicyServerDecoder" class="org.menacheri.handlers.netty.FlashPolicyServerDecoder"></bean>
+	<bean id="flashPolicyServerHandler" class="org.menacheri.handlers.netty.FlashPolicyServerHandler"></bean>
+	<bean id="AMF3ToJavaObjectDecoder" class="org.menacheri.handlers.netty.AMF3ToJavaObjectDecoder"></bean>
+	<bean id="javaToAMF3Encoder" class="org.menacheri.handlers.netty.JavaObjectToAMF3Encoder"></bean>
+	<bean id="preventSerializationHandler"
+		class="org.menacheri.handlers.netty.PreventSerializationHandler"></bean>
+	<bean id="syncIdHeaderEncoder" class="org.menacheri.handlers.netty.SyncIdHeaderEncoder"></bean>
+	<bean id="eventDecoder" class="org.menacheri.handlers.netty.EventDecoder"></bean>
+	<bean id="eventEncoder" class="org.menacheri.handlers.netty.EventEncoder"></bean>
+	<bean id="messageBufferEventDecoder" class="org.menacheri.handlers.netty.MessageBufferEventDecoder"></bean>
+	<bean id="messageBufferEventEncoder" class="org.menacheri.handlers.netty.MessageBufferEventEncoder"></bean>
+	<bean id="udpUpstreamHandler" class="org.menacheri.handlers.netty.UDPUpstreamHandler">
+		<property name="sessionRegistryService" ref="sessionRegistryService"></property>
+	</bean>
+	
+	<bean id="sessionRegistryService" class="org.menacheri.service.impl.SessionRegistry"></bean>
+	
+</beans>

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<import resource="server-beans.xml"></import>
+	<context:annotation-config />
+
+	<!--
+		The lookup service abstracts away the implementation detail on getting
+		the game room from the reference key. It holds a map of reference keys
+		to game rooms.
+	-->
+	<bean id="lookupService" class="org.menacheri.service.impl.LookupService">
+		<property name="refKeyGameRoomMap">
+			<map>
+				<entry key="Zombie_ROOM_1_REF_KEY_1" value-ref="Zombie_ROOM_1"></entry>
+				<entry key="Zombie_ROOM_1_REF_KEY_2" value-ref="Zombie_ROOM_2"></entry>
+			</map>
+		</property>
+	</bean>
+	
+	<bean id="Zombie" class="org.menacheri.app.impl.Game">
+		<property name="id" value="4"></property>
+		<property name="gameName" value="Zombie"></property>
+		<!-- <property name="configurationService" ref="configurationService"></property>  -->
+	</bean>
+	
+	
+	<bean id="Zombie_ROOM_1" class="org.menacheri.zombie.game.ZombieRoom" init-method="initialize">
+		<property name="parentGame" ref="Zombie"></property>
+		<property name="gameRoomName" value="Zombie_ROOM_1"></property>
+		<property name="protocol" ref="messageBufferProtocol"></property>
+		<!-- <property name="id" value="6"></property>
+		<property name="gameRoomChannelGroup" ref="defaultChannelGroup"></property> -->
+		<property name="defender" ref="defender"></property>
+		<property name="zombie" ref="zombie"></property>
+	</bean>
+	
+	<bean id="Zombie_ROOM_2" class="org.menacheri.zombie.game.ZombieRoom" init-method="initialize">
+		<property name="parentGame" ref="Zombie"></property>
+		<property name="gameRoomName" value="Zombie_ROOM_2"></property>
+		<property name="protocol" ref="messageBufferProtocol"></property>
+		<!-- <property name="id" value="7"></property>
+		<property name="gameRoomChannelGroup" ref="defaultChannelGroup"></property> -->
+		<property name="defender" ref="defender2"></property>
+		<property name="zombie" ref="zombie2"></property>
+	</bean>
+	
+	<bean id="world" class="org.menacheri.zombie.domain.World">
+		<property name="alive" value="1000"></property>
+		<property name="undead" value="1"></property>
+	</bean>
+	
+	<bean id="defender" class="org.menacheri.zombie.domain.Defender">
+		<property name="world" ref="world"></property>
+	</bean>
+	
+	<bean id="zombie" class="org.menacheri.zombie.domain.Zombie">
+		<property name="world" ref="world"></property>
+	</bean>
+	
+	<bean id="world2" class="org.menacheri.zombie.domain.World">
+		<property name="alive" value="1000000"></property>
+		<property name="undead" value="1"></property>
+	</bean>
+	
+	<bean id="defender2" class="org.menacheri.zombie.domain.Defender">
+		<property name="world" ref="world2"></property>
+	</bean>
+	
+	<bean id="zombie2" class="org.menacheri.zombie.domain.Zombie">
+		<property name="world" ref="world2"></property>
+	</bean>
+	
+</beans>
