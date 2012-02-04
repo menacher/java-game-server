@@ -2,13 +2,14 @@ This project holds some example multi-player games that uses the [jetserver](htt
 
 Jar Dependencies
 ----------------
-The jar dependencies of this project are provided explicitly.
+The jar dependencies of this project are provided explicitly.    
 aopalliance-1.0.jar   
 backport-util-concurrent-3.1.jar    
 blazeds-core-1.0-beta1.jar    
 cglib-nodep-2.1_3.jar    
 commons-logging-1.1.1.jar    
 jetlang-0.2.7.jar    
+jetserver-0.1.jar    
 log4j-1.2.16.jar    
 netty-3.2.4.Final.jar    
 slf4j-api-1.6.1.jar    
