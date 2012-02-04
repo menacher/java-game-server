@@ -4,7 +4,7 @@ Installation
 ============
 Using pre-built jar files
 -------------------------
-The pre-built jar files of this project are located in the jetserver/build directory. All dependant jars are located in the jetserver/lib directory. You can just add them to your classpath in your favorite IDE and start coding. If you want to compile from source, then follow steps below.
+The pre-built jar files of this project are located in the jetserver/binaries directory. All dependant jars are located in the jetserver/lib directory. You can just add them to your classpath in your favorite IDE and start coding. If you want to compile from source, then follow steps below.
 
 With Maven and using Eclipse
 ----------------------------
