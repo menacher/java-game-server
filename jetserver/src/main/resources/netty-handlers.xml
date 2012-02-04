@@ -32,9 +32,6 @@
 	<bean id="flashPolicyServerHandler" class="org.menacheri.handlers.netty.FlashPolicyServerHandler"></bean>
 	<bean id="AMF3ToJavaObjectDecoder" class="org.menacheri.handlers.netty.AMF3ToJavaObjectDecoder"></bean>
 	<bean id="javaToAMF3Encoder" class="org.menacheri.handlers.netty.JavaObjectToAMF3Encoder"></bean>
-	<bean id="preventSerializationHandler"
-		class="org.menacheri.handlers.netty.PreventSerializationHandler"></bean>
-	<bean id="syncIdHeaderEncoder" class="org.menacheri.handlers.netty.SyncIdHeaderEncoder"></bean>
 	<bean id="eventDecoder" class="org.menacheri.handlers.netty.EventDecoder"></bean>
 	<bean id="eventEncoder" class="org.menacheri.handlers.netty.EventEncoder"></bean>
 	<bean id="messageBufferEventDecoder" class="org.menacheri.handlers.netty.MessageBufferEventDecoder"></bean>
