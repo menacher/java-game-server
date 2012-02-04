@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>jetserver</name>
+	<comment>A high speed event based java server written using JBoss Netty and Mike Rettig&apos;s Jetlang.It is specifically tuned for network based multiplayer games. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.ajdt.core.ajbuilder</name>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.ajdt.ui.ajnature</nature>
+		<nature>org.eclipse.jdt.core.javanature</nature>
+		<nature>org.springframework.ide.eclipse.core.springnature</nature>
+		<nature>org.eclipse.wst.common.project.facet.core.nature</nature>
+	</natures>
+</projectDescription>

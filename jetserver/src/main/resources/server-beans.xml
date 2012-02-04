@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+	
+	<import resource="service-beans.xml"></import>
+	<context:annotation-config />
+	
+	<!-- The Spring application context -->
+	<bean id="appContext" class="org.menacheri.context.AppContext"></bean>
+	
+	<!-- Configure the three servers. By default tcp runs at 8090 and flash at 843 -->
+	<bean id="serverManager" class="org.menacheri.server.netty.ServerManagerImpl"></bean>
+	
+	<bean id="tcpServer" class="org.menacheri.server.netty.NettyTCPServer"
+		init-method="createServerBootstrap" destroy-method="stopServer">
+		<property name="pipelineFactory" ref="loginPipelineFactory"></property>
+		<property name="gameAdminService" ref="gameAdminService"></property>
+	</bean>
+
+	<bean id="udpServer" class="org.menacheri.server.netty.NettyUDPServer"
+		init-method="createServerBootstrap" destroy-method="stopServer">
+		<property name="pipelineFactory" ref="updChannelPipelineFactory"></property>
+		<property name="gameAdminService" ref="gameAdminService"></property>
+		<property name="bufferSizePredictor" ref="bufferSizePredictor"></property>
+	</bean>
+
+	<!-- Configure the Flash policy server. By default it runs at 843 -->
+	<bean id="flashPolicyServer" class="org.menacheri.server.netty.FlashPolicyServer"
+		init-method="createServerBootstrap" destroy-method="stopServer">
+		<property name="pipelineFactory" ref="flashPolicyServerPipelineFactory"></property>
+		<property name="gameAdminService" ref="gameAdminService"></property>
+	</bean>
+
+	<!-- All the pipeline factory beans are now defined -->
+	<bean id="flashPolicyServerPipelineFactory"
+		class="org.menacheri.server.netty.FlashPolicyServerPipelineFactory">
+		<property name="timer" ref="hashedWheelTimer"></property>
+	</bean>
+		
+	<!--
+		This bean creates a new instance of handshake handler for each call of
+		the getPipeline using lookup method feature of spring
+	-->
+	<bean id="handshakePipelineFactory" class="org.menacheri.server.netty.HandshakePipelineFactory">
+		<lookup-method name="createHandshakeHandler" bean="handshakeHandler" />
+		<property name="stringDecoder" ref="stringDecoder"></property>
+		<property name="stringEncoder" ref="stringEncoder"></property>
+		<property name="nulEncoder" ref="nulEncoder"></property>
+		<property name="frameSize" value="256"></property>
+	</bean>
+
+	<bean id="loginPipelineFactory" class="org.menacheri.server.netty.LoginPipelineFactory">
+		<property name="frameSize" value="1024"></property>
+		<property name="timer" ref="hashedWheelTimer"></property>
+		<property name="idleCheckHandler" ref="idleCheckHandler"></property>
+		<property name="eventDecoder" ref="eventDecoder"></property>
+		<property name="loginHandler" ref="loginHandler"></property>
+		<property name="lengthFieldPrepender" ref="lengthFieldPrepender"></property>
+	</bean>
+	
+	<bean id="updChannelPipelineFactory" class="org.menacheri.server.netty.UDPChannelPipelineFactory" 
+	init-method="init">
+		<property name="messageBufferEventDecoder" ref="messageBufferEventDecoder"></property>
+		<property name="messageBufferEventEncoder" ref="messageBufferEventEncoder"></property>
+		<property name="upstream" ref="udpUpstreamHandler"></property>
+	</bean>
+	
+	<bean id="handshakeHandler" class="org.menacheri.handlers.netty.HandshakeHandler"
+		scope="prototype">
+		<property name="handshakeSerivce" ref="handshakeSerivce"></property>
+		<property name="timer" ref="hashedWheelTimer"></property>
+		<property name="idleCheckHandler" ref="idleCheckHandler"></property>
+	</bean>
+
+	<bean id="loginHandler" class ="org.menacheri.handlers.netty.LoginHandler">
+		<property name="lookupService" ref="lookupService"></property>
+		<property name="sessionRegistryService" ref="sessionRegistryService"></property>
+	</bean>
+	
+	<bean id="hashedWheelTimer" class="org.jboss.netty.util.HashedWheelTimer"></bean>
+
+	<!-- Netty channelgroup -->
+	<bean id="defaultChannelGroup" class="org.jboss.netty.channel.group.DefaultChannelGroup" scope="prototype"></bean>
+	
+	<!-- Buffer size predictor is used to create the UDP server -->
+	<bean id="bufferSizePredictor" class="org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory">
+		<constructor-arg type="int" value="1024"></constructor-arg>
+	</bean>
+	
+</beans>

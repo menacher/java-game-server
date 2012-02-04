@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<project name="jetserver" default="jar" basedir=".">
+	<property name="src" value="${basedir}/src/main/java" />
+	<property name="build" value="${basedir}/build" />
+	<property name="classes" value="${build}/classes" />
+	<property name="lib" value="${basedir}/lib" />
+	<property name="jar-file" value="${build}/${ant.project.name}.jar" />
+	<property name="deploy" value="${basedir}/../GameServer/lib" />
+	<property name="aspectj" value="${lib}/aspectj" />
+	<property name="aspectjrt" value="${aspectj}/aspectjrt.jar" />
+	<property name="aspectjtools" value="${aspectj}/aspectjtools.jar" />
+
+	<!--============================================================== -->
+	<!--======================== JAR FILE LOCATIONS ================== -->
+	<!--============================================================== -->
+	<path id="server.classpath">
+		<fileset dir="${lib}" includes="*.jar" />
+		<pathelement location="${aspectjrt}" />
+	</path>
+
+	<!--============================================================== -->
+	<!--======================= AspectJ TASK DEFINITIONS ============= -->
+	<!--============================================================== -->
+	<taskdef resource="org/aspectj/tools/ant/taskdefs/aspectjTaskdefs.properties">
+		<classpath>
+			<pathelement location="${aspectjtools}" />
+		</classpath>
+	</taskdef>
+
+	<!--============================================================== -->
+	<!--=========================== TARGETS ========================== -->
+	<!--============================================================== -->
+	<target name="clean">
+		<delete dir="build" />
+	</target>
+
+	<target name="prepare" depends="clean">
+		<mkdir dir="${build}" />
+		<mkdir dir="${classes}" />
+	</target>
+
+	<target name="compile" depends="prepare">
+		<!-- <javac srcdir="${src}" destdir="${classes}" classpathref="server.classpath" /> -->
+		<iajc debug="true" destdir="${classes}" source="1.6" classpathRef="server.classpath">
+			<sourceroots>
+				<pathelement location="${src}" />
+			</sourceroots>
+		</iajc>
+	</target>
+
+
+	<target name="jar" depends="compile">
+		<jar destfile="${jar-file}" basedir="${classes}" />
+	</target>
+
+	<!--============================================================== -->
+	<!--================= COPY JAR TO CLIENT PROJECT ================= -->
+	<!--============================================================== -->	
+	<target name="deploy" depends="jar">
+		<copy file="${jar-file}" todir="${deploy}" />
+	</target>
+
+</project>

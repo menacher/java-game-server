@@ -1,0 +1,288 @@
+package org.menacheri.app.impl;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import org.menacheri.app.IGame;
+import org.menacheri.app.IGameRoom;
+import org.menacheri.app.IPlayerSession;
+import org.menacheri.app.ISession;
+import org.menacheri.communication.DeliveryGuaranty;
+import org.menacheri.event.Events;
+import org.menacheri.event.IEvent;
+import org.menacheri.event.IEventHandler;
+import org.menacheri.event.impl.DataOutTcpListener;
+import org.menacheri.event.impl.DataOutUDPListener;
+import org.menacheri.event.impl.EventDispatchers;
+import org.menacheri.protocols.IProtocol;
+import org.menacheri.service.IGameStateManagerService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+
+public abstract class GameRoomSession extends Session implements IGameRoom
+{
+	private static final Logger LOG = LoggerFactory.getLogger(GameRoomSession.class);
+	
+	private String uniqueId;
+	/**
+	 * The name of the game room, preferably unique across multiple games.
+	 */
+	private String gameRoomName;
+	/**
+	 * The parent {@link Game} reference of this game room.
+	 */
+	private IGame parentGame;
+	/**
+	 * Each game room has separate state manager instances. This variable will
+	 * manage the state for all the {@link Player}s connected to this game room.
+	 */
+	private IGameStateManagerService stateManager;
+
+	/**
+	 * The set of sessions in this object.
+	 */
+	private Set<IPlayerSession> sessions;
+	
+	/**
+	 * Life cycle variable to check if the room is shutting down. If it is, then no
+	 * more connections will be accepted.
+	 */
+	volatile boolean isShuttingDown;
+	
+	/**
+	 * Each game room has its own protocol for communication with client.
+	 */
+	private IProtocol protocol;
+	
+	public GameRoomSession()
+	{
+	}
+	
+	public void initialize()
+	{
+		super.initialize();
+		isShuttingDown = false;
+		sessions = new HashSet<IPlayerSession>();
+		this.eventDispatcher = EventDispatchers.newJetlangEventDispatcher();
+	}
+	
+	@Override
+	public IPlayerSession createPlayerSession()
+	{
+		IPlayerSession playerSession = getSessionInstance();
+		return playerSession;
+	}
+	
+	@Override
+	public abstract void onLogin(IPlayerSession playerSession);
+	
+	@Override
+	public synchronized boolean connectSession(IPlayerSession playerSession)
+	{
+		if (!isShuttingDown)
+		{
+			playerSession.setStatus(ISession.Status.CONNECTING);
+			sessions.add(playerSession);
+			LOG.trace("Protocol to be applied is: {}",protocol.getClass().getName());
+			protocol.applyProtocol(playerSession);
+			// Create tcp and udp event handlers and add it to the game rooms event dispatcher.
+			createAndAddEventHandlers(playerSession);
+			playerSession.setStatus(ISession.Status.CONNECTED);
+			afterSessionConnect(playerSession);
+			return true;
+			// TODO send event to all other sessions.
+		}
+		else
+		{
+			LOG.warn("Game Room is shutting down, playerSession {} {}",
+					playerSession,"will not be connected!");
+			return false;
+		}
+	}
+
+	@Override
+	public boolean connectSession(IPlayerSession session, Object protocolKey,
+			Object nativeConnection)
+	{
+		return false;
+	}
+	
+	@Override
+	public void afterSessionConnect(IPlayerSession playerSession)
+	{
+			
+	}
+	
+	public synchronized boolean disconnectSession(IPlayerSession playerSession)
+	{
+		boolean removeHandlers = this.eventDispatcher.removeHandlersForSession(playerSession);
+		return (removeHandlers && sessions.remove(playerSession));
+	}
+
+	@Override
+	public void sendBroadcast(Object message)
+	{
+		sendBroadcast(message,DeliveryGuaranty.RELIABLE);
+	}
+
+	@Override
+	public void sendBroadcast(Object message, int deliveryGuaranty)
+	{
+		// Create a udp or tcp message based on the deliveryGuaranty.
+		IEvent event = null;
+		switch (deliveryGuaranty)
+		{
+		case DeliveryGuaranty.FAST:
+			event = Events.dataOutUdpEvent(message);
+			break;
+		case DeliveryGuaranty.RELIABLE:
+		default:
+			event = Events.dataOutTcpEvent(message);
+			break;
+		}
+		
+		if(null != event)
+		{
+			System.out.println("Going to broadcast event: " + event.getType());
+			// publish it on the channel, it will be picked up by the player
+			// sessions because their fibers are subscribed to this channel
+			onEvent(event);
+		}
+	}
+	
+	@Override
+	public synchronized void close()
+	{
+		isShuttingDown = true;
+		for(IPlayerSession session: sessions)
+		{
+			session.close();
+		}
+	}
+	
+	public IPlayerSession getSessionInstance()
+	{
+		IPlayerSession playerSession = Sessions.newPlayerSession(this);
+		return playerSession;
+	}
+	
+	public Set<IPlayerSession> getSessions()
+	{
+		return sessions;
+	}
+
+	@Override
+	public void setSessions(Set<IPlayerSession> sessions)
+	{
+		this.sessions = sessions;
+	}
+	
+	public String getUniqueId()
+	{
+		return uniqueId;
+	}
+
+	public void setUniqueId(String uniqueId)
+	{
+		this.uniqueId = uniqueId;
+	}
+
+	public String getGameRoomName()
+	{
+		return gameRoomName;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.menacheri.app.IGameRoom#setGameRoomName(java.lang.String)
+	 */
+	public void setGameRoomName(String gameRoomName)
+	{
+		this.gameRoomName = gameRoomName;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.menacheri.app.IGameRoom#getParentGame()
+	 */
+	public IGame getParentGame()
+	{
+		return parentGame;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.menacheri.app.IGameRoom#setParentGame(org.menacheri.app.IGame)
+	 */
+	public void setParentGame(IGame parentGame)
+	{
+		this.parentGame = parentGame;
+	}
+
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @seecom.menacher.game.IGameRoom#setStateManager(org.menacheri.app.
+	 * IGameStateManagerService)
+	 */
+	public void setStateManager(IGameStateManagerService stateManager)
+	{
+		this.stateManager = stateManager;
+	}
+	
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see org.menacheri.app.IGameRoom#getStateManager()
+	 */
+	public IGameStateManagerService getStateManager()
+	{
+		return stateManager;
+	}
+
+	@Override
+	public IProtocol getProtocol()
+	{
+		return protocol;
+	}
+
+	@Override
+	public void setProtocol(IProtocol protocol)
+	{
+		this.protocol = protocol;
+	}
+	
+	public boolean isShuttingDown()
+	{
+		return isShuttingDown;
+	}
+
+	public void setShuttingDown(boolean isShuttingDown)
+	{
+		this.isShuttingDown = isShuttingDown;
+	}
+
+	/**
+	 * Method which will create and add event handlers to the player session as
+	 * well as the EventDispatcher.
+	 * 
+	 * @param playerSession
+	 *            The session for which the event handlers are created.
+	 */
+	public void createAndAddEventHandlers(IPlayerSession playerSession)
+	{
+		//TODO only add the UDP handler if the session can handle it. For e.g flash can't.
+		IEventHandler tcpHandler = new DataOutTcpListener(playerSession);
+		IEventHandler udpHandler = new DataOutUDPListener(playerSession);
+		// Add a listener to the game room which will in turn pass game room events to session.
+		this.eventDispatcher.addHandler(tcpHandler);
+		this.eventDispatcher.addHandler(udpHandler);
+		LOG.trace("Added the tcp and udp handler to "
+				+ "EventDispatcher of GameRoom {} for session: {}", this,
+				playerSession);
+	}
+}

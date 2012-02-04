@@ -1,0 +1,228 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.menacheri</groupId>
+	<artifactId>jetserver</artifactId>
+	<packaging>jar</packaging>
+	<version>0.1</version>
+	<name>jetserver</name>
+	<url>http://maven.apache.org</url>
+	<description>A high speed event based java server written using JBoss Netty and Mike Rettig's Jetlang.It is specifically tuned for network based multiplayer games.</description>
+
+	<licenses>
+		<license>
+			<name>The Apache Software License, Version 2.0</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+
+
+	<!-- Shared version number properties -->
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<org.springframework.version>3.1.0.RELEASE</org.springframework.version>
+	</properties>
+
+	<repositories>
+		<repository>
+			<id>jetlang.googlecode.com</id>
+			<name>Jetlang Repository for Maven</name>
+			<url>http://jetlang.googlecode.com/svn/repo/</url>
+		</repository>
+	</repositories>
+
+	<dependencies>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.6.1</version>
+			<scope>test</scope>
+		</dependency>
+
+		<!-- Core utilities used by other modules. Define this if you use Spring 
+			Utility APIs (org.springframework.core.*/org.springframework.util.*) -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-core</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+
+		<!-- Expression Language (depends on spring-core) Define this if you use 
+			Spring Expression APIs (org.springframework.expression.*) -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-expression</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+
+
+		<!-- Bean Factory and JavaBeans utilities (depends on spring-core) Define 
+			this if you use Spring Bean APIs (org.springframework.beans.*) -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-beans</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+
+		<!-- Application Context (depends on spring-core, spring-expression, spring-aop, 
+			spring-beans) This is the central artifact for Spring's Dependency Injection 
+			Container and is generally always defined -->
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-context</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-asm</artifactId>
+			<version>${org.springframework.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib-nodep</artifactId>
+			<version>2.1_3</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>1.6.1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jetlang</groupId>
+			<artifactId>jetlang</artifactId>
+			<version>0.2.7</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jboss.netty</groupId>
+			<artifactId>netty</artifactId>
+			<version>3.2.4.Final</version>
+		</dependency>
+
+		<!-- Blazeds dependency is there for converting java objects to AMF3 format 
+			and back -->
+		<dependency>
+			<groupId>com.adobe.blazeds</groupId>
+			<artifactId>blazeds-core</artifactId>
+			<version>1.0-beta1</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.aspectj</groupId>
+			<artifactId>aspectjrt</artifactId>
+			<version>1.6.1</version>
+		</dependency>
+
+	</dependencies>
+
+	<build>
+		<plugins>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.1.2</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.8.1</version>
+				<executions>
+					<execution>
+						<id>attach-javadoc</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<show>private</show>
+					<nohelp>true</nohelp>
+				</configuration>
+
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.8</version>
+				<configuration>
+					<ajdtVersion>1.6</ajdtVersion>
+					<additionalProjectnatures>
+						<projectnature>org.eclipse.ajdt.ui.ajnature</projectnature>
+						<projectnature>org.springframework.ide.eclipse.core.springnature</projectnature>
+						<projectnature>org.eclipse.wst.common.project.facet.core.nature</projectnature>
+					</additionalProjectnatures>
+					<!-- Source includes is necessary to allow aj files in the java 
+						folder, else eclipse will throw a filtering exception -->
+					<sourceIncludes>
+						<sourceInclude>**/*.aj</sourceInclude>
+					</sourceIncludes>
+					<!-- Download sources will make maven download and attach source files 
+						where available -->
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>true</downloadJavadocs>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>aspectj-maven-plugin</artifactId>
+				<version>1.4</version>
+				<dependencies>
+					<dependency>
+						<groupId>org.aspectj</groupId>
+						<artifactId>aspectjrt</artifactId>
+						<version>1.6.1</version>
+					</dependency>
+					<dependency>
+						<groupId>org.aspectj</groupId>
+						<artifactId>aspectjtools</artifactId>
+						<version>1.6.1</version>
+					</dependency>
+				</dependencies>
+				<configuration>
+					<source>1.6</source>
+					<complianceLevel>1.6</complianceLevel>
+					<verbose>true</verbose>
+					<showWeaveInfo>true</showWeaveInfo>
+					<target>1.6</target>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>compile</goal>
+							<goal>test-compile</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+		</plugins>
+
+	</build>
+
+</project>
