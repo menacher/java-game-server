@@ -1,4 +1,4 @@
-This is a java nio based server specifically designed for mutliplayer games. It supports UDP and TCP transports. It uses [JBoss Netty](http://netty.io/) for high speed network transmission and [Jetlang](http://code.google.com/p/jetlang/ "jetlang") for extremely fast in-vm message passing between player sessions and game rooms. The project also uses spring for its dependency injection. This way, it is highly configurable and you can swap out any part of the server with your own implementations.
+JetServer is a java nio based server specifically designed for mutliplayer games. It supports UDP and TCP transports. It uses [JBoss Netty](http://netty.io/) for high speed network transmission and [Jetlang](http://code.google.com/p/jetlang/ "jetlang") for extremely fast in-vm message passing between player sessions and game rooms. The project also uses spring for its dependency injection. This way, it is highly configurable and you can swap out any part of the server with your own implementations.
 
 Installation
 ============
