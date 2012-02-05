@@ -35,3 +35,9 @@ spring-beans-3.1.0.RELEASE.jar
 spring-context-3.1.0.RELEASE.jar    
 spring-core-3.1.0.RELEASE.jar    
 spring-expression-3.1.0.RELEASE.jar    
+
+Trouble Shooting
+----------------
+If you get the following property access exception    
+	``PropertyAccessException 2: org.springframework.beans.MethodInvocationException: Property 'undead' threw exception; nested exception is java.lang.NoSuchMethodError: org.menacheri.aspect.AppManagedAspect.ajc$if$ac5(Lorg/menacheri/aspect/AppManaged;)Z``        
+This is mostly because of the eclipse project not having proper binaries compiled to its target. Just goto Project->clean for both the jetserver as well as client project **without** doing a maven clean and it should work the second time. 
