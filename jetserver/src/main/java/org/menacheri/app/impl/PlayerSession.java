@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
  * This implementation of the {@link IPlayerSession} interface is used to both
  * receive and send messages to a particular player using the
  * {@link #onEvent(org.menacheri.event.IEvent)}. Broadcasts from the
- * {@link GameRoom} are directly patched to the {@link EventDispatcher} which
+ * {@link IGameRoom} are directly patched to the {@link EventDispatcher} which
  * listens on the room's {@link MemoryChannel} for events and in turn publishes
  * them to the listeners.
  * 
@@ -46,21 +46,10 @@ public class PlayerSession extends Session implements IPlayerSession
 	public void initialize()
 	{
 		super.initialize();
-//		EventDispatcher dispatcher = new EventDispatcher();
-//		dispatcher.initialize();
-//		this.eventDispatcher = dispatcher;
 		this.eventDispatcher = EventDispatchers.newJetlangEventDispatcher();
+		LOG.trace("Initalized : {}",this);
 	}
 
-	@Override
-	public Object subscribeToGameChannel(Object nativeGameChannel)
-	{
-		EventDispatcher dispatcher = (EventDispatcher) eventDispatcher;
-		Object object = dispatcher.subscribeToGameChannel(nativeGameChannel);
-		LOG.trace("Session {} subscribed to game room {}", this.getId(),
-				this.getGameRoom().getUniqueId());
-		return object;
-	}
 
 	@Override
 	public IPlayer getPlayer()
@@ -106,4 +95,10 @@ public class PlayerSession extends Session implements IPlayerSession
 		}
 	}
 
+	@Override
+	public String toString() {
+		return "PlayerSession [id=" + id + "player=" + player + ", parentGameRoom="
+				+ parentGameRoom + ", protocol=" + protocol  
+				+ ", isShuttingDown=" + isShuttingDown + "]";
+	}
 }
