@@ -1,15 +1,19 @@
 package org.menacheri.handlers.netty;
 
 import java.net.InetSocketAddress;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
+import org.jboss.netty.channel.ChannelHandler.Sharable;
 import org.jboss.netty.channel.ChannelHandlerContext;
+import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
-import org.jboss.netty.channel.ChannelHandler.Sharable;
+import org.jboss.netty.channel.group.ChannelGroup;
+import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.menacheri.app.IGameRoom;
 import org.menacheri.app.IPlayer;
 import org.menacheri.app.IPlayerSession;
@@ -32,6 +36,16 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 
 	private ILookupService lookupService;
 	ISessionRegistryService sessionRegistryService;
+	/**
+	 * Stores reference to all connected channels to the server. This can be
+	 * used for graceful shutdown later.
+	 */
+	public static final ChannelGroup ALL_CHANNELS = new DefaultChannelGroup("jetserver");
+	/**
+	 * Used for book keeping purpose. It will count all open channels. Currently
+	 * closed channels will not lead to a decrement.
+	 */
+	private static final AtomicInteger CHANNEL_COUNTER =  new AtomicInteger(0);
 	
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e)
 			throws Exception
@@ -49,6 +63,14 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 		}
 	}
 
+	@Override
+	public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e)
+			throws Exception {
+		ALL_CHANNELS.add(e.getChannel());
+		LOG.debug("Added Channel with id: {} as the {}th open channel", e
+				.getChannel().getId(), CHANNEL_COUNTER.incrementAndGet());
+	}
+	
 	public IPlayer lookupPlayer(ChannelBuffer buffer, Channel channel)
 	{
 		ICredentials credentials = new Credentials(buffer);
