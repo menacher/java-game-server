@@ -54,10 +54,10 @@ public abstract class AbstractSessionEventHandler implements ISessionEventHandle
 		case Events.SESSION_MESSAGE:
 			onDataIn(event);
 			break;
-		case Events.DATA_OUT_TCP:
+		case Events.SERVER_OUT_TCP:
 			onTcpDataOut(event);
 			break;
-		case Events.DATA_OUT_UDP:
+		case Events.SERVER_OUT_UDP:
 			onUdpDataOut(event);
 			break;
 		case Events.LOG_IN_UDP:

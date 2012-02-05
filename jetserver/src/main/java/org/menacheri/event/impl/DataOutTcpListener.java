@@ -6,9 +6,17 @@ import org.menacheri.event.IEvent;
 import org.menacheri.event.ISessionEventHandler;
 
 
+/**
+ * This class listens for tcp data out events from one {@link ISession} and
+ * passes it on to another {@link ISession}. In short it acts as a conduit
+ * between sessions.
+ * 
+ * @author Abraham Menacherry
+ * 
+ */
 public class DataOutTcpListener implements ISessionEventHandler
 {
-	private static final int eventType = Events.DATA_OUT_TCP;
+	private static final int eventType = Events.SERVER_OUT_TCP;
 	private final ISession session;
 	
 	public DataOutTcpListener(ISession session)

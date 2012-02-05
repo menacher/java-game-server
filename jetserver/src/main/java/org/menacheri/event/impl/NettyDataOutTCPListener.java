@@ -9,7 +9,7 @@ import org.menacheri.event.IEventHandler;
 public class NettyDataOutTCPListener implements IEventHandler
 {
 	private final Channel channel;
-	private static final int eventType = Events.DATA_OUT_TCP;
+	private static final int eventType = Events.SERVER_OUT_TCP;
 	public NettyDataOutTCPListener(Channel channel)
 	{
 		this.channel = channel;
