@@ -51,21 +51,35 @@ public class Events
 	public final static byte SESSION_MESSAGE = 0x1c;
 
 	/**
-	 * Outgoing data from this JVM to another remote machine/JVM using TCP as
-	 * the socket transport protocol
+	 * Outgoing data from the server to a remote client using TCP as the socket
+	 * transport protocol
 	 */
-	public final static byte DATA_OUT_TCP = 0x1d;
+	public final static byte SERVER_OUT_TCP = 0x1d;
 	
 	/**
-	 * Outgoing data from this JVM to another remote machine/JVM using UDP as
-	 * the socket transport protocol
+	 * Outgoing data from the server to a remote client using UDP as the socket
+	 * transport protocol
 	 */
-	public final static byte DATA_OUT_UDP = 0x1e;
+	public final static byte SERVER_OUT_UDP = 0x1e;
+	
+	/**
+	 * Outgoing data from this client to the server using TCP as the socket
+	 * transport protocol. <b>Note</b> that the op-code is the same as
+	 * {@link #SERVER_OUT_TCP}, this variable is defined for use at client side.
+	 */
+	public final static byte CLIENT_OUT_TCP = 0x1d;
+	
+	/**
+	 * Outgoing data from the client to server using UDP as the socket transport
+	 * protocol. <b>Note</b> that the op-code is the same as
+	 * {@link #SERVER_OUT_UDP}, this variable is defined for use at client side.
+	 */
+	public final static byte CLIENT_OUT_UDP = 0x1e;
 	
 	public final static byte CHANGE_ATTRIBUTE = 0x20;
 	
 	/**
-	 * If a remote connection is forcibly disconnected then raise this event.
+	 * If a remote connection is disconnected or closed then raise this event.
 	 */
 	public final static byte DISCONNECT = 0x22;
 	public final static byte EXCEPTION = 0x24;
@@ -97,12 +111,12 @@ public class Events
 	
 	public static IEvent dataOutTcpEvent(Object source)
 	{
-		return event(source,Events.DATA_OUT_TCP);
+		return event(source,Events.SERVER_OUT_TCP);
 	}
 	
 	public static IEvent dataOutUdpEvent(Object source)
 	{
-		return event(source,Events.DATA_OUT_UDP);
+		return event(source,Events.SERVER_OUT_UDP);
 	}
 	
 	public static IEvent dataInEvent(Object source)
