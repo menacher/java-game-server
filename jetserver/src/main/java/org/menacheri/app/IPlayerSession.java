@@ -1,7 +1,5 @@
 package org.menacheri.app;
 
-import org.jboss.netty.channel.group.ChannelGroup;
-import org.jetlang.channels.MemoryChannel;
 import org.menacheri.protocols.IProtocol;
 import org.menacheri.service.IGameConnectionService;
 
@@ -17,24 +15,6 @@ import org.menacheri.service.IGameConnectionService;
  */
 public interface IPlayerSession extends ISession
 {
-	/**
-	 * Each game room would have a "channel-group" to which the session has to
-	 * subscribe. For e.g. it could be a <a
-	 * href="http://code.google.com/p/jetlang/">jetlang</a>
-	 * {@link MemoryChannel} or a <a
-	 * href="http://www.jboss.org/netty/">Netty</a> {@link ChannelGroup} or some
-	 * similar implementation which would basically group all the player
-	 * sessions together.
-	 * 
-	 * @param nativeGameChannel
-	 *            The MemoryChannel or ChannelGroup or similar collection
-	 *            interface. TODO Pass this parameter in as an interface instead
-	 *            of Object.
-	 * @return Should return a handle to the subscription. Could be used for
-	 *         unsbuscribing.
-	 */
-	public Object subscribeToGameChannel(Object nativeGameChannel);
-	
 	/**
 	 * Each session is associated with a {@link IPlayer}. This is the actual
 	 * human or machine using this session.
