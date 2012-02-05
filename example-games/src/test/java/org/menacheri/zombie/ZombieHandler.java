@@ -50,7 +50,7 @@ public class ZombieHandler extends SimpleChannelUpstreamHandler
 			{
 				connectUDP(event);
 			}
-			else if(Events.DATA_OUT_UDP == event.getType())
+			else if(Events.SERVER_OUT_UDP == event.getType())
 			{
 				ChannelBuffer buffer = (ChannelBuffer)event.getSource();
 				if(buffer.readableBytes() >= 4)

@@ -19,8 +19,8 @@ public abstract class AbstractSessionEventHandler implements ISessionEventHandle
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractSessionEventHandler.class);
 	int eventType = Events.ANY;
 
-	IMessageSender tcpSender = null;
-	IMessageSender udpSender = null;
+	protected IMessageSender tcpSender = null;
+	protected IMessageSender udpSender = null;
 	
 	private ISession session = null;
 	
