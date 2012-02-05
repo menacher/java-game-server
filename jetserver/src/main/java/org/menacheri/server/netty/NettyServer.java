@@ -3,6 +3,8 @@ package org.menacheri.server.netty;
 import org.jboss.netty.bootstrap.Bootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelPipelineFactory;
+import org.jboss.netty.channel.group.ChannelGroupFuture;
+import org.menacheri.handlers.netty.LoginHandler;
 import org.menacheri.service.IGameAdminService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,6 +42,12 @@ public abstract class NettyServer implements INettyServerManager
 	{
 		LOG.debug("In stopServer method of class: {}",
 				this.getClass().getName());
+		ChannelGroupFuture future = LoginHandler.ALL_CHANNELS.close();
+		try {
+			future.await();
+		} catch (InterruptedException e) {
+			LOG.error("Execption occurred while waiting for channels to close: {}",e);
+		}
 		serverBootstrap.releaseExternalResources();
 		gameAdminService.shutdown();
 		return true;
