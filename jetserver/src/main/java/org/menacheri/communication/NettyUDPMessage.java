@@ -31,7 +31,7 @@ public class NettyUDPMessage implements INettyMessage
 	}
 	
 	@Override
-	public Channel getChannel()
+	public DatagramChannel getChannel()
 	{
 		return channel;
 	}
