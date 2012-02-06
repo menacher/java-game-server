@@ -65,7 +65,12 @@ public class DataFlowVariable
 	public Object getVal(long waitTime, TimeUnit timeUnit)
 			throws InterruptedException
 	{
-		latch.await(waitTime, timeUnit);
-		return val;
+		if(latch.await(waitTime, timeUnit)){
+			return val;
+		}
+		else
+		{
+			return null;
+		}
 	}
 }
