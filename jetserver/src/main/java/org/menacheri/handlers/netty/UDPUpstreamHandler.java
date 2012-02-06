@@ -68,8 +68,15 @@ public class UDPUpstreamHandler extends SimpleChannelUpstreamHandler
 		}
 		
 		NettyUDPMessage updMessage = new NettyUDPMessage();
-		updMessage.setChannelBuffer((ChannelBuffer)messageBuffer.getNativeBuffer()).setChannel(udpChannel)
-				.setSocketAddress(remoteAddress);
+		if(null != messageBuffer)
+		{
+			updMessage.setChannelBuffer((ChannelBuffer)messageBuffer.getNativeBuffer()).setChannel(udpChannel)
+					.setSocketAddress(remoteAddress);
+		}
+		else
+		{
+			updMessage.setChannel(udpChannel).setSocketAddress(remoteAddress);
+		}
 		// The source is now a updMessage.
 		event.setSource(updMessage);
 		
