@@ -14,7 +14,14 @@ public class SmallFileReader
 		{
 			return null;
 		}
-		FileReader reader = new FileReader(new File(filePath));
+		File smallFile = new File(filePath);
+		return readSmallFile(smallFile);
+	}
+	
+	public static String readSmallFile(File smallFile)
+			throws IOException
+	{
+		FileReader reader = new FileReader(smallFile);
 		BufferedReader bufferedReader = new BufferedReader(reader);
 		StringBuffer buf = new StringBuffer();
 		String line = null;
