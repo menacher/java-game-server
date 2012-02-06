@@ -7,7 +7,7 @@
 	<version>0.1</version>
 	<name>jetserver</name>
 	<url>http://maven.apache.org</url>
-	<description>A high speed event based java server written using JBoss Netty and Mike Rettig's Jetlang.It is specifically tuned for network based multiplayer games.</description>
+	<description>Jetserver is a high speed socket based java game server written using JBoss Netty and Mike Rettig's Jetlang.It is specifically tuned for network based multiplayer games and supports TCP and UDP network protocols.</description>
 
 	<licenses>
 		<license>
