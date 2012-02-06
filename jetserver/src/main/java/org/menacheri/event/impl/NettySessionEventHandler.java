@@ -108,8 +108,7 @@ public class NettySessionEventHandler extends AbstractSessionEventHandler
 	public IMessageSender createUDPMessageSender(NettyUDPMessage udpConnection)
 	{
 		LOG.trace("Creating UDP Message sender");
-		DatagramChannel udpChannel = (DatagramChannel) udpConnection
-				.getChannel();
+		DatagramChannel udpChannel = udpConnection.getChannel();
 		SocketAddress remoteAddress = udpConnection.getSocketAddress();
 		return new NettyUDPMessageSender(remoteAddress, udpChannel);
 	}
