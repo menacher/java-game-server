@@ -123,6 +123,7 @@
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjrt</artifactId>
 			<version>1.6.1</version>
+			<scope>compile</scope>
 		</dependency>
 
 	</dependencies>
