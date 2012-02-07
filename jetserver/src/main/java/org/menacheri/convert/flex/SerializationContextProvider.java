@@ -29,7 +29,7 @@ public class SerializationContextProvider {
 		// true New E4X XML Type
 		serializationContext.legacyXMLDocument = false;
 		// determines whether the constructed Document is name-space aware
-		//serializationContext.legacyXMLNamespaces = false;
+		serializationContext.legacyXMLNamespaces = false;
 		serializationContext.legacyThrowable = false;
 		serializationContext.legacyBigNumbers = false;
 		serializationContext.restoreReferences = false;
