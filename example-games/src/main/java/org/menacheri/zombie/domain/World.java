@@ -1,12 +1,9 @@
 package org.menacheri.zombie.domain;
 
-import org.menacheri.aspect.AppManaged;
-import org.menacheri.aspect.ConcurrencyType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-@AppManaged(concurrencyType=ConcurrencyType.AGENT)
 public class World
 {
 	private static final Logger LOG = LoggerFactory.getLogger(World.class);

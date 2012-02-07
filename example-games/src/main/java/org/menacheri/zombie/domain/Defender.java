@@ -1,8 +1,6 @@
 package org.menacheri.zombie.domain;
 
-import org.menacheri.aspect.AppManaged;
 
-@AppManaged
 public class Defender
 {
 	private World world;
