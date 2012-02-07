@@ -30,7 +30,7 @@ public class GameServer
 		// Start the main game server
 		IServerManager serverManager = (IServerManager)AppContext.getBean(AppContext.SERVER_MANAGER);
 		//serverManager.startServers(8090,843,8081);
-		serverManager.startServers(8090,843,8090);
+		serverManager.startServers();
 		System.out.println("Started servers");
 		startGames();
 	}
