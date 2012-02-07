@@ -20,7 +20,7 @@ public class SpringNettyServer
 		PropertyConfigurator.configure(System
 				.getProperty("log4j.configuration"));
 		AbstractApplicationContext context = new ClassPathXmlApplicationContext(
-		"server-beans.xml");
+		"/jetserver/beans/server-beans.xml");
 		// For the destroy method to work.
 		context.registerShutdownHook();
 		
