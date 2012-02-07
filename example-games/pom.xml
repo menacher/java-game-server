@@ -8,7 +8,7 @@
 	<name>example-games</name>
 	<url>http://maven.apache.org</url>
 	<description>This project holds some example multiplayer games that uses the jetserver library. The server part is in src/main/java and the client part of the game is in src/test/java</description>
-	
+
 	<!-- Shared version number properties -->
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -69,7 +69,15 @@
 					<downloadJavadocs>true</downloadJavadocs>
 				</configuration>
 			</plugin>
-
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<compilerVersion>1.6</compilerVersion>
+				</configuration>
+			</plugin>
+			<!-- 
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>aspectj-maven-plugin</artifactId>
@@ -97,8 +105,8 @@
 					<verbose>true</verbose>
 					<showWeaveInfo>true</showWeaveInfo>
 					<target>1.6</target>
-					<!-- The following sets up aspectj weaving path. jetserver jar has the 
-						compiled aspect which is used to weave classes in this app -->
+					// The following sets up aspectj weaving path. jetserver jar has the 
+					//compiled aspect which is used to weave classes in this app '
 					<aspectLibraries>
 						<aspectLibrary>
 							<groupId>org.menacheri</groupId>
@@ -116,6 +124,8 @@
 					</execution>
 				</executions>
 			</plugin>
+			 -->
+
 		</plugins>
 	</build>
 
