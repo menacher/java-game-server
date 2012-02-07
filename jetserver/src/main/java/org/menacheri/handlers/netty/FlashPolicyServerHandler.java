@@ -12,7 +12,6 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.jboss.netty.handler.timeout.ReadTimeoutException;
 import org.jboss.netty.util.CharsetUtil;
-import org.menacheri.service.impl.GameStateManager;
 import org.menacheri.util.SmallFileReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,10 +22,10 @@ import org.slf4j.LoggerFactory;
  */
 public class FlashPolicyServerHandler extends SimpleChannelUpstreamHandler {
 
-	private static final Logger LOG = LoggerFactory.getLogger(GameStateManager.class);
+	private static final Logger LOG = LoggerFactory.getLogger(FlashPolicyServerHandler.class);
 	
 	private static ChannelBuffer policyFile;
-	private static String portNumber;
+	private final String portNumber;
 	private static final String NEWLINE = "\r\n";
 	
 	public String getPortNumber()
@@ -36,9 +35,8 @@ public class FlashPolicyServerHandler extends SimpleChannelUpstreamHandler {
 
 	static
 	{
-		portNumber = "8090";
 		policyFile = null;
-		String filePath = System.getProperty("policy_file_path");
+		String filePath = System.getProperty("flash_policy_file_path");
 		if (null != filePath)
 		{
 			try
@@ -54,18 +52,9 @@ public class FlashPolicyServerHandler extends SimpleChannelUpstreamHandler {
 		}
 	}
 
-	public void setPortNumber(String portNum)
-	{
-		portNumber = portNum;
-	}
-
-	public FlashPolicyServerHandler()
-	{
-	}
-
 	public FlashPolicyServerHandler(String portNum)
 	{
-		portNumber = portNum;
+		this.portNumber = portNum;
 	}
 
 	@Override
