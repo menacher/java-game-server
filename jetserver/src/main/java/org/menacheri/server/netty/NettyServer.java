@@ -15,7 +15,7 @@ public abstract class NettyServer implements INettyServerManager
 {
 	private static final Logger LOG = LoggerFactory.getLogger(NettyServer.class);
 	
-	int portNumber = 8090;
+	int portNumber = 18090;
 	Bootstrap serverBootstrap;
 	ChannelPipelineFactory pipelineFactory;
 	IGameAdminService gameAdminService;
@@ -37,6 +37,7 @@ public abstract class NettyServer implements INettyServerManager
 	
 	public abstract void startServer(int port);
 	
+	public abstract void startServer();
 	
 	public boolean stopServer()
 	{
