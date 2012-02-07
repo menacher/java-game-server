@@ -58,6 +58,12 @@ public class NettyUDPServer extends NettyServer
 		startServer(null);
 	}
 	
+	@Override
+	public void startServer()
+	{
+		startServer(null);
+	}
+	
 	public boolean startServer(String[] args)
 	{
 		serverBootstrap.setOption("broadcast", "false");
