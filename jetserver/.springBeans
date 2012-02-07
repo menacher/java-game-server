@@ -7,11 +7,10 @@
 	</configSuffixes>
 	<enableImports><![CDATA[false]]></enableImports>
 	<configs>
-		<config>src/main/resources/server-protocols.xml</config>
-		<config>src/main/resources/server-beans.xml</config>
-		<config>src/main/resources/netty-handlers.xml</config>
-		<config>src/main/resources/service-beans.xml</config>
-		<config>src/org/menacheri/context/server-beans.xml</config>
+		<config>src/main/resources/jetserver/beans/netty-handlers.xml</config>
+		<config>src/main/resources/jetserver/beans/service-beans.xml</config>
+		<config>src/main/resources/jetserver/beans/server-beans.xml</config>
+		<config>src/main/resources/jetserver/beans/server-protocols.xml</config>
 	</configs>
 	<configSets>
 	</configSets>
