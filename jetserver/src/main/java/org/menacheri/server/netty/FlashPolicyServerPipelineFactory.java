@@ -22,10 +22,21 @@ public class FlashPolicyServerPipelineFactory implements ChannelPipelineFactory
         ChannelPipeline pipeline = pipeline();
         pipeline.addLast("timeout", new ReadTimeoutHandler(timer, 30));
         pipeline.addLast("decoder", new FlashPolicyServerDecoder());
-        pipeline.addLast("handler", new FlashPolicyServerHandler());
+        pipeline.addLast("handler", getFlashPolicyServerHandler());
         return pipeline;
     }
 
+    /**
+	 * Spring will return the actual prototype bean from its context here. It
+	 * uses method lookup here.
+	 * 
+	 * @return a new instance of the {@link FlashPolicyServerHandler}
+	 */
+    protected FlashPolicyServerHandler getFlashPolicyServerHandler()
+    {
+    	return null;
+    }
+    
 	public Timer getTimer()
 	{
 		return timer;
