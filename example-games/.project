@@ -1,21 +1,16 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>example-games</name>
-	<comment>NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
-	<projects>
-		<project>jetserver</project>
-	</projects>
-	<buildSpec>
-		<buildCommand>
-			<name>org.eclipse.ajdt.core.ajbuilder</name>
-			<arguments>
-			</arguments>
-		</buildCommand>
-	</buildSpec>
-	<natures>
-		<nature>org.eclipse.ajdt.ui.ajnature</nature>
-		<nature>org.eclipse.jdt.core.javanature</nature>
-		<nature>org.springframework.ide.eclipse.core.springnature</nature>
-		<nature>org.eclipse.wst.common.project.facet.core.nature</nature>
-	</natures>
+  <name>example-games</name>
+  <comment>This project holds some example multiplayer games that uses the jetserver library. The server part is in src/main/java and the client part of the game is in src/test/java. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
+  <projects/>
+  <buildSpec>
+    <buildCommand>
+      <name>org.eclipse.jdt.core.javabuilder</name>
+    </buildCommand>
+  </buildSpec>
+  <natures>
+    <nature>org.eclipse.jdt.core.javanature</nature>
+    <nature>org.eclipse.ajdt.ui.ajnature</nature>
+    <nature>org.springframework.ide.eclipse.core.springnature</nature>
+    <nature>org.eclipse.wst.common.project.facet.core.nature</nature>
+  </natures>
 </projectDescription>
