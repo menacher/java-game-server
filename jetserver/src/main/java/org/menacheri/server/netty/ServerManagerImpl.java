@@ -1,7 +1,7 @@
 package org.menacheri.server.netty;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.menacheri.context.AppContext;
 import org.menacheri.server.IServerManager;
@@ -9,11 +9,11 @@ import org.menacheri.server.IServerManager;
 
 public class ServerManagerImpl implements IServerManager
 {
-	private Map<Integer,NettyServer> portAndServer;
+	private Set<NettyServer> servers;
 	
 	public ServerManagerImpl()
 	{
-		portAndServer = new HashMap<Integer, NettyServer>();
+		servers = new HashSet<NettyServer>();
 	}
 	
 	@Override
@@ -23,33 +23,43 @@ public class ServerManagerImpl implements IServerManager
 		{
 			NettyServer tcpServer = (NettyServer)AppContext.getBean(AppContext.TCP_SERVER);
 			tcpServer.startServer(tcpPort);
-			portAndServer.put(tcpPort, tcpServer);
+			servers.add(tcpServer);
 		}
 		
 		if(flashPort > 0)
 		{
 			NettyServer flashServer = (NettyServer)AppContext.getBean(AppContext.FLASH_POLICY_SERVER);
 			flashServer.startServer(flashPort);
-			portAndServer.put(flashPort,flashServer);
+			servers.add(flashServer);
 		}
 		
 		if(udpPort > 0)
 		{
 			NettyServer udpServer = (NettyServer)AppContext.getBean(AppContext.UDP_SERVER);
 			udpServer.startServer(udpPort);
-			portAndServer.put(udpPort, udpServer);
+			servers.add(udpServer);
 		}
 		
 	}
 
 	@Override
-	public void stopServer(int[] ports)
+	public void startServers() {
+		NettyServer tcpServer = (NettyServer)AppContext.getBean(AppContext.TCP_SERVER);
+		tcpServer.startServer();
+		servers.add(tcpServer);
+		NettyServer flashServer = (NettyServer)AppContext.getBean(AppContext.FLASH_POLICY_SERVER);
+		flashServer.startServer();
+		servers.add(flashServer);
+		NettyServer udpServer = (NettyServer)AppContext.getBean(AppContext.UDP_SERVER);
+		udpServer.startServer();
+		servers.add(udpServer);
+	}
+	
+	@Override
+	public void stopServers()
 	{
-		if (null != ports && ports.length > 0){
-			for (int i: ports){
-				NettyServer server = portAndServer.get(ports[i]);
-				server.stopServer();
-			}
+		for(NettyServer nettyServer: servers){
+			nettyServer.stopServer();
 		}
 	}
 
