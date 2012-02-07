@@ -37,7 +37,7 @@ public class DefenderHandler extends SimpleChannelUpstreamHandler
 	public UDPClient udpClient;
 	public DefenderHandler()
 	{
-		this.udpClient = new UDPClient(this,iam,"255.255.255.255",8090,service);
+		this.udpClient = new UDPClient(this,iam,"255.255.255.255",18090,service);
 	}
 	
 	@Override

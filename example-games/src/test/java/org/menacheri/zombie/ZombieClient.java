@@ -22,7 +22,7 @@ public class ZombieClient
 	public static void main(String[] args)
 	{
 		String host = "localhost";
-		int port = 8090;
+		int port = 18090;
 		ChannelFactory factory = new NioClientSocketChannelFactory(Executors
 				.newCachedThreadPool(), Executors.newCachedThreadPool());
 		DefenderHandler defHandler = new DefenderHandler();
