@@ -9,9 +9,6 @@ import org.menacheri.concurrent.NamedThreadFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-
-
 public class FlashPolicyServer extends NettyTCPServer
 {
 	private static final Logger LOG = LoggerFactory.getLogger(FlashPolicyServer.class);
@@ -51,6 +48,16 @@ public class FlashPolicyServer extends NettyTCPServer
 								"Flash-Server-Worker"))));
 
 		return serverBootstrap;
+	}
+	
+	public int getPortNumber() 
+	{
+		return portNumber;
+	}
+
+	public void setPortNumber(int portNumber) 
+	{
+		this.portNumber = portNumber;
 	}
 	
 }
