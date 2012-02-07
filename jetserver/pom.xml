@@ -6,7 +6,7 @@
 	<packaging>jar</packaging>
 	<version>0.1</version>
 	<name>jetserver</name>
-	<url>http://maven.apache.org</url>
+	<url>https://github.com/menacher/java-game-server/tree/master/jetserver</url>
 	<description>Jetserver is a high speed socket based java game server written using JBoss Netty and Mike Rettig's Jetlang.It is specifically tuned for network based multiplayer games and supports TCP and UDP network protocols.</description>
 
 	<licenses>
@@ -116,7 +116,7 @@
 		<dependency>
 			<groupId>com.adobe.blazeds</groupId>
 			<artifactId>blazeds-core</artifactId>
-			<version>1.0-beta1</version>
+			<version>3.2.0.3978</version>
 		</dependency>
 
 		<dependency>
