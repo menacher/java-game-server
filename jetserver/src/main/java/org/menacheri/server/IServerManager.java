@@ -9,10 +9,10 @@ public interface IServerManager
 {
 	public void startServers(int tcpPort, int flashPort, int udpPort);
 	
+	public void startServers();
 	/**
-	 * Used to stop the server and manage cleanup of resources. Server name is
-	 * for future use, implementations may ignore this parameter.
+	 * Used to stop the server and manage cleanup of resources. 
 	 * 
 	 */
-	public void stopServer(int[] ports);
+	public void stopServers();
 }
