@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
+<!-- Configure all properties files here, wildcards like *.properties are 
+		also allowed -->
+	<context:property-placeholder
+		location="jetserver/props/jetserver.properties" />
+		
 	<!-- Netty and decoders encoders and handlers -->
 	<bean id="stringDecoder" class="org.jboss.netty.handler.codec.string.StringDecoder"></bean>
 	<bean id="stringEncoder" class="org.jboss.netty.handler.codec.string.StringEncoder"></bean>
@@ -29,7 +34,9 @@
 	<bean id="byteArrayStreamDecoder" class="org.menacheri.handlers.netty.ByteArrayStreamDecoder"></bean>
 	<bean id="byteArrayDecoder" class="org.menacheri.handlers.netty.ByteArrayDecoder"></bean>
 	<bean id="flashPolicyServerDecoder" class="org.menacheri.handlers.netty.FlashPolicyServerDecoder"></bean>
-	<bean id="flashPolicyServerHandler" class="org.menacheri.handlers.netty.FlashPolicyServerHandler"></bean>
+	<bean id="flashPolicyServerHandler" class="org.menacheri.handlers.netty.FlashPolicyServerHandler" scope="prototype">
+		<constructor-arg value="${tcp.port}"></constructor-arg>
+	</bean>
 	<bean id="AMF3ToJavaObjectDecoder" class="org.menacheri.handlers.netty.AMF3ToJavaObjectDecoder"></bean>
 	<bean id="javaToAMF3Encoder" class="org.menacheri.handlers.netty.JavaObjectToAMF3Encoder"></bean>
 	<bean id="eventDecoder" class="org.menacheri.handlers.netty.EventDecoder"></bean>
