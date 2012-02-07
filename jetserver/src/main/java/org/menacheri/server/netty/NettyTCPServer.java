@@ -42,6 +42,11 @@ public class NettyTCPServer extends NettyServer
 		startServer(null);
 	}
 	
+	public void startServer()
+	{
+		startServer(null);
+	}
+	
 	public boolean startServer(String[] args)
 	{
 		if (null == args || args.length == 0)
