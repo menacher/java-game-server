@@ -36,12 +36,14 @@ public class NettyTCPServer extends NettyServer
 		super(portNumber, serverBootstrap, pipelineFactory, gameAdminService);
 	}
 
+	@Override
 	public void startServer(int port)
 	{
 		portNumber = port;
 		startServer(null);
 	}
 	
+	@Override
 	public void startServer()
 	{
 		startServer(null);
