@@ -10,12 +10,15 @@ import org.menacheri.server.IServerManager;
 import org.menacheri.service.ITaskManagerService;
 import org.menacheri.zombie.domain.World;
 import org.menacheri.zombie.domain.WorldMonitor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
 public class GameServer
 {
+	private static final Logger LOG = LoggerFactory.getLogger(GameServer.class);
 	
 	public static void main(String[] args)
 	{
@@ -29,8 +32,15 @@ public class GameServer
 		
 		// Start the main game server
 		IServerManager serverManager = (IServerManager)AppContext.getBean(AppContext.SERVER_MANAGER);
-		//serverManager.startServers(8090,843,8081);
-		serverManager.startServers();
+		//serverManager.startServers(18090,843,8081);
+		try
+		{
+			serverManager.startServers();
+		}
+		catch (Exception e)
+		{
+			LOG.error("Unable to start servers cleanly: {}",e);
+		}
 		System.out.println("Started servers");
 		startGames();
 	}
