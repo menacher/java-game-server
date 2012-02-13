@@ -2,6 +2,8 @@ package org.menacheri;
 
 import org.apache.log4j.PropertyConfigurator;
 import org.menacheri.server.IServerManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
@@ -15,6 +17,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  */
 public class SpringNettyServer
 {
+	private static final Logger LOG = LoggerFactory.getLogger(SpringNettyServer.class);
 	public static void main(String[] args)
 	{
 		PropertyConfigurator.configure(System
@@ -26,7 +29,14 @@ public class SpringNettyServer
 		
 		// Start tcp and flash servers
 		IServerManager manager = (IServerManager)context.getBean("serverManager");
-		manager.startServers(8090,843,8081);
+		try
+		{
+			manager.startServers(8090,843,8081);
+		}
+		catch (Exception e)
+		{
+			LOG.error("Could not start servers cleanly: {}",e);
+		}
 	}
 	
 	
