@@ -5,11 +5,14 @@ import java.util.Set;
 
 import org.menacheri.context.AppContext;
 import org.menacheri.server.IServerManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class ServerManagerImpl implements IServerManager
 {
 	private Set<NettyServer> servers;
+	private static final Logger LOG = LoggerFactory.getLogger(ServerManagerImpl.class);
 	
 	public ServerManagerImpl()
 	{
@@ -17,8 +20,9 @@ public class ServerManagerImpl implements IServerManager
 	}
 	
 	@Override
-	public void startServers(int tcpPort, int flashPort, int udpPort)
+	public void startServers(int tcpPort, int flashPort, int udpPort) throws Exception
 	{
+		
 		if(tcpPort > 0)
 		{
 			NettyServer tcpServer = (NettyServer)AppContext.getBean(AppContext.TCP_SERVER);
@@ -43,7 +47,8 @@ public class ServerManagerImpl implements IServerManager
 	}
 
 	@Override
-	public void startServers() {
+	public void startServers() throws Exception 
+	{
 		NettyServer tcpServer = (NettyServer)AppContext.getBean(AppContext.TCP_SERVER);
 		tcpServer.startServer();
 		servers.add(tcpServer);
@@ -56,10 +61,18 @@ public class ServerManagerImpl implements IServerManager
 	}
 	
 	@Override
-	public void stopServers()
+	public void stopServers() throws Exception
 	{
 		for(NettyServer nettyServer: servers){
-			nettyServer.stopServer();
+			try
+			{
+				nettyServer.stopServer();
+			}
+			catch (Exception e)
+			{
+				LOG.error("Unable to stop server {} due to error {}", nettyServer,e);
+				throw e;
+			}
 		}
 	}
 
