@@ -1,6 +1,6 @@
 package org.menacheri.server;
 
-import java.net.InetAddress;
+import java.net.InetSocketAddress;
 
 public interface IServer {
 
@@ -12,10 +12,12 @@ public interface IServer {
 	
 	void startServer() throws Exception;
 	
-	void startServer(InetAddress netAddress);
+	void startServer(int port) throws Exception;;
+	
+	void startServer(InetSocketAddress socketAddress) throws Exception;
 	
 	void stopServer() throws Exception;
 	
-	InetAddress getAddress();
+	InetSocketAddress getSocketAddress();
 	
 }
