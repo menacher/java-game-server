@@ -7,12 +7,12 @@ package org.menacheri.server;
  */
 public interface IServerManager
 {
-	public void startServers(int tcpPort, int flashPort, int udpPort);
+	public void startServers(int tcpPort, int flashPort, int udpPort) throws Exception;
 	
-	public void startServers();
+	public void startServers() throws Exception;
 	/**
 	 * Used to stop the server and manage cleanup of resources. 
 	 * 
 	 */
-	public void stopServers();
+	public void stopServers() throws Exception;
 }
