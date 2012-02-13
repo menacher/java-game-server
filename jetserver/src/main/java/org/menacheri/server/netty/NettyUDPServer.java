@@ -1,6 +1,7 @@
 package org.menacheri.server.netty;
 
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 import java.util.concurrent.Executors;
 
 import org.jboss.netty.bootstrap.Bootstrap;
@@ -33,6 +34,8 @@ public class NettyUDPServer extends NettyServer
 {
 	private static final Logger LOG = LoggerFactory.getLogger(NettyUDPServer.class);
 	private FixedReceiveBufferSizePredictorFactory bufferSizePredictor;
+	private String[] args;
+	
 	/**
 	 * The connected channel for this server. This reference can be used to
 	 * shutdown this server.
@@ -52,39 +55,23 @@ public class NettyUDPServer extends NettyServer
 	}
 
 	@Override
-	public void startServer(int port)
+	public void startServer(int port) throws Exception
 	{
 		portNumber = port;
-		startServer(null);
+		startServer(args);
 	}
 	
 	@Override
-	public void startServer()
+	public void startServer() throws Exception
 	{
-		startServer(null);
+		startServer(args);
 	}
 	
-	public boolean startServer(String[] args)
+	public void startServer(String[] args)  throws Exception
 	{
-		serverBootstrap.setOption("broadcast", "false");
-		serverBootstrap.setOption("receiveBufferSizePredictorFactory",
-				bufferSizePredictor);
-		serverBootstrap.setOption("sendBufferSize", 65536);
-		serverBootstrap.setOption("receiveBufferSize", 65536);
-		configureServerBootStrap(args);
-
 		int portNumber = getPortNumber(args);
-		try
-		{
-			channel = ((ConnectionlessBootstrap) serverBootstrap)
-					.bind(new InetSocketAddress(portNumber));
-		}
-		catch (ChannelException e)
-		{
-			LOG.error("Unable to start UDP server due to error {}",e);
-			return false;
-		}
-		return true;
+		InetSocketAddress socketAddress = new InetSocketAddress(portNumber);
+		startServer(socketAddress);
 	}
 
 	@Override
@@ -98,7 +85,7 @@ public class NettyUDPServer extends NettyServer
 	}
 
 	@Override
-	public boolean stopServer()
+	public void stopServer()
 	{
 		LOG.debug("In stopServer method of class: {}",
 				this.getClass().getName());
@@ -108,7 +95,6 @@ public class NettyUDPServer extends NettyServer
 			channel.close();
 		}
 		gameAdminService.shutdown();
-		return true;
 	}
 	
 	public FixedReceiveBufferSizePredictorFactory getBufferSizePredictor()
@@ -120,6 +106,55 @@ public class NettyUDPServer extends NettyServer
 			FixedReceiveBufferSizePredictorFactory bufferSizePredictor)
 	{
 		this.bufferSizePredictor = bufferSizePredictor;
+	}
+
+	@Override
+	public TRANSMISSION_PROTOCOL getTransmissionProtocol()
+	{
+		return TRANSMISSION_PROTOCOL.UDP;
+	}
+
+	@Override
+	public void startServer(InetSocketAddress socketAddress)
+	{
+		this.socketAddress = socketAddress;
+		//TODO these should be set from spring
+		serverBootstrap.setOption("broadcast", "false");
+		serverBootstrap.setOption("receiveBufferSizePredictorFactory",
+				bufferSizePredictor);
+		serverBootstrap.setOption("sendBufferSize", 65536);
+		serverBootstrap.setOption("receiveBufferSize", 65536);
+		configureServerBootStrap(args);
+
+		try
+		{
+			channel = ((ConnectionlessBootstrap) serverBootstrap)
+					.bind(socketAddress);
+		}
+		catch (ChannelException e)
+		{
+			LOG.error("Unable to start UDP server due to error {}",e);
+			throw e;
+		}
+		
+	}
+
+	public String[] getArgs()
+	{
+		return args;
+	}
+
+	public void setArgs(String[] args)
+	{
+		this.args = args;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "NettyUDPServer [args=" + Arrays.toString(args)
+				+ ", socketAddress=" + socketAddress + ", portNumber=" + portNumber
+				+ "]";
 	}
 
 }

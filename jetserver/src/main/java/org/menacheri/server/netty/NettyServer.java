@@ -1,5 +1,7 @@
 package org.menacheri.server.netty;
 
+import java.net.InetSocketAddress;
+
 import org.jboss.netty.bootstrap.Bootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelPipelineFactory;
@@ -11,14 +13,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Required;
 
 
-public abstract class NettyServer implements INettyServerManager
+public abstract class NettyServer implements INettyServer
 {
 	private static final Logger LOG = LoggerFactory.getLogger(NettyServer.class);
 	
-	int portNumber = 18090;
-	Bootstrap serverBootstrap;
-	ChannelPipelineFactory pipelineFactory;
-	IGameAdminService gameAdminService;
+	protected InetSocketAddress socketAddress;
+	protected int portNumber = 18090;
+	protected Bootstrap serverBootstrap;
+	protected ChannelPipelineFactory pipelineFactory;
+	protected IGameAdminService gameAdminService;
 	
 	public NettyServer()
 	{
@@ -35,11 +38,8 @@ public abstract class NettyServer implements INettyServerManager
 		this.gameAdminService = gameAdminService;
 	}
 	
-	public abstract void startServer(int port);
-	
-	public abstract void startServer();
-	
-	public boolean stopServer()
+	@Override
+	public void stopServer() throws Exception
 	{
 		LOG.debug("In stopServer method of class: {}",
 				this.getClass().getName());
@@ -51,9 +51,9 @@ public abstract class NettyServer implements INettyServerManager
 		}
 		serverBootstrap.releaseExternalResources();
 		gameAdminService.shutdown();
-		return true;
 	}
 
+	@Override
 	public void configureServerBootStrap(String[] optionsList)
 	{
 		// For clients who do not use spring.
@@ -102,6 +102,7 @@ public abstract class NettyServer implements INettyServerManager
 		this.serverBootstrap = serverBootstrap;
 	}
 	
+	@Override
 	public ChannelPipelineFactory getPipelineFactory()
 	{
 		return pipelineFactory;
@@ -134,5 +135,22 @@ public abstract class NettyServer implements INettyServerManager
 		this.gameAdminService = gameAdminService;
 	}
 
+	@Override
+	public InetSocketAddress getSocketAddress()
+	{
+		return socketAddress;
+	}
+
+	public void setInetAddress(InetSocketAddress inetAddress)
+	{
+		this.socketAddress = inetAddress;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "NettyServer [socketAddress=" + socketAddress + ", portNumber="
+				+ portNumber + "]";
+	}
 
 }

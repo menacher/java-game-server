@@ -1,6 +1,7 @@
 package org.menacheri.server.netty;
 
 import java.net.InetSocketAddress;
+import java.util.Arrays;
 import java.util.concurrent.Executors;
 
 import org.jboss.netty.bootstrap.Bootstrap;
@@ -24,6 +25,9 @@ import org.slf4j.LoggerFactory;
 public class NettyTCPServer extends NettyServer
 {
 	private static final Logger LOG = LoggerFactory.getLogger(NettyTCPServer.class);
+	
+	private String[] args;
+	
 	public NettyTCPServer()
 	{
 
@@ -36,44 +40,23 @@ public class NettyTCPServer extends NettyServer
 		super(portNumber, serverBootstrap, pipelineFactory, gameAdminService);
 	}
 
-	@Override
-	public void startServer(int port)
+	public void startServer(int port) throws Exception
 	{
 		portNumber = port;
-		startServer(null);
+		startServer(args);
 	}
 	
 	@Override
-	public void startServer()
+	public void startServer() throws Exception
 	{
-		startServer(null);
+		startServer(args);
 	}
 	
-	public boolean startServer(String[] args)
+	public void startServer(String[] args) throws Exception
 	{
-		if (null == args || args.length == 0)
-		{
-			String[] optionsList = new String[2];
-			optionsList[0] = "child.tcpNoDelay";
-			optionsList[1] = "child.keepAlive";
-			configureServerBootStrap(optionsList);
-		}
-		else
-		{
-			configureServerBootStrap(args);
-		}
 		int portNumber = getPortNumber(args);
-		try
-		{
-			((ServerBootstrap) serverBootstrap).bind(new InetSocketAddress(
-					portNumber));
-		}
-		catch (ChannelException e)
-		{
-			LOG.error("Unable to start TCP server due to error {}",e);
-			return false;
-		}
-		return true;
+		InetSocketAddress socketAddress = new InetSocketAddress(portNumber);
+		startServer(socketAddress);
 	}
 
 	public Bootstrap createServerBootstrap()
@@ -89,4 +72,54 @@ public class NettyTCPServer extends NettyServer
 		return serverBootstrap;
 	}
 
+	@Override
+	public TRANSMISSION_PROTOCOL getTransmissionProtocol()
+	{
+		return TRANSMISSION_PROTOCOL.TCP;
+	}
+
+	@Override
+	public void startServer(InetSocketAddress socketAddress)
+	{
+		this.socketAddress = socketAddress;
+		if (null == args || args.length == 0)
+		{
+			String[] optionsList = new String[2];
+			optionsList[0] = "child.tcpNoDelay";
+			optionsList[1] = "child.keepAlive";
+			configureServerBootStrap(optionsList);
+		}
+		else
+		{
+			configureServerBootStrap(args);
+		}
+		try
+		{
+			((ServerBootstrap) serverBootstrap).bind(socketAddress);
+		}
+		catch (ChannelException e)
+		{
+			LOG.error("Unable to start TCP server due to error {}",e);
+			throw e;
+		}
+	}
+
+	public String[] getArgs()
+	{
+		return args;
+	}
+
+	public void setArgs(String[] args)
+	{
+		this.args = args;
+	}
+
+	@Override
+	public String toString()
+	{
+		return "NettyTCPServer [args=" + Arrays.toString(args)
+				+ ", socketAddress=" + socketAddress + ", portNumber=" + portNumber
+				+ "]";
+	}
+	
 }
