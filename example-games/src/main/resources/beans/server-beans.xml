@@ -23,7 +23,7 @@
 		init-method="createServerBootstrap" destroy-method="stopServer">
 		<property name="pipelineFactory" ref="loginPipelineFactory"></property>
 		<property name="gameAdminService" ref="gameAdminService"></property>
-		<property name="portNumber" value="${udp.port}"></property>
+		<property name="portNumber" value="${tcp.port}"></property>
 	</bean>
 
 	<bean id="udpServer" class="org.menacheri.server.netty.NettyUDPServer"
