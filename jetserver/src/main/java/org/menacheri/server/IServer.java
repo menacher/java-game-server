@@ -2,6 +2,8 @@ package org.menacheri.server;
 
 import java.net.InetSocketAddress;
 
+import org.menacheri.app.ISession;
+
 public interface IServer {
 
 	public enum TRANSMISSION_PROTOCOL{
@@ -20,4 +22,7 @@ public interface IServer {
 	
 	InetSocketAddress getSocketAddress();
 	
+	ISession getSession();
+	
+	void setSession(ISession session);
 }
