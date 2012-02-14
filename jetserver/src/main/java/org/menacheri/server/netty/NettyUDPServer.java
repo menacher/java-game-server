@@ -6,14 +6,11 @@ import java.util.concurrent.Executors;
 
 import org.jboss.netty.bootstrap.Bootstrap;
 import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
-import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelException;
-import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
 import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
 import org.menacheri.concurrent.NamedThreadFactory;
-import org.menacheri.service.IGameAdminService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,13 +42,6 @@ public class NettyUDPServer extends NettyServer
 	public NettyUDPServer()
 	{
 
-	}
-
-	public NettyUDPServer(int portNumber, ServerBootstrap serverBootstrap,
-			ChannelPipelineFactory pipelineFactory,
-			IGameAdminService gameAdminService)
-	{
-		super(portNumber, serverBootstrap, pipelineFactory, gameAdminService);
 	}
 
 	@Override
