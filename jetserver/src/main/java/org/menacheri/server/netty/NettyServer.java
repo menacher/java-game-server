@@ -3,9 +3,9 @@ package org.menacheri.server.netty;
 import java.net.InetSocketAddress;
 
 import org.jboss.netty.bootstrap.Bootstrap;
-import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.group.ChannelGroupFuture;
+import org.menacheri.app.ISession;
 import org.menacheri.handlers.netty.LoginHandler;
 import org.menacheri.service.IGameAdminService;
 import org.slf4j.Logger;
@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Required;
 public abstract class NettyServer implements INettyServer
 {
 	private static final Logger LOG = LoggerFactory.getLogger(NettyServer.class);
-	
+	protected ISession session;
 	protected InetSocketAddress socketAddress;
 	protected int portNumber = 18090;
 	protected Bootstrap serverBootstrap;
@@ -28,16 +28,6 @@ public abstract class NettyServer implements INettyServer
 		super();
 	}
 
-	public NettyServer(int portNumber, ServerBootstrap serverBootstrap,
-			ChannelPipelineFactory pipelineFactory,IGameAdminService gameAdminService)
-	{
-		super();
-		this.portNumber = portNumber;
-		this.serverBootstrap = serverBootstrap;
-		this.pipelineFactory = pipelineFactory;
-		this.gameAdminService = gameAdminService;
-	}
-	
 	@Override
 	public void stopServer() throws Exception
 	{
@@ -151,6 +141,18 @@ public abstract class NettyServer implements INettyServer
 	{
 		return "NettyServer [socketAddress=" + socketAddress + ", portNumber="
 				+ portNumber + "]";
+	}
+
+	@Override
+	public ISession getSession()
+	{
+		return session;
+	}
+
+	@Override
+	public void setSession(ISession session)
+	{
+		this.session = session;
 	}
 
 }
