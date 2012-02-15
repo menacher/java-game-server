@@ -24,6 +24,7 @@
 		<property name="pipelineFactory" ref="loginPipelineFactory"></property>
 		<property name="gameAdminService" ref="gameAdminService"></property>
 		<property name="portNumber" value="${tcp.port}"></property>
+		<property name="session" ref="session"></property>
 	</bean>
 
 	<bean id="udpServer" class="org.menacheri.server.netty.NettyUDPServer"
@@ -32,6 +33,7 @@
 		<property name="gameAdminService" ref="gameAdminService"></property>
 		<property name="bufferSizePredictor" ref="bufferSizePredictor"></property>
 		<property name="portNumber" value="${udp.port}"></property>
+		<property name="session" ref="session"></property>
 	</bean>
 
 	<!-- Configure the Flash policy server. By default it runs at 843 -->
@@ -40,6 +42,7 @@
 		<property name="pipelineFactory" ref="flashPolicyServerPipelineFactory"></property>
 		<property name="gameAdminService" ref="gameAdminService"></property>
 		<property name="portNumber" value="${flash.policy.port}"></property>
+		<property name="session" ref="session"></property>
 	</bean>
 
 	<!-- All the pipeline factory beans are now defined -->
@@ -88,6 +91,12 @@
 		<property name="lookupService" ref="lookupService"></property>
 		<property name="sessionRegistryService" ref="sessionRegistryService"></property>
 	</bean>
+	
+	<bean id="session" class="org.menacheri.app.impl.Session" init-method="initialize" destroy-method="close" scope="prototype">
+		<property name="eventDispatcher" ref="jetlangEventDispatcher"></property>
+	</bean>
+	
+	<bean id="jetlangEventDispatcher" class="org.menacheri.event.impl.EventDispatchers" factory-method="newJetlangEventDispatcher" scope="prototype"/>
 	
 	<bean id="hashedWheelTimer" class="org.jboss.netty.util.HashedWheelTimer"></bean>
 
