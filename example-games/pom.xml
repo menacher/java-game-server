@@ -14,14 +14,6 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
-	<repositories>
-		<repository>
-			<id>jetlang.googlecode.com</id>
-			<name>Jetlang Repository for Maven</name>
-			<url>http://jetlang.googlecode.com/svn/repo/</url>
-		</repository>
-	</repositories>
-
 	<dependencies>
 		<dependency>
 			<groupId>junit</groupId>

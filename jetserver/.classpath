@@ -16,9 +16,9 @@
       <attribute value="jar:file:/C:/Documents%20and%20Settings/abraham/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/jetlang/jetlang/0.2.7/jetlang-0.2.7.jar" sourcepath="M2_REPO/org/jetlang/jetlang/0.2.7/jetlang-0.2.7-sources.jar">
+  <classpathentry kind="var" path="M2_REPO/org/jetlang/jetlang/0.2.9/jetlang-0.2.9.jar" sourcepath="M2_REPO/org/jetlang/jetlang/0.2.9/jetlang-0.2.9-sources.jar">
     <attributes>
-      <attribute value="jar:file:/C:/Documents%20and%20Settings/abraham/.m2/repository/org/jetlang/jetlang/0.2.7/jetlang-0.2.7-javadoc.jar!/" name="javadoc_location"/>
+      <attribute value="jar:file:/C:/Documents%20and%20Settings/abraham/.m2/repository/org/jetlang/jetlang/0.2.9/jetlang-0.2.9-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar" sourcepath="M2_REPO/junit/junit/3.8.1/junit-3.8.1-sources.jar"/>
