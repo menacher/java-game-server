@@ -21,8 +21,7 @@ public interface IGameStateManagerService
 	 * PictureDataStateManager does it by using an AtomicInteger.
 	 * 
 	 * @param key
-	 *            The current state is wrapped in this object key. For Doodler
-	 *            game this is just a number.
+	 *            The current state is wrapped in this object key.
 	 * @return True if the atomic compare and set was successful. False
 	 *         otherwise.
 	 */
