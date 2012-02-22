@@ -21,13 +21,13 @@ import org.menacheri.util.ICredentials;
  */
 public class LookupService implements ILookupService
 {
-	private Map<String, IGameRoom> refKeyGameRoomMap;
+	private final Map<String, IGameRoom> refKeyGameRoomMap;
 
 	public LookupService()
 	{
 		refKeyGameRoomMap = new HashMap<String, IGameRoom>();
 	}
-
+	
 	public LookupService(Map<String, IGameRoom> refKeyGameRoomMap)
 	{
 		super();
@@ -58,9 +58,5 @@ public class LookupService implements ILookupService
 		return refKeyGameRoomMap;
 	}
 
-	public void setRefKeyGameRoomMap(Map<String, IGameRoom> refKeyGameRoomMap)
-	{
-		this.refKeyGameRoomMap = refKeyGameRoomMap;
-	}
 
 }
