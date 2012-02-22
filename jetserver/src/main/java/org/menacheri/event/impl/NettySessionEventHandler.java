@@ -39,7 +39,7 @@ public class NettySessionEventHandler extends AbstractSessionEventHandler
 		if (null != udpSessions)
 		{
 			InetSocketAddress remoteAddress = NettyUtils
-					.readSocketAddress((ChannelBuffer)buffer.getNativeBuffer());
+					.readSocketAddress(buffer.getNativeBuffer());
 			if (udpSessions.putSession(remoteAddress, getSession()))
 			{
 				NettyMessageBuffer messageBuffer = new NettyMessageBuffer();
