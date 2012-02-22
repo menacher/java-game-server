@@ -58,8 +58,15 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 		case Events.LOG_IN:
 			LOG.trace("Login attempt from {}",channel.getRemoteAddress());
 			IPlayer player = lookupPlayer(buffer, channel);
-			handleLogin(buffer, channel,player);
+			handleLogin(player,channel);
+			handleGameRoomJoin(player, channel,buffer);
 			break;
+		default:
+			LOG.error("Invalid event {} sent from remote address {}. "
+					+ "Going to close channel {}",
+					new Object[] { event.getType(), channel.getRemoteAddress(),
+							channel.getId() });
+			closeChannelWithLoginFailure(channel);
 		}
 	}
 
@@ -75,6 +82,14 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 	{
 		ICredentials credentials = new Credentials(buffer);
 		IPlayer player = lookupService.playerLookup(credentials);
+		if(null == player){
+			LOG.error("Invalid credentials provided by user: {}",credentials);
+		}
+		return player;
+	}
+	
+	public void handleLogin(IPlayer player,Channel channel)
+	{
 		if (null != player)
 		{
 			channel.write(NettyUtils
@@ -83,15 +98,25 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 		else
 		{
 			// Write future and close channel
-			ChannelFuture future = channel.write(NettyUtils
-					.createBufferForOpcode(Events.LOG_IN_FAILURE));
-			future.addListener(ChannelFutureListener.CLOSE);
-			LOG.error("Invalid credentials provided by user: {}",credentials);
+			closeChannelWithLoginFailure(channel);
 		}
-		return player;
 	}
 	
-	public void handleLogin(ChannelBuffer buffer, Channel channel,IPlayer player)
+	/**
+	 * Helper method which will close the channel after writing
+	 * {@link Events#LOG_IN_FAILURE} to remote connection.
+	 * 
+	 * @param channel
+	 *            The tcp connection to remote machine that will be closed.
+	 */
+	private void closeChannelWithLoginFailure(Channel channel)
+	{
+		ChannelFuture future = channel.write(NettyUtils
+				.createBufferForOpcode(Events.LOG_IN_FAILURE));
+		future.addListener(ChannelFutureListener.CLOSE);
+	}
+	
+	public void handleGameRoomJoin(IPlayer player, Channel channel, ChannelBuffer buffer)
 	{
 		String refKey = NettyUtils.readString(buffer);
 		
@@ -112,7 +137,7 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 			// Write failure and close channel.
 			ChannelFuture future = channel.write(NettyUtils.createBufferForOpcode(Events.GAME_ROOM_JOIN_FAILURE));
 			future.addListener(ChannelFutureListener.CLOSE);
-			LOG.error("Invalid ref key provided by client: {}",refKey);
+			LOG.error("Invalid ref key provided by client: {}. Channel {} will be closed",refKey,channel.getId());
 		}
 	}
 	
