@@ -4,8 +4,8 @@ import org.apache.log4j.PropertyConfigurator;
 import org.menacheri.server.IServerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
 /**
@@ -22,8 +22,7 @@ public class SpringNettyServer
 	{
 		PropertyConfigurator.configure(System
 				.getProperty("log4j.configuration"));
-		AbstractApplicationContext context = new ClassPathXmlApplicationContext(
-		"/jetserver/beans/server-beans.xml");
+		AbstractApplicationContext context = new AnnotationConfigApplicationContext(JetServerSpringConfig.class);
 		// For the destroy method to work.
 		context.registerShutdownHook();
 		
