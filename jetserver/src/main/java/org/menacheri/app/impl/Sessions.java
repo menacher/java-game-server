@@ -5,6 +5,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.menacheri.app.IGameRoom;
 import org.menacheri.app.IPlayerSession;
 import org.menacheri.app.ISession;
+import org.menacheri.app.impl.PlayerSession.PlayerSessionBuilder;
+import org.menacheri.app.impl.Session.SessionBuilder;
 
 
 /**
@@ -24,23 +26,16 @@ public class Sessions
 
 	public static ISession newSession()
 	{
-		Session session = new Session();
-		session.initialize();
-		return session;
+		SessionBuilder sessionBuilder = new SessionBuilder();
+		return sessionBuilder.build();
 	}
 	
 	public static IPlayerSession newPlayerSession(IGameRoom gameRoom)
 	{
-		if (null == gameRoom)
-		{
-			throw new IllegalStateException(
-					"GameRoom instance is null, session will not be constructed");
-		}
-		PlayerSession playerSession = new PlayerSession();
-		playerSession.initialize();
-		playerSession.setGameRoom(gameRoom);
-		playerSession.setId(sessionId.incrementAndGet());
-		return playerSession;
+		// TODO the player has to be set here after doing lookup.
+		PlayerSessionBuilder builder = new PlayerSessionBuilder();
+		builder.parentGameRoom(gameRoom).id(String.valueOf(sessionId.incrementAndGet()));
+		return builder.build();
 	}
 
 }
