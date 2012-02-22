@@ -13,7 +13,6 @@ import org.menacheri.event.IEvent;
 import org.menacheri.event.IEventHandler;
 import org.menacheri.event.impl.DataOutTcpListener;
 import org.menacheri.event.impl.DataOutUDPListener;
-import org.menacheri.event.impl.EventDispatchers;
 import org.menacheri.protocols.IProtocol;
 import org.menacheri.service.IGameStateManagerService;
 import org.slf4j.Logger;
@@ -24,47 +23,78 @@ public abstract class GameRoomSession extends Session implements IGameRoom
 {
 	private static final Logger LOG = LoggerFactory.getLogger(GameRoomSession.class);
 	
-	private String uniqueId;
 	/**
 	 * The name of the game room, preferably unique across multiple games.
 	 */
-	private String gameRoomName;
+	protected String gameRoomName;
 	/**
 	 * The parent {@link Game} reference of this game room.
 	 */
-	private IGame parentGame;
+	protected IGame parentGame;
 	/**
 	 * Each game room has separate state manager instances. This variable will
 	 * manage the state for all the {@link Player}s connected to this game room.
 	 */
-	private IGameStateManagerService stateManager;
+	protected IGameStateManagerService stateManager;
 
 	/**
 	 * The set of sessions in this object.
 	 */
-	private Set<IPlayerSession> sessions;
-	
-	/**
-	 * Life cycle variable to check if the room is shutting down. If it is, then no
-	 * more connections will be accepted.
-	 */
-	volatile boolean isShuttingDown;
+	protected Set<IPlayerSession> sessions;
 	
 	/**
 	 * Each game room has its own protocol for communication with client.
 	 */
-	private IProtocol protocol;
+	protected IProtocol protocol;
 	
-	public GameRoomSession()
+	protected GameRoomSession(GameRoomSessionBuilder gameRoomSessionBuilder)
 	{
+		super(gameRoomSessionBuilder);
+		this.sessions = gameRoomSessionBuilder.sessions;
+		this.parentGame = gameRoomSessionBuilder.parentGame;
+		this.gameRoomName = gameRoomSessionBuilder.gameRoomName;
+		this.protocol = gameRoomSessionBuilder.protocol;
 	}
 	
-	public void initialize()
+	public static class GameRoomSessionBuilder extends SessionBuilder
 	{
-		super.initialize();
-		isShuttingDown = false;
-		sessions = new HashSet<IPlayerSession>();
-		this.eventDispatcher = EventDispatchers.newJetlangEventDispatcher();
+		private Set<IPlayerSession> sessions;
+		private IGame parentGame;
+		private String gameRoomName;
+		private IProtocol protocol;
+		
+		@Override
+		protected void validateAndSetValues()
+		{
+			super.validateAndSetValues();// Mandatory call
+			if(null == sessions){
+				sessions = new HashSet<IPlayerSession>();
+			}
+		}
+		
+		public GameRoomSessionBuilder sessions(Set<IPlayerSession> sessions)
+		{
+			this.sessions = sessions;
+			return this;
+		}
+		
+		public GameRoomSessionBuilder parentGame(IGame parentGame)
+		{
+			this.parentGame = parentGame;
+			return this;
+		}
+		
+		public GameRoomSessionBuilder gameRoomName(String gameRoomName)
+		{
+			this.gameRoomName = gameRoomName;
+			return this;
+		}
+		
+		public GameRoomSessionBuilder protocol(IProtocol protocol)
+		{
+			this.protocol = protocol;
+			return this;
+		}
 	}
 	
 	@Override
@@ -178,16 +208,6 @@ public abstract class GameRoomSession extends Session implements IGameRoom
 		this.sessions = sessions;
 	}
 	
-	public String getUniqueId()
-	{
-		return uniqueId;
-	}
-
-	public void setUniqueId(String uniqueId)
-	{
-		this.uniqueId = uniqueId;
-	}
-
 	public String getGameRoomName()
 	{
 		return gameRoomName;
