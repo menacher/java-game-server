@@ -56,7 +56,6 @@ public interface ISession
 
 	IEventDispatcher getEventDispatcher();
 
-	void setEventDispatcher(IEventDispatcher eventDispatcher);
 
 	boolean isWriteable();
 
