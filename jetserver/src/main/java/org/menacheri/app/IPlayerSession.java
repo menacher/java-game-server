@@ -25,15 +25,6 @@ public interface IPlayerSession extends ISession
 	public abstract IPlayer getPlayer();
 
 	/**
-	 * Set the {@link IPlayer} associated with this session. The lookup to find
-	 * the player can be done using the lookup service based on some reference
-	 * key provided by this session.
-	 * 
-	 * @param player
-	 */
-	public abstract void setPlayer(IPlayer player);
-
-	/**
 	 * Each user session is attached to a game room. This method is used to retrieve that
 	 * game room object.
 	 * 
