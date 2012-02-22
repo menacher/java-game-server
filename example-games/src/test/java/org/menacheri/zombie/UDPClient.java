@@ -67,32 +67,36 @@ public class UDPClient
 	
 	public void start(DatagramChannel c)
 	{
-		if(c.isBound())
-		{
-			// Write the connect statement. TODO repeat till we get start.
-			System.out.println("Events.CONNECT_UDP: " + Events.CONNECT_UDP);
-			ChannelBuffer buf = NettyUtils.createBufferForOpcode(Events.CONNECT_UDP);
-			
-			ChannelFuture future = c.write(buf, serverAddress);
-			future.addListener(new ChannelFutureListener()
+		try{
+			if(c.isBound())
 			{
-				@Override
-				public void operationComplete(ChannelFuture future) throws Exception
+				// Write the connect statement. TODO repeat till we get start.
+				System.out.println("Events.CONNECT_UDP: " + Events.CONNECT_UDP);
+				ChannelBuffer buf = NettyUtils.createBufferForOpcode(Events.CONNECT_UDP);
+				
+				ChannelFuture future = c.write(buf, serverAddress);
+				future.addListener(new ChannelFutureListener()
 				{
-					if(!future.isSuccess())
+					@Override
+					public void operationComplete(ChannelFuture future) throws Exception
 					{
-						System.out.println("CONNECT_UDP write to server unsuccessful: " + future.getCause().getMessage());
+						if(!future.isSuccess())
+						{
+							System.out.println("CONNECT_UDP write to server unsuccessful: " + future.getCause().getMessage());
+						}
 					}
-				}
-			});
-			
-			future.awaitUninterruptibly();
-			WriteByte write = new WriteByte(c, serverAddress,iam);
-			DefenderHandler.getService().scheduleAtFixedRate(write,10000l,1000l, TimeUnit.MILLISECONDS);
-		}
-		else
-		{
-			System.out.println("Error: datagram channel is not bound");
+				});
+				
+				future.awaitUninterruptibly();
+				WriteByte write = new WriteByte(c, serverAddress,iam);
+				DefenderHandler.getService().scheduleAtFixedRate(write,10000l,5000l, TimeUnit.MILLISECONDS);
+			}
+			else
+			{
+				System.out.println("Error: datagram channel is not bound");
+			}
+		}catch(Exception e){
+			e.printStackTrace();
 		}
 	}
 }
