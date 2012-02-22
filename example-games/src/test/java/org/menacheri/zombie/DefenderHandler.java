@@ -118,7 +118,7 @@ public class DefenderHandler extends SimpleChannelUpstreamHandler
 		ChannelBuffer buffer = (ChannelBuffer)event.getSource();
 		InetSocketAddress address = NettyUtils.readSocketAddress(buffer);
 		final DatagramChannel c = clients.get(address);
-		if(null != udpClient)
+		if ((udpClient != null) && (c != null))
 		{
 			System.out.println("Going to connect UDP in DefenderHandler");
 			// Connect the UDP

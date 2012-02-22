@@ -21,45 +21,51 @@ import org.menacheri.event.IEvent;
 import org.menacheri.util.NettyUtils;
 import org.menacheri.zombie.domain.IAM;
 
-
 public class ZombieHandler extends SimpleChannelUpstreamHandler
 {
 	private static final IAM iam = IAM.ZOMBIE;
 	private static final Map<InetSocketAddress, DatagramChannel> clients = new HashMap<InetSocketAddress, DatagramChannel>();
 	private UDPClient udpClient;
-	
+
 	public ZombieHandler()
 	{
-		udpClient = new UDPClient(this,iam,"255.255.255.255",8090,DefenderHandler.getService());
+		udpClient = new UDPClient(this, iam, "255.255.255.255", 18090,
+				DefenderHandler.getService());
 	}
+
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e)
 			throws Exception
 	{
 		Object message = e.getMessage();
-		if(message instanceof IEvent)
+		if (message instanceof IEvent)
 		{
-			IEvent event = (IEvent)message;
-			if(Events.START == event.getType())
+			IEvent event = (IEvent) message;
+			if (Events.START == event.getType())
 			{
 				loginUDP(e.getChannel());
-				WriteByte write = new WriteByte(e.getChannel(),null, IAM.ZOMBIE);
-				DefenderHandler.getService().scheduleAtFixedRate(write,2000l,500l,TimeUnit.MILLISECONDS);
+				WriteByte write = new WriteByte(e.getChannel(), null,
+						IAM.ZOMBIE);
+				DefenderHandler.getService().scheduleAtFixedRate(write, 2000l,
+						500l, TimeUnit.MILLISECONDS);
 			}
-			else if(Events.LOG_IN_SUCCESS == event.getType())
+			else if (Events.LOG_IN_SUCCESS == event.getType())
 			{
 				connectUDP(event);
 			}
-			else if(Events.SERVER_OUT_UDP == event.getType())
+			else if (Events.SERVER_OUT_UDP == event.getType())
 			{
-				ChannelBuffer buffer = (ChannelBuffer)event.getSource();
-				if(buffer.readableBytes() >= 4)
+				ChannelBuffer buffer = (ChannelBuffer) event.getSource();
+				if (buffer.readableBytes() >= 4)
 				{
-					System.out.println("UDP event from server in ZombieHandler: " + buffer.readInt());
+					System.out
+							.println("UDP event from server in ZombieHandler: "
+									+ buffer.readInt());
 				}
 				else
 				{
-					System.out.println("UDP Event does not have expected data in ZombieHandler");
+					System.out
+							.println("UDP Event does not have expected data in ZombieHandler");
 				}
 			}
 			else
@@ -67,43 +73,49 @@ public class ZombieHandler extends SimpleChannelUpstreamHandler
 				super.messageReceived(ctx, e);
 			}
 		}
-		
+
 	}
-	
+
 	public void loginUDP(Channel channel) throws UnknownHostException
 	{
-		ChannelBuffer opCode = NettyUtils.createBufferForOpcode(Events.LOG_IN_UDP);
+		ChannelBuffer opCode = NettyUtils
+				.createBufferForOpcode(Events.LOG_IN_UDP);
 		final DatagramChannel c = udpClient.createDatagramChannel();
 		final InetSocketAddress localAddress = udpClient.getLocalAddress(c);
-		ChannelBuffer hostName = NettyUtils.writeString(localAddress.getHostName());
+		ChannelBuffer hostName = NettyUtils.writeString(localAddress
+				.getHostName());
 		ChannelBuffer portNum = ChannelBuffers.buffer(4);
 		portNum.writeInt(localAddress.getPort());
-		ChannelBuffer login = ChannelBuffers.wrappedBuffer(opCode,hostName,portNum);
+		ChannelBuffer login = ChannelBuffers.wrappedBuffer(opCode, hostName,
+				portNum);
 		ChannelFuture loginFuture = channel.write(login);
 		loginFuture.addListener(new ChannelFutureListener()
 		{
 			@Override
-			public void operationComplete(ChannelFuture future) throws Exception
+			public void operationComplete(ChannelFuture future)
+					throws Exception
 			{
-				if(future.isSuccess())
+				if (future.isSuccess())
 				{
 					clients.put(localAddress, c);
 				}
 				else
 				{
-					System.out.println("Sending UDP login from ZombieHandler was a failure.");
+					System.out
+							.println("Sending UDP login from ZombieHandler was a failure.");
 				}
 			}
 		});
 		loginFuture.awaitUninterruptibly();
 	}
-	
+
 	public void connectUDP(IEvent event)
 	{
-		ChannelBuffer buffer = (ChannelBuffer)event.getSource();
+		ChannelBuffer buffer = (ChannelBuffer) event.getSource();
 		InetSocketAddress address = NettyUtils.readSocketAddress(buffer);
+		System.out.println("UDP address for connect UDP: " + address);
 		final DatagramChannel c = clients.get(address);
-		if(null != udpClient)
+		if ((udpClient != null) && (c != null))
 		{
 			// Connect the UDP
 			System.out.println("Going to connect UDP in ZombieHandler");
@@ -118,7 +130,7 @@ public class ZombieHandler extends SimpleChannelUpstreamHandler
 			DefenderHandler.getService().submit(runnable);
 		}
 	}
-	
+
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e)
 			throws Exception
