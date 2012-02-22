@@ -97,19 +97,6 @@ public interface IGameRoom
 	public abstract Set<IPlayerSession> getSessions();
 
 	/**
-	 * @return Returns the unique identifier of this session.
-	 */
-	public abstract String getUniqueId();
-
-	/**
-	 * Sets the session identifier. This will not be set on the native netty
-	 * channel.
-	 * 
-	 * @param uniqueId
-	 */
-	public abstract void setUniqueId(String uniqueId);
-
-	/**
 	 * @return Returns the name of the game room
 	 */
 	public abstract String getGameRoomName();
