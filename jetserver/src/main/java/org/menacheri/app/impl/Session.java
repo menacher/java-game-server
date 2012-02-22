@@ -10,6 +10,7 @@ import org.menacheri.event.Events;
 import org.menacheri.event.IEvent;
 import org.menacheri.event.IEventDispatcher;
 import org.menacheri.event.IEventHandler;
+import org.menacheri.event.impl.EventDispatchers;
 
 
 /**
@@ -26,46 +27,161 @@ public class Session implements ISession
 	/**
 	 * session id
 	 */
-	protected String id = null;
+	protected final String id;
 	/**
 	 * event dispatcher
 	 */
-	protected IEventDispatcher eventDispatcher;
+	protected final IEventDispatcher eventDispatcher;
 
 	/**
 	 * session parameters
 	 */
-	private Map<String, Object> sessionAttributes;
+	protected final Map<String, Object> sessionAttributes;
 
-	private long creationTime;
+	protected final long creationTime;
 
-	private long lastReadWriteTime;
+	protected long lastReadWriteTime;
 
-	private Status status;
+	protected Status status;
 
-	private boolean isWriteable;
+	protected boolean isWriteable;
 
 	/**
 	 * Life cycle variable to check if the session is shutting down. If it is, then no
 	 * more incoming events will be accepted.
 	 */
-	volatile boolean isShuttingDown;
+	protected volatile boolean isShuttingDown;
 	
-	private boolean isUDPEnabled;
+	protected boolean isUDPEnabled;
 	
-	private Map<String, Object> connectParameters;
+	protected final Map<String, Object> connectParameters;
 
-	public void initialize()
+	protected Session(SessionBuilder sessionBuilder)
 	{
-		isShuttingDown = Boolean.valueOf(false);
-		sessionAttributes = new HashMap<String, Object>();
-		creationTime = System.currentTimeMillis();
-		lastReadWriteTime = 0l;
-		isWriteable = Boolean.valueOf(false);
-		isUDPEnabled = Boolean.valueOf(false);
-		connectParameters = new HashMap<String, Object>();
+		// validate variables and provide default values if necessary. Normally
+		// done in the builder.build() method, but done here since this class is
+		// meant to be overriden and this could be easier.
+		sessionBuilder.validateAndSetValues();
+		this.id = sessionBuilder.id;
+		this.eventDispatcher = sessionBuilder.eventDispatcher;
+		this.sessionAttributes = sessionBuilder.sessionAttributes;
+		this.creationTime = sessionBuilder.creationTime;
+		this.status = sessionBuilder.status;
+		this.lastReadWriteTime = sessionBuilder.lastReadWriteTime;
+		this.isWriteable = sessionBuilder.isWriteable;
+		this.isShuttingDown = sessionBuilder.isShuttingDown;
+		this.isUDPEnabled = sessionBuilder.isUDPEnabled;
+		this.connectParameters = sessionBuilder.connectParameters;
 	}
-
+	
+	/**
+	 * This class is roughly based on Joshua Bloch's Builder pattern. Since
+	 * Session class will be extended by child classes, the
+	 * {@link #validateAndSetValues()} method on this builder is actually called
+	 * by the {@link Session} constructor for ease of use. May not be good
+	 * design though.
+	 * 
+	 * @author Abraham, Menacherry
+	 * 
+	 */
+	public static class SessionBuilder
+	{
+		private String id = null;
+		private IEventDispatcher eventDispatcher = null;
+		private Map<String, Object> sessionAttributes = null;
+		private long creationTime = 0l;
+		private long lastReadWriteTime = 0l;
+		private Status status = Status.NOT_CONNECTED;
+		private boolean isWriteable = true;
+		private volatile boolean isShuttingDown = false;
+		private boolean isUDPEnabled = false;// By default UDP is not enabled.
+		private Map<String, Object> connectParameters = null;
+		
+		public ISession build()
+		{
+			return new Session(this);
+		}
+		
+		/**
+		 * This method is used to validate and set the variables to default
+		 * values if they are not already set before calling build. This method
+		 * is invoked by the constructor of SessionBuilder. <b>Important!</b>
+		 * Builder child classes which override this method need to call
+		 * super.validateAndSetValues(), otherwise you could get runtime NPE's.
+		 */
+		protected void validateAndSetValues(){
+			if (null == eventDispatcher)
+			{
+				eventDispatcher = EventDispatchers.newJetlangEventDispatcher();
+			}
+			if(null == sessionAttributes)
+			{
+				sessionAttributes = new HashMap<String, Object>();
+			}
+			if(null == connectParameters)
+			{
+				connectParameters = new HashMap<String, Object>();
+			}
+			creationTime = System.currentTimeMillis();
+		}
+		
+		public String getId()
+		{
+			return id;
+		}
+		public SessionBuilder id(String id)
+		{
+			this.id = id;
+			return this;
+		}
+		public SessionBuilder eventDispatcher(IEventDispatcher eventDispatcher)
+		{
+			this.eventDispatcher = eventDispatcher;
+			return this;
+		}
+		public SessionBuilder sessionAttributes(Map<String, Object> sessionAttributes)
+		{
+			this.sessionAttributes = sessionAttributes;
+			return this;
+		}
+		public SessionBuilder creationTime(long creationTime)
+		{
+			this.creationTime = creationTime;
+			return this;
+		}
+		public SessionBuilder lastReadWriteTime(long lastReadWriteTime)
+		{
+			this.lastReadWriteTime = lastReadWriteTime;
+			return this;
+		}
+		public SessionBuilder status(Status status)
+		{
+			this.status = status;
+			return this;
+		}
+		public SessionBuilder isWriteable(boolean isWriteable)
+		{
+			this.isWriteable = isWriteable;
+			return this;
+		}
+		public SessionBuilder isShuttingDown(boolean isShuttingDown)
+		{
+			this.isShuttingDown = isShuttingDown;
+			return this;
+		}
+		public SessionBuilder isUDPEnabled(boolean isUDPEnabled)
+		{
+			this.isUDPEnabled = isUDPEnabled;
+			return this;
+		}
+		public SessionBuilder connectParameters(Map<String, Object> connectParameters)
+		{
+			this.connectParameters = connectParameters;
+			return this;
+		}
+		
+	}
+	
 	@Override
 	public void onEvent(IEvent event)
 	{
@@ -83,19 +199,13 @@ public class Session implements ISession
 	@Override
 	public void setId(Object id)
 	{
-		this.id = id.toString();
+		
 	}
 
 	@Override
 	public IEventDispatcher getEventDispatcher()
 	{
 		return eventDispatcher;
-	}
-
-	@Override
-	public void setEventDispatcher(IEventDispatcher eventDispatcher)
-	{
-		this.eventDispatcher = eventDispatcher;
 	}
 
 	@Override
@@ -179,11 +289,6 @@ public class Session implements ISession
 		return creationTime;
 	}
 
-	public void setCreationTime(long creationTime)
-	{
-		this.creationTime = creationTime;
-	}
-
 	@Override
 	public long getLastReadWriteTime()
 	{
@@ -232,6 +337,7 @@ public class Session implements ISession
 	 * 
 	 * @see org.menacheri.app.ISession#isUDPEnabled()
 	 */
+	@Override
 	public boolean isUDPEnabled()
 	{
 		return isUDPEnabled;
@@ -240,7 +346,7 @@ public class Session implements ISession
 	@Override
 	public void setUDPEnabled(boolean isEnabled)
 	{
-		isUDPEnabled = isEnabled;
+		this.isUDPEnabled = isEnabled;
 	}
 	
 	@Override
@@ -262,19 +368,9 @@ public class Session implements ISession
 		return sessionAttributes;
 	}
 
-	public void setSessionAttributes(Map<String, Object> sessionAttributes)
-	{
-		this.sessionAttributes = sessionAttributes;
-	}
-
 	public Map<String, Object> getConnectParameters()
 	{
 		return connectParameters;
-	}
-
-	public void setConnectParameters(Map<String, Object> connectParameters)
-	{
-		this.connectParameters = connectParameters;
 	}
 
 	@Override
