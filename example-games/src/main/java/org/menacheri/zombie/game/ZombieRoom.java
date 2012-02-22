@@ -17,13 +17,14 @@ public class ZombieRoom extends GameRoomSession
 	private Defender defender;
 	private Zombie zombie;
 	
-	public ZombieRoom()
+	public ZombieRoom(GameRoomSessionBuilder sessionBuilder)
 	{
+		super(sessionBuilder);
 	}
 	
-	public ZombieRoom(World world, Defender defender, Zombie zombie)
+	public ZombieRoom(GameRoomSessionBuilder sessionBuilder, World world, Defender defender, Zombie zombie)
 	{
-		super();
+		super(sessionBuilder);
 		this.defender = defender;
 		this.zombie = zombie;
 	}
