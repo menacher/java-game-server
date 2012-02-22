@@ -12,7 +12,6 @@
 		<config>src/main/resources/beans/netty-handlers.xml</config>
 		<config>src/main/resources/beans/service-beans.xml</config>
 		<config>src/main/resources/beans/beans.xml</config>
-		<config>src/org/menacheri/context/server-beans.xml</config>
 	</configs>
 	<configSets>
 	</configSets>
