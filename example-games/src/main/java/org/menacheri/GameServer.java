@@ -5,15 +5,16 @@ import java.util.concurrent.TimeUnit;
 import org.apache.log4j.PropertyConfigurator;
 import org.menacheri.app.IGameRoom;
 import org.menacheri.app.ITask;
-import org.menacheri.context.AppContext;
 import org.menacheri.server.IServerManager;
 import org.menacheri.service.ITaskManagerService;
 import org.menacheri.zombie.domain.World;
 import org.menacheri.zombie.domain.WorldMonitor;
+import org.menacheri.zombie.game.ZombieRoom;
+import org.menacheri.zombie.game.ZombieSpringConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.AbstractApplicationContext;
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
 public class GameServer
@@ -24,14 +25,12 @@ public class GameServer
 	{
 		PropertyConfigurator.configure(System
 				.getProperty("log4j.configuration"));
-		AbstractApplicationContext context = new ClassPathXmlApplicationContext(
-		"/beans/beans.xml");
-		
+		AbstractApplicationContext ctx = new AnnotationConfigApplicationContext(ZombieSpringConfig.class);
 		// For the destroy method to work.
-		context.registerShutdownHook();
+		ctx.registerShutdownHook();
 		
 		// Start the main game server
-		IServerManager serverManager = (IServerManager)AppContext.getBean(AppContext.SERVER_MANAGER);
+		IServerManager serverManager = ctx.getBean(IServerManager.class);
 		//serverManager.startServers(18090,843,8081);
 		try
 		{
@@ -42,16 +41,15 @@ public class GameServer
 			LOG.error("Unable to start servers cleanly: {}",e);
 		}
 		System.out.println("Started servers");
-		startGames();
+		startGames(ctx);
 	}
 	
-	public static void startGames()
+	public static void startGames(AbstractApplicationContext ctx)
 	{
-		World world = (World) AppContext.getBean("world");
-		world.setAlive(2000000000);
-		IGameRoom room = (IGameRoom)AppContext.getBean("Zombie_ROOM_1");
+		World world = ctx.getBean(World.class);
+		IGameRoom room = ctx.getBean(ZombieRoom.class);
 		ITask monitor = new WorldMonitor(world,room);
-		ITaskManagerService taskManager = (ITaskManagerService)AppContext.getBean(AppContext.TASK_MANAGER_SERVICE);
+		ITaskManagerService taskManager = ctx.getBean(ITaskManagerService.class);
 		taskManager.scheduleWithFixedDelay(monitor, 500, 5000, TimeUnit.MILLISECONDS);
 	}
 	
