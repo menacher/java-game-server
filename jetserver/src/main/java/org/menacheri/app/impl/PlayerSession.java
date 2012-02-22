@@ -5,10 +5,7 @@ import org.menacheri.app.IGameRoom;
 import org.menacheri.app.IPlayer;
 import org.menacheri.app.IPlayerSession;
 import org.menacheri.event.impl.EventDispatcher;
-import org.menacheri.event.impl.EventDispatchers;
 import org.menacheri.protocols.IProtocol;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 /**
@@ -24,13 +21,11 @@ import org.slf4j.LoggerFactory;
  */
 public class PlayerSession extends Session implements IPlayerSession
 {
-	private static final Logger LOG = LoggerFactory
-			.getLogger(PlayerSession.class);
 
 	/**
 	 * Each session belongs to a Player. This variable holds the reference.
 	 */
-	IPlayer player;
+	final protected IPlayer player;
 
 	/**
 	 * Each incoming connection is made to a game room. This reference holds the
@@ -43,24 +38,51 @@ public class PlayerSession extends Session implements IPlayerSession
 	 */
 	IProtocol protocol;
 
-	public void initialize()
+	protected PlayerSession(PlayerSessionBuilder playerSessionBuilder)
 	{
-		super.initialize();
-		this.eventDispatcher = EventDispatchers.newJetlangEventDispatcher();
-		LOG.trace("Initalized : {}",this);
+		super(playerSessionBuilder);
+		this.player = playerSessionBuilder.player;
+		this.parentGameRoom = playerSessionBuilder.parentGameRoom;
+		this.protocol = playerSessionBuilder.protocol;
 	}
+	
+	public static class PlayerSessionBuilder extends SessionBuilder
+	{
+		private IPlayer player = null;
+		private IGameRoom parentGameRoom;
+		private IProtocol protocol;
 
-
+		public IPlayerSession build()
+		{
+			return new PlayerSession(this);
+		}
+		
+		public PlayerSessionBuilder player(IPlayer player)
+		{
+			this.player = player;
+			return this;
+		}
+		public PlayerSessionBuilder parentGameRoom(IGameRoom parentGameRoom)
+		{
+			if (null == parentGameRoom)
+			{
+				throw new IllegalStateException(
+						"GameRoom instance is null, session will not be constructed");
+			}
+			this.parentGameRoom = parentGameRoom;
+			return this;
+		}
+		public PlayerSessionBuilder protocol(IProtocol protocol)
+		{
+			this.protocol = protocol;
+			return this;
+		}
+	}
+	
 	@Override
 	public IPlayer getPlayer()
 	{
 		return player;
-	}
-
-	@Override
-	public void setPlayer(IPlayer player)
-	{
-		this.player = player;
 	}
 
 	public IGameRoom getGameRoom()
