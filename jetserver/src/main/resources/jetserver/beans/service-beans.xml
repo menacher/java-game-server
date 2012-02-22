@@ -10,7 +10,7 @@
 		<property name="lookupService" ref="lookupService"></property>
 	</bean>
 
-	<bean id="lookupService" class="org.menacheri.service.impl.LookupService"></bean>
+	<!-- <bean id="lookupService" class="org.menacheri.service.impl.LookupService"></bean> -->
 
 	<bean id="taskManagerService" class="org.menacheri.service.impl.TaskManagerService">
 		<constructor-arg type="int" index="0" value="2" ></constructor-arg>
