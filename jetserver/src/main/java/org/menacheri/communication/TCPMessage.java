@@ -4,9 +4,9 @@ package org.menacheri.communication;
 public class TCPMessage implements IMessage
 {
 	private final Object message;
-	private static final int deliveryGuaranty = DeliveryGuaranty.RELIABLE;
+	private static final int DELIVERY_GUARANTY = DeliveryGuaranty.RELIABLE;
 
-	public TCPMessage(Object message)
+	public TCPMessage(final Object message)
 	{
 		this.message = message;
 	}
@@ -20,7 +20,7 @@ public class TCPMessage implements IMessage
 	@Override
 	public int getDeliveryGuaranty()
 	{
-		return deliveryGuaranty;
+		return DELIVERY_GUARANTY;
 	}
 
 }

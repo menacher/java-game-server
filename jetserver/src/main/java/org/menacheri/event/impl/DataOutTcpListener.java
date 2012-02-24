@@ -16,7 +16,7 @@ import org.menacheri.event.ISessionEventHandler;
  */
 public class DataOutTcpListener implements ISessionEventHandler
 {
-	private static final int eventType = Events.SERVER_OUT_TCP;
+	private static final int EVENT_TYPE = Events.SERVER_OUT_TCP;
 	private final ISession session;
 	
 	public DataOutTcpListener(ISession session)
@@ -33,7 +33,7 @@ public class DataOutTcpListener implements ISessionEventHandler
 	@Override
 	public int getEventType()
 	{
-		return eventType;
+		return EVENT_TYPE;
 	}
 
 	@Override

@@ -79,7 +79,7 @@ public class NettyMessageBuffer implements IMessageBuffer<ChannelBuffer>
 	}
 
 	@Override
-	public short readUnsignedByte()
+	public int readUnsignedByte()
 	{
 		return buffer.readUnsignedByte();
 	}
@@ -117,7 +117,7 @@ public class NettyMessageBuffer implements IMessageBuffer<ChannelBuffer>
 	}
 
 	@Override
-	public short readShort()
+	public int readShort()
 	{
 		return buffer.readShort();
 	}

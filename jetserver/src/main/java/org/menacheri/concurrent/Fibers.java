@@ -17,8 +17,8 @@ import org.jetlang.fibers.ThreadFiber;
 public class Fibers
 {
 	// TODO inject this from spring or AppContext
-	private static final ExecutorService service = Executors.newSingleThreadExecutor();
-	private static final PoolFiberFactory fact = new PoolFiberFactory(service);
+	private static final ExecutorService SERVICE = Executors.newSingleThreadExecutor();
+	private static final PoolFiberFactory FACT = new PoolFiberFactory(SERVICE);
 
 	/**
 	 * Creates and starts a fiber and returns the created instance.
@@ -26,7 +26,7 @@ public class Fibers
 	 */
 	public static Fiber pooledFiber()
 	{
-		Fiber fiber = fact.create();
+		Fiber fiber = FACT.create();
 		fiber.start();
 		return fiber;
 	}

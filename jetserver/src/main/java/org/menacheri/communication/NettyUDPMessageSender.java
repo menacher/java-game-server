@@ -19,7 +19,7 @@ public class NettyUDPMessageSender implements IMessageSender
 {
 	private SocketAddress remoteAddress;
 	private DatagramChannel channel;
-	private static final IDeliveryGuaranty deliveryGuaranty = new DeliveryGuaranty(
+	private static final IDeliveryGuaranty DELIVERY_GUARANTY = new DeliveryGuaranty(
 			DeliveryGuaranty.FAST);
 
 	public NettyUDPMessageSender(SocketAddress remoteAddress,
@@ -38,7 +38,7 @@ public class NettyUDPMessageSender implements IMessageSender
 	@Override
 	public IDeliveryGuaranty getDeliveryGuaranty()
 	{
-		return deliveryGuaranty;
+		return DELIVERY_GUARANTY;
 	}
 
 	public SocketAddress getRemoteAddress()

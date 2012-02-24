@@ -22,7 +22,7 @@ public class Sessions
 	/**
 	 * Used to set a unique id on the incoming sessions to this room.
 	 */
-	private static final AtomicInteger sessionId = new AtomicInteger(0);
+	private static final AtomicInteger SESSION_ID = new AtomicInteger(0);
 
 	public static ISession newSession()
 	{
@@ -34,7 +34,7 @@ public class Sessions
 	{
 		// TODO the player has to be set here after doing lookup.
 		PlayerSessionBuilder builder = new PlayerSessionBuilder();
-		builder.parentGameRoom(gameRoom).id(String.valueOf(sessionId.incrementAndGet()));
+		builder.parentGameRoom(gameRoom).id(String.valueOf(SESSION_ID.incrementAndGet()));
 		return builder.build();
 	}
 

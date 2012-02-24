@@ -11,7 +11,7 @@ public class NettyUDPMessage implements INettyMessage
 	private ChannelBuffer buffer;
 	private DatagramChannel channel;
 	private SocketAddress remoteAddress;
-	private static final int deliveryGuaranty = DeliveryGuaranty.FAST;
+	private static final int DELIVERY_GUARANTY = DeliveryGuaranty.FAST;
 	
 	public NettyUDPMessage()
 	{
@@ -67,7 +67,7 @@ public class NettyUDPMessage implements INettyMessage
 	@Override
 	public int getDeliveryGuaranty()
 	{
-		return deliveryGuaranty;
+		return DELIVERY_GUARANTY;
 	}
 
 }

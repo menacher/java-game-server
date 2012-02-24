@@ -20,7 +20,7 @@ public class AppTest
      *
      * @param testName name of the test case
      */
-    public AppTest( String testName )
+    public AppTest( final String testName )
     {
         super( testName );
     }

@@ -146,7 +146,7 @@ public abstract class GameRoomSession extends Session implements IGameRoom
 	
 	public synchronized boolean disconnectSession(IPlayerSession playerSession)
 	{
-		boolean removeHandlers = this.eventDispatcher.removeHandlersForSession(playerSession);
+		final boolean removeHandlers = this.eventDispatcher.removeHandlersForSession(playerSession);
 		return (removeHandlers && sessions.remove(playerSession));
 	}
 

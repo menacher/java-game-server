@@ -3,9 +3,9 @@ package org.menacheri.communication;
 public class UDPMessage implements IMessage
 {
 	private final Object message;
-	private static final int deliveryGuaranty = DeliveryGuaranty.FAST;
+	private static final int DELIVERY_GUARANTY = DeliveryGuaranty.FAST;
 	
-	public UDPMessage(Object message)
+	public UDPMessage(final Object message)
 	{
 		this.message = message;
 	}
@@ -13,7 +13,7 @@ public class UDPMessage implements IMessage
 	@Override
 	public int getDeliveryGuaranty()
 	{
-		return deliveryGuaranty;
+		return DELIVERY_GUARANTY;
 	}
 
 	@Override

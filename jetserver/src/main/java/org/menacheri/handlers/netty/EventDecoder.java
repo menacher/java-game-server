@@ -25,7 +25,7 @@ public class EventDecoder extends OneToOneDecoder
 			return msg;
 		}
 		ChannelBuffer buffer = (ChannelBuffer)msg;
-		short opCode = buffer.readUnsignedByte();
+		int opCode = buffer.readUnsignedByte();
 		return Events.event(buffer, opCode);
 	}
 	

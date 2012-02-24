@@ -55,7 +55,7 @@ public abstract class NettyServer implements INettyServer
 		{
 			for (String option : optionsList)
 			{
-				serverBootstrap.setOption(option, Boolean.valueOf(true));
+				serverBootstrap.setOption(option, true);
 			}
 		}
 	}

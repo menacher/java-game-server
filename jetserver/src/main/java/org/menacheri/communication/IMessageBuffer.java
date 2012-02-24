@@ -84,7 +84,7 @@ public interface IMessageBuffer<T> {
 	 * @throws IndexOutOfBoundsException
 	 *             if {@code this.readableBytes} is less than {@code 1}
 	 */
-	short readUnsignedByte();
+	int readUnsignedByte();
 
 	/**
 	 * Gets a 16-bit short integer at the current {@code readerIndex} and
@@ -93,7 +93,7 @@ public interface IMessageBuffer<T> {
 	 * @throws IndexOutOfBoundsException
 	 *             if {@code this.readableBytes} is less than {@code 2}
 	 */
-	short readShort();
+	int readShort();
 
 	/**
 	 * Gets an unsigned 16-bit short integer at the current {@code readerIndex}

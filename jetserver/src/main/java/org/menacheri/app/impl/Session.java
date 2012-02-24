@@ -129,17 +129,17 @@ public class Session implements ISession
 		{
 			return id;
 		}
-		public SessionBuilder id(String id)
+		public SessionBuilder id(final String id)
 		{
 			this.id = id;
 			return this;
 		}
-		public SessionBuilder eventDispatcher(IEventDispatcher eventDispatcher)
+		public SessionBuilder eventDispatcher(final IEventDispatcher eventDispatcher)
 		{
 			this.eventDispatcher = eventDispatcher;
 			return this;
 		}
-		public SessionBuilder sessionAttributes(Map<String, Object> sessionAttributes)
+		public SessionBuilder sessionAttributes(final Map<String, Object> sessionAttributes)
 		{
 			this.sessionAttributes = sessionAttributes;
 			return this;
@@ -352,7 +352,7 @@ public class Session implements ISession
 	@Override
 	public void close()
 	{
-		isShuttingDown = Boolean.valueOf(true);
+		isShuttingDown = true;
 		eventDispatcher.close();
 		this.status = Status.CLOSED;
 	}

@@ -8,7 +8,7 @@ import org.menacheri.event.ISessionEventHandler;
 
 public class DataOutUDPListener implements ISessionEventHandler
 {
-	private static final int eventType = Events.SERVER_OUT_UDP;
+	private static final int EVENT_TYPE = Events.SERVER_OUT_UDP;
 	private final ISession session;
 	
 	public DataOutUDPListener(ISession session)
@@ -25,7 +25,7 @@ public class DataOutUDPListener implements ISessionEventHandler
 	@Override
 	public int getEventType()
 	{
-		return eventType;
+		return EVENT_TYPE;
 	}
 	
 	@Override

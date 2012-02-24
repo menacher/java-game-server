@@ -47,21 +47,21 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 	 */
 	private static final AtomicInteger CHANNEL_COUNTER =  new AtomicInteger(0);
 	
-	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e)
+	public void messageReceived(final ChannelHandlerContext ctx, final MessageEvent e)
 			throws Exception
 	{
-		IEvent event = (IEvent)e.getMessage();
-		ChannelBuffer buffer = (ChannelBuffer) event.getSource();
-		Channel channel = e.getChannel();
-		switch(event.getType())
+		final IEvent event = (IEvent)e.getMessage();
+		final ChannelBuffer buffer = (ChannelBuffer) event.getSource();
+		final Channel channel = e.getChannel();
+		if(event.getType() == Events.LOG_IN)
 		{
-		case Events.LOG_IN:
 			LOG.trace("Login attempt from {}",channel.getRemoteAddress());
 			IPlayer player = lookupPlayer(buffer, channel);
 			handleLogin(player,channel);
 			handleGameRoomJoin(player, channel,buffer);
-			break;
-		default:
+		}
+		else
+		{
 			LOG.error("Invalid event {} sent from remote address {}. "
 					+ "Going to close channel {}",
 					new Object[] { event.getType(), channel.getRemoteAddress(),
@@ -78,7 +78,7 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 				.getChannel().getId(), CHANNEL_COUNTER.incrementAndGet());
 	}
 	
-	public IPlayer lookupPlayer(ChannelBuffer buffer, Channel channel)
+	public IPlayer lookupPlayer(final ChannelBuffer buffer, final Channel channel)
 	{
 		ICredentials credentials = new Credentials(buffer);
 		IPlayer player = lookupService.playerLookup(credentials);

@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory;
 public class NettyUDPLoginHandler implements IEventHandler
 {
 	private static final Logger LOG = LoggerFactory.getLogger(NettyUDPLoginHandler.class);
-	private static final int eventType = Events.LOG_IN_UDP;
+	private static final int EVENT_TYPE = Events.LOG_IN_UDP;
 	private final Map<InetSocketAddress,ISession> updSessionsMap;
 	private final ISession session;
 	
@@ -29,7 +29,7 @@ public class NettyUDPLoginHandler implements IEventHandler
 	@Override
 	public int getEventType()
 	{
-		return eventType;
+		return EVENT_TYPE;
 	}
 
 	@Override

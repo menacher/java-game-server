@@ -65,7 +65,7 @@ public class JetlangEventDispatcher implements IEventDispatcher
 	}
 	
 	@Override
-	public void fireEvent(IEvent event)
+	public void fireEvent(final IEvent event)
 	{
 		eventQueue.publish(event);
 	}
@@ -73,7 +73,7 @@ public class JetlangEventDispatcher implements IEventDispatcher
 	@Override
 	public synchronized void addHandler(final IEventHandler eventHandler)
 	{
-		int eventType = eventHandler.getEventType();
+		final int eventType = eventHandler.getEventType();
 		List<IEventHandler> listeners = this.handlersByEventType
 				.get(eventType);
 		if (listeners == null)
