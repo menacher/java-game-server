@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractSessionEventHandler implements ISessionEventHandler
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractSessionEventHandler.class);
-	int eventType = Events.ANY;
+	protected final int eventType;
 
 	protected IMessageSender tcpSender = null;
 	protected IMessageSender udpSender = null;
@@ -26,7 +26,7 @@ public abstract class AbstractSessionEventHandler implements ISessionEventHandle
 	
 	public AbstractSessionEventHandler()
 	{
-
+		this.eventType = Events.ANY;
 	}
 
 	public AbstractSessionEventHandler(int eventType)
