@@ -128,10 +128,11 @@ public class NettySessionEventHandler extends AbstractSessionEventHandler
 			NettyTCPMessageSender nettyTcpSender = (NettyTCPMessageSender) tcpSender;
 			// Close the channel after flushing the pending writes.
 			nettyTcpSender.close(Events.event(null, Events.DISCONNECT));
+			tcpSender = null;
 		}
 		else
 		{
-			LOG.warn("TCPSender is null in class {}, no need to close", this
+			LOG.trace("TCPSender is null in class {}, no need to close", this
 					.getClass().getName());
 		}
 
@@ -154,10 +155,11 @@ public class NettySessionEventHandler extends AbstractSessionEventHandler
 				LOG.warn("No session found for address: {} in class: {}",
 						remoteAddress, this.getClass().getName());
 			}
+			udpSender = null;
 		}
 		else
 		{
-			LOG.warn("UDPSender is null in class {}, no need to close", this
+			LOG.trace("UDPSender is null in class {}, no need to close", this
 					.getClass().getName());
 		}
 	}
