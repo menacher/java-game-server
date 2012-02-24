@@ -7,8 +7,8 @@ import org.menacheri.handlers.netty.LoginHandler;
 
 /**
  * This interface defines a protocol that needs to be applied while
- * communicating to the user session object. For the netty implementation,
- * this would mean that the protocol would be a series of handlers, decoders and
+ * communicating to the user session object. For the netty implementation, this
+ * would mean that the protocol would be a series of handlers, decoders and
  * encoders added to the pipeline associated with this session to enable the
  * relevant protocol. For Example, the STRING protocol would add string encoder
  * and decoder to the pipeline. AMF3 would add the relevant serializer and
@@ -26,15 +26,6 @@ public interface IProtocol
 	 *         custom protocol has been used.
 	 */
 	public String getProtocolName();
-
-	/**
-	 * This method returns the associated protocol enumeration. Not very useful
-	 * if you are implementing custom protocols.
-	 * 
-	 * @return Some protocols are supported by default and this enumeration
-	 *         lists them.
-	 */
-	public ServerDataProtocols getProtocolEnum();
 
 	/**
 	 * The main method of this interface. For the Netty implementation, this

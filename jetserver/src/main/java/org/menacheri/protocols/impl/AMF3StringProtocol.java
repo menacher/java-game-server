@@ -14,7 +14,6 @@ import org.menacheri.handlers.netty.ByteArrayStreamDecoder;
 import org.menacheri.handlers.netty.JavaObjectToAMF3Encoder;
 import org.menacheri.handlers.netty.NulEncoder;
 import org.menacheri.protocols.AbstractNettyProtocol;
-import org.menacheri.protocols.ServerDataProtocols;
 import org.menacheri.util.NettyUtils;
 import org.springframework.beans.factory.annotation.Required;
 
@@ -73,8 +72,7 @@ public class AMF3StringProtocol extends AbstractNettyProtocol
 
 	public AMF3StringProtocol()
 	{
-		super("" + ServerDataProtocols.AMF3_STRING,
-				ServerDataProtocols.AMF3_STRING);
+		super("AMF3_STRING");
 	}
 
 	public AMF3StringProtocol(int frameSize, Base64Decoder base64Decoder,
@@ -83,8 +81,7 @@ public class AMF3StringProtocol extends AbstractNettyProtocol
 			JavaObjectToAMF3Encoder javaObjectToAMF3Encoder,
 			Base64Encoder base64Encoder, NulEncoder nulEncoder)
 	{
-		super("" + ServerDataProtocols.AMF3_STRING,
-				ServerDataProtocols.AMF3_STRING);
+		super("AMF3_STRING");
 		this.frameSize = frameSize;
 		this.base64Decoder = base64Decoder;
 		this.byteArrayStreamDecoder = byteArrayStreamDecoder;

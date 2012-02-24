@@ -16,18 +16,11 @@ public abstract class AbstractNettyProtocol implements IProtocol
 	 * value while child class instance is created.
 	 */
 	final String protocolName;
-	/**
-	 * The protocol enumeration. This is set by the child class to appropriate
-	 * value while child class instance is created.
-	 */
-	final ServerDataProtocols protocol;
 
-	public AbstractNettyProtocol(String protocolName,
-			ServerDataProtocols protocol)
+	public AbstractNettyProtocol(String protocolName)
 	{
 		super();
 		this.protocolName = protocolName;
-		this.protocol = protocol;
 	}
 
 	public ChannelHandler createLengthBasedFrameDecoder()
@@ -35,12 +28,6 @@ public abstract class AbstractNettyProtocol implements IProtocol
 		// This will be overriden by spring.
 		//return new LengthFieldBasedFrameDecoder(4096, 0, 2, 0, 2);
 		return null;
-	}
-
-	@Override
-	public ServerDataProtocols getProtocolEnum()
-	{
-		return protocol;
 	}
 
 	@Override

@@ -7,7 +7,6 @@ import org.menacheri.app.IPlayerSession;
 import org.menacheri.handlers.netty.ByteArrayDecoder;
 import org.menacheri.handlers.netty.ByteArrayToChannelBufferEncoder;
 import org.menacheri.protocols.AbstractNettyProtocol;
-import org.menacheri.protocols.ServerDataProtocols;
 import org.menacheri.util.NettyUtils;
 import org.springframework.beans.factory.annotation.Required;
 
@@ -40,15 +39,13 @@ public class SimpleByteArrayProtocol extends AbstractNettyProtocol
 
 	public SimpleByteArrayProtocol()
 	{
-		super("" + ServerDataProtocols.SIMPLE_BYTE_ARRAY,
-				ServerDataProtocols.SIMPLE_BYTE_ARRAY);
+		super("SIMPLE_BYTE_ARRAY_PROTOCOL");
 	}
 
 	public SimpleByteArrayProtocol(ByteArrayDecoder byteArrayDecoder,
 			LengthFieldPrepender lengthFieldPrepender)
 	{
-		super("" + ServerDataProtocols.SIMPLE_BYTE_ARRAY,
-				ServerDataProtocols.SIMPLE_BYTE_ARRAY);
+		super("SIMPLE_BYTE_ARRAY_PROTOCOL");
 		this.byteArrayDecoder = byteArrayDecoder;
 		this.lengthFieldPrepender = lengthFieldPrepender;
 	}

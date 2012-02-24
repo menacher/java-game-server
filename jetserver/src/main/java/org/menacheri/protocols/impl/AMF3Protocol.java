@@ -11,7 +11,6 @@ import org.menacheri.handlers.netty.EventDecoder;
 import org.menacheri.handlers.netty.EventEncoder;
 import org.menacheri.handlers.netty.JavaObjectToAMF3Encoder;
 import org.menacheri.protocols.AbstractNettyProtocol;
-import org.menacheri.protocols.ServerDataProtocols;
 import org.menacheri.util.NettyUtils;
 
 
@@ -65,7 +64,7 @@ public class AMF3Protocol extends AbstractNettyProtocol
 
 	public AMF3Protocol()
 	{
-		super("" + ServerDataProtocols.AMF3, ServerDataProtocols.AMF3);
+		super("AMF3");
 	}
 
 	@Override

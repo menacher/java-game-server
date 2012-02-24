@@ -7,7 +7,6 @@ import org.menacheri.handlers.netty.DefaultToServerHandler;
 import org.menacheri.handlers.netty.MessageBufferEventDecoder;
 import org.menacheri.handlers.netty.MessageBufferEventEncoder;
 import org.menacheri.protocols.AbstractNettyProtocol;
-import org.menacheri.protocols.ServerDataProtocols;
 import org.menacheri.util.NettyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,8 +25,7 @@ public class MessageBufferProtocol extends AbstractNettyProtocol
 	
 	public MessageBufferProtocol()
 	{
-		super("" + ServerDataProtocols.CHANNEL_BUFFER_PROTOCOL,
-				ServerDataProtocols.CHANNEL_BUFFER_PROTOCOL);
+		super("MESSAGE_BUFFER_PROTOCOL");
 	}
 	
 	@Override

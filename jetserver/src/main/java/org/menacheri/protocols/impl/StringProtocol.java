@@ -10,7 +10,6 @@ import org.jboss.netty.handler.codec.string.StringEncoder;
 import org.menacheri.app.IPlayerSession;
 import org.menacheri.handlers.netty.NulEncoder;
 import org.menacheri.protocols.AbstractNettyProtocol;
-import org.menacheri.protocols.ServerDataProtocols;
 import org.menacheri.util.NettyUtils;
 import org.springframework.beans.factory.annotation.Required;
 
@@ -42,13 +41,13 @@ public class StringProtocol extends AbstractNettyProtocol
 
 	public StringProtocol()
 	{
-		super("" + ServerDataProtocols.STRING, ServerDataProtocols.STRING);
+		super("STRING_PROTOCOL");
 	}
 
 	public StringProtocol(int frameSize, NulEncoder nulEncoder,
 			StringDecoder stringDecoder, StringEncoder stringEncoder)
 	{
-		super("" + ServerDataProtocols.STRING, ServerDataProtocols.STRING);
+		super("STRING_PROTOCOL");
 		this.frameSize = frameSize;
 		this.nulEncoder = nulEncoder;
 		this.stringDecoder = stringDecoder;

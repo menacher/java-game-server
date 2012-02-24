@@ -7,7 +7,6 @@ import org.menacheri.handlers.netty.DefaultToServerHandler;
 import org.menacheri.handlers.netty.EventDecoder;
 import org.menacheri.handlers.netty.EventEncoder;
 import org.menacheri.protocols.AbstractNettyProtocol;
-import org.menacheri.protocols.ServerDataProtocols;
 import org.menacheri.util.NettyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,8 +36,7 @@ public class ChannelBufferProtocol extends AbstractNettyProtocol
 	
 	public ChannelBufferProtocol()
 	{
-		super("" + ServerDataProtocols.CHANNEL_BUFFER_PROTOCOL,
-				ServerDataProtocols.CHANNEL_BUFFER_PROTOCOL);
+		super("CHANNEL_BUFFER_PROTOCOL");
 	}
 
 	@Override
