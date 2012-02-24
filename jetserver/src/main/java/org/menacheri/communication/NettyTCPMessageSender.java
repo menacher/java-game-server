@@ -12,14 +12,9 @@ import org.slf4j.LoggerFactory;
 
 public class NettyTCPMessageSender implements IMessageSender
 {
-	private Channel channel;
+	private final Channel channel;
 	private static final IDeliveryGuaranty DELIVERY_GUARANTY = new DeliveryGuaranty(DeliveryGuaranty.RELIABLE);
 	private static final Logger LOG = LoggerFactory.getLogger(NettyTCPMessageSender.class);
-	
-	public NettyTCPMessageSender()
-	{
-		
-	}
 	
 	public NettyTCPMessageSender(Channel channel)
 	{
@@ -43,11 +38,6 @@ public class NettyTCPMessageSender implements IMessageSender
 		return channel;
 	}
 
-	public void setChannel(Channel channel)
-	{
-		this.channel = channel;
-	}
-	
 	public ChannelFuture close()
 	{
 		return channel.close();

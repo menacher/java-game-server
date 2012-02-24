@@ -17,8 +17,8 @@ import org.menacheri.event.Events;
  */
 public class NettyUDPMessageSender implements IMessageSender
 {
-	private SocketAddress remoteAddress;
-	private DatagramChannel channel;
+	private final SocketAddress remoteAddress;
+	private final DatagramChannel channel;
 	private static final IDeliveryGuaranty DELIVERY_GUARANTY = new DeliveryGuaranty(
 			DeliveryGuaranty.FAST);
 
@@ -46,19 +46,9 @@ public class NettyUDPMessageSender implements IMessageSender
 		return remoteAddress;
 	}
 
-	public void setRemoteAddress(SocketAddress remoteAddress)
-	{
-		this.remoteAddress = remoteAddress;
-	}
-
 	public DatagramChannel getChannel()
 	{
 		return channel;
-	}
-
-	public void setChannel(DatagramChannel channel)
-	{
-		this.channel = channel;
 	}
 
 	@Override
