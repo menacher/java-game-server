@@ -114,8 +114,8 @@ public class JetlangEventDispatcher implements IEventDispatcher
 					return (eventHandler.getEventType() == msg.getType());
 				}
 			};
-			BatchSubscriber<IEvent> batchEventSubscriber = new BatchSubscriber<IEvent>(fiber,eventCallback,eventFilter,0,TimeUnit.MILLISECONDS);
 			// Create a subscription based on the filter also.
+			BatchSubscriber<IEvent> batchEventSubscriber = new BatchSubscriber<IEvent>(fiber,eventCallback,eventFilter,0,TimeUnit.MILLISECONDS);
 			disposable = eventQueue.subscribe(batchEventSubscriber);
 			disposableHandlerMap.put(eventHandler, disposable);
 		}
