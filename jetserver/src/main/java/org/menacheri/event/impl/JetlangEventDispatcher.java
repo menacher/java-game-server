@@ -6,8 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.TimeUnit;
 
-import org.jetlang.channels.ChannelSubscription;
+import org.jetlang.channels.BatchSubscriber;
 import org.jetlang.channels.MemoryChannel;
 import org.jetlang.core.Callback;
 import org.jetlang.core.Disposable;
@@ -84,19 +85,22 @@ public class JetlangEventDispatcher implements IEventDispatcher
 
 		listeners.add(eventHandler);
 
-		Callback<IEvent> eventCallback = new Callback<IEvent>()
+		Callback<List<IEvent>> eventCallback = new Callback<List<IEvent>>()
 		{
 			@Override
-			public void onMessage(IEvent message)
+			public void onMessage(List<IEvent> messages)
 			{
-				eventHandler.onEvent(message);
+				for(IEvent event:messages){
+					eventHandler.onEvent(event);
+				}
 			}
 		};
 
 		Disposable disposable = null;
 		if (eventType == Events.ANY)
 		{
-			disposable = eventQueue.subscribe(fiber, eventCallback);
+			BatchSubscriber<IEvent> batchEventSubscriber = new BatchSubscriber<IEvent>(fiber,eventCallback,0,TimeUnit.MILLISECONDS);
+			disposable = eventQueue.subscribe(batchEventSubscriber);
 		}
 		// It is a specific event listener
 		else
@@ -110,10 +114,9 @@ public class JetlangEventDispatcher implements IEventDispatcher
 					return (eventHandler.getEventType() == msg.getType());
 				}
 			};
+			BatchSubscriber<IEvent> batchEventSubscriber = new BatchSubscriber<IEvent>(fiber,eventCallback,eventFilter,0,TimeUnit.MILLISECONDS);
 			// Create a subscription based on the filter also.
-			ChannelSubscription<IEvent> subscription = new ChannelSubscription<IEvent>(
-					fiber, eventCallback, eventFilter);
-			disposable = eventQueue.subscribe(subscription);
+			disposable = eventQueue.subscribe(batchEventSubscriber);
 			disposableHandlerMap.put(eventHandler, disposable);
 		}
 		
