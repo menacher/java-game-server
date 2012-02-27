@@ -1,56 +1,29 @@
 package org.menacheri;
 
+import static org.junit.Assert.assertEquals;
+
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
+import org.junit.Test;
 import org.menacheri.util.NettyUtils;
-
-import junit.framework.Assert;
-import junit.framework.Test;
-import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Unit test for simple App.
  */
-public class AppTest 
-    extends TestCase
+public class AppTest
 {
-    /**
-     * Create the test case
-     *
-     * @param testName name of the test case
-     */
-    public AppTest( final String testName )
-    {
-        super( testName );
-    }
 
-    /**
-     * @return the suite of tests being tested
-     */
-    public static Test suite()
-    {
-        return new TestSuite( AppTest.class );
-    }
-
-    /**
-     * Rigourous Test :-)
-     */
-    public void testApp()
-    {
-        assertTrue( true );
-    }
-    
-	public void testNettyUtilStringWriteRead()
+    @Test
+	public void nettyUtilStringWriteRead()
 	{
 		String msg = "Hello World!";
 		ChannelBuffer stringBuffer = NettyUtils.writeString(msg);
 		String reply = NettyUtils.readString(stringBuffer);
-		System.out.println(reply);
-		Assert.assertEquals(msg, reply);
+		assertEquals(msg, reply);
 	}
 	
-	public void testNettyUtilMultiStringWriteRead()
+    @Test
+	public void nettyUtilMultiStringWriteRead()
 	{
 		String hello = "Hello ";
 		String world = "World!";
@@ -59,20 +32,19 @@ public class AppTest
 		ChannelBuffer stringBuffer = ChannelBuffers.wrappedBuffer(stringBuffer1,stringBuffer2);
 		String helloReply = NettyUtils.readString(stringBuffer);
 		String worldReply = NettyUtils.readString(stringBuffer);
-		System.out.println(helloReply + worldReply);
-		Assert.assertEquals(hello, helloReply);
-		Assert.assertEquals(worldReply, world);
+		assertEquals(hello, helloReply);
+		assertEquals(worldReply, world);
 	}
 	
-	public void testNettyUtilVarArgsStringWriteRead()
+    @Test
+	public void nettyUtilVarArgsStringWriteRead()
 	{
 		String hello = "Hello ";
 		String world = "World!";
 		ChannelBuffer stringBuffer = NettyUtils.writeStrings(hello,world);
 		String helloReply = NettyUtils.readString(stringBuffer);
 		String worldReply = NettyUtils.readString(stringBuffer);
-		System.out.println(helloReply + worldReply);
-		Assert.assertEquals(hello, helloReply);
-		Assert.assertEquals(worldReply, world);
+		assertEquals(hello, helloReply);
+		assertEquals(worldReply, world);
 	}
 }
