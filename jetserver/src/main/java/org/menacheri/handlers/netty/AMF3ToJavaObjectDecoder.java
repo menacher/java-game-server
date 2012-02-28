@@ -36,21 +36,14 @@ public class AMF3ToJavaObjectDecoder extends OneToOneDecoder implements ITransfo
 	{
 		if(null == msg)
 		{
-			LOG.error("Incoming message is null");
+			LOG.warn("Incoming message is null");
 			return msg;
 		}
 		
-		// Check if incoming message is of correct type. If not return null.
-		if (!(msg instanceof ByteArrayInputStream))
-		{
-			LOG.error("Received Invalid object: {} to decode!", msg.getClass()
-					.getCanonicalName());
-			return null;
-		}
-
 		// Cast object to correct type and pass it on to the de serializer
 		IEvent event = (IEvent)msg;
-		ByteArrayInputStream bis = (ByteArrayInputStream) event.getSource();
+		ChannelBuffer buffer = (ChannelBuffer)event.getSource();
+		ByteArrayInputStream bis = new ByteArrayInputStream(buffer.array());
 		event.setSource(deSerializeObjectFromStream(bis));
 		return event;
 	}
