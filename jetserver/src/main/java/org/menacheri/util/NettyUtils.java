@@ -8,6 +8,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelPipeline;
+import org.jboss.netty.handler.codec.serialization.ClassResolvers;
 import org.jboss.netty.handler.codec.serialization.ObjectDecoder;
 import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
 import org.jboss.netty.handler.codec.string.StringDecoder;
@@ -426,6 +427,17 @@ public class NettyUtils
 		return remoteAddress;
 	}
 	
+	public static ChannelBuffer writeSocketAddress(InetSocketAddress socketAddress)
+	{
+		String host = socketAddress.getHostName();
+		int port = socketAddress.getPort();
+		ChannelBuffer hostName = writeString(host);
+		ChannelBuffer portNum = ChannelBuffers.buffer(4);
+		portNum.writeInt(port);
+		ChannelBuffer socketAddressBuffer = ChannelBuffers.wrappedBuffer(hostName,portNum);
+		return socketAddressBuffer;
+	}
+	
 	public static class StringDecoderWrapper extends StringDecoder
 	{
 		public String decode(ChannelBuffer buffer) throws Exception
@@ -446,6 +458,10 @@ public class NettyUtils
 	
 	public static class ObjectDecoderWrapper extends ObjectDecoder
 	{
+		public ObjectDecoderWrapper()
+		{
+			super(ClassResolvers.weakCachingResolver(null));
+		}
 		public Object decode(ChannelBuffer buffer) throws Exception
 		{
 			return super.decode(null, null, buffer);
