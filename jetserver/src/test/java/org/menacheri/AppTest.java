@@ -2,6 +2,8 @@ package org.menacheri;
 
 import static org.junit.Assert.assertEquals;
 
+import java.net.InetSocketAddress;
+
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.junit.Test;
@@ -47,4 +49,13 @@ public class AppTest
 		assertEquals(hello, helloReply);
 		assertEquals(worldReply, world);
 	}
+    
+    @Test
+    public void readWriteSocketAddress()
+    {
+    	InetSocketAddress socketAddress = new InetSocketAddress("localhost", 18090);
+    	ChannelBuffer buffer = NettyUtils.writeSocketAddress(socketAddress);
+    	InetSocketAddress readAddress = NettyUtils.readSocketAddress(buffer);
+    	assertEquals(socketAddress,readAddress);
+    }
 }
