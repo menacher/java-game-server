@@ -16,14 +16,14 @@ public interface IPlayer
 	 * 
 	 * @return Returns the unique key for the gamer.
 	 */
-	public String getUniqueKey();
+	public Object getId();
 
 	/**
 	 * A unique key representing a gamer. This could be an email id or something
 	 * unique.
 	 * 
 	 */
-	public void setUniqueKey(String uniqueKey);
+	public void setId(Object uniqueKey);
 
 	/**
 	 * Method used to get the name of the gamer.
