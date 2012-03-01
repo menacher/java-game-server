@@ -130,7 +130,7 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 			LOG.trace("Sending GAME_ROOM_JOIN_SUCCESS to channel {}", channel.getId());
 			ChannelFuture future = channel.write(NettyUtils.createBufferForOpcode(Events.GAME_ROOM_JOIN_SUCCESS));
 			connectToGameRoom(gameRoom, playerSession, future);
-			loginUdp(buffer, playerSession);
+			loginUdp(playerSession,buffer);
 		}
 		else
 		{
@@ -172,7 +172,7 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 		});
 	}
 	
-	protected void loginUdp(ChannelBuffer buffer,IPlayerSession playerSession)
+	protected void loginUdp(IPlayerSession playerSession,ChannelBuffer buffer)
 	{
 		InetSocketAddress remoteAdress = NettyUtils.readSocketAddress(buffer);
 		if(null != remoteAdress)
