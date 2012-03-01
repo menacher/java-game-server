@@ -12,12 +12,8 @@ public class Player implements IPlayer
 	/**
 	 * This variable could be used as a database key.
 	 */
-	private long id;
+	private Object id;
 
-	/**
-	 * The unique identifier of the Player.This can be same as email id.
-	 */
-	private String uniqueKey;
 	/**
 	 * The name of the gamer.
 	 */
@@ -39,11 +35,10 @@ public class Player implements IPlayer
 		playerSessions = new HashSet<IPlayerSession>();
 	}
 	
-	public Player(long id, String uniqueKey, String name, String emailId)
+	public Player(Object id, String name, String emailId)
 	{
 		super();
 		this.id = id;
-		this.uniqueKey = uniqueKey;
 		this.name = name;
 		this.emailId = emailId;
 		playerSessions = new HashSet<IPlayerSession>();
@@ -54,9 +49,7 @@ public class Player implements IPlayer
 	{
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (int) (id ^ (id >>> 32));
-		result = prime * result
-				+ ((uniqueKey == null) ? 0 : uniqueKey.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
 
@@ -70,44 +63,30 @@ public class Player implements IPlayer
 		if (getClass() != obj.getClass())
 			return false;
 		Player other = (Player) obj;
-		if (id != other.id)
-			return false;
-		if (uniqueKey == null)
+		if (id == null)
 		{
-			if (other.uniqueKey != null)
+			if (other.id != null)
 				return false;
 		}
-		else if (!uniqueKey.equals(other.uniqueKey))
+		else if (!id.equals(other.id))
 			return false;
 		return true;
 	}
 	
-	
-	public long getId()
-	{
-		return id;
-	}
-
-	
-	public void setId(long id)
-	{
-		this.id = id;
-	}
-
 	/* (non-Javadoc)
 	 * @see org.menacheri.app.impl.IGamer#getUniqueKey()
 	 */
-	public String getUniqueKey()
+	public Object getId()
 	{
-		return uniqueKey;
+		return id;
 	}
 
 	/* (non-Javadoc)
 	 * @see org.menacheri.app.impl.IGamer#setUniqueKey(java.lang.String)
 	 */
-	public void setUniqueKey(String uniqueKey)
+	public void setId(Object id)
 	{
-		this.uniqueKey = uniqueKey;
+		this.id = id;
 	}
 
 	/* (non-Javadoc)
