@@ -3,6 +3,7 @@ package org.menacheri.communication;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
+import org.menacheri.communication.IDeliveryGuaranty.DeliveryGuaranty;
 import org.menacheri.event.Events;
 import org.menacheri.event.IEvent;
 import org.slf4j.Logger;
@@ -13,7 +14,7 @@ import org.slf4j.LoggerFactory;
 public class NettyTCPMessageSender implements IMessageSender
 {
 	private final Channel channel;
-	private static final IDeliveryGuaranty DELIVERY_GUARANTY = new DeliveryGuaranty(DeliveryGuaranty.RELIABLE);
+	private static final IDeliveryGuaranty DELIVERY_GUARANTY = DeliveryGuaranty.RELIABLE;
 	private static final Logger LOG = LoggerFactory.getLogger(NettyTCPMessageSender.class);
 	
 	public NettyTCPMessageSender(Channel channel)

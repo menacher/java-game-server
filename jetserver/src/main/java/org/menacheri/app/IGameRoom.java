@@ -5,7 +5,8 @@ import java.util.Set;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.menacheri.app.impl.Player;
-import org.menacheri.communication.DeliveryGuaranty;
+import org.menacheri.communication.IDeliveryGuaranty;
+import org.menacheri.communication.IDeliveryGuaranty.DeliveryGuaranty;
 import org.menacheri.communication.IMessage;
 import org.menacheri.handlers.IMessageSender;
 import org.menacheri.protocols.IProtocol;
@@ -177,8 +178,8 @@ public interface IGameRoom
 	 * Method used to send a broadcast message to all sessions in the group. It
 	 * is the easiest way to update the state of all connected {@link Player} s
 	 * to the same state. This method delegates to
-	 * {@link #sendBroadcast(Object, int)} with delivery guaranty set to the
-	 * default {@link DeliveryGuaranty#RELIABLE}.
+	 * {@link #sendBroadcast(Object, IDeliveryGuaranty)} with delivery guaranty
+	 * set to the default {@link DeliveryGuaranty#RELIABLE}.
 	 * 
 	 * @param message
 	 *            The message that is to be broadcast to all user sessions of
@@ -202,7 +203,7 @@ public interface IGameRoom
 	 *            message. Based on this value the {@link IMessageSender}
 	 *            implementation would be switched.
 	 */
-	public abstract void sendBroadcast(Object message, int deliveryGuaranty);
+	public abstract void sendBroadcast(Object message, IDeliveryGuaranty deliveryGuaranty);
 
 	/**
 	 * This method will close down the game room. It can be used to disconnect

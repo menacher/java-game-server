@@ -4,6 +4,7 @@ import java.net.SocketAddress;
 
 import org.jboss.netty.channel.socket.DatagramChannel;
 import org.menacheri.app.ISession;
+import org.menacheri.communication.IDeliveryGuaranty.DeliveryGuaranty;
 import org.menacheri.event.Events;
 
 
@@ -19,8 +20,7 @@ public class NettyUDPMessageSender implements IMessageSender
 {
 	private final SocketAddress remoteAddress;
 	private final DatagramChannel channel;
-	private static final IDeliveryGuaranty DELIVERY_GUARANTY = new DeliveryGuaranty(
-			DeliveryGuaranty.FAST);
+	private static final IDeliveryGuaranty DELIVERY_GUARANTY = DeliveryGuaranty.FAST;
 
 	public NettyUDPMessageSender(SocketAddress remoteAddress,
 			DatagramChannel channel)

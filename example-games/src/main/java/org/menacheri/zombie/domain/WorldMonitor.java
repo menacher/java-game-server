@@ -2,7 +2,7 @@ package org.menacheri.zombie.domain;
 
 import org.menacheri.app.IGameRoom;
 import org.menacheri.app.ITask;
-import org.menacheri.communication.DeliveryGuaranty;
+import org.menacheri.communication.IDeliveryGuaranty.DeliveryGuaranty;
 import org.menacheri.communication.NettyMessageBuffer;
 import org.menacheri.zombie.game.Messages;
 

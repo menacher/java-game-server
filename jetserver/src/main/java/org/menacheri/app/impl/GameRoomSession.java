@@ -7,7 +7,8 @@ import org.menacheri.app.IGame;
 import org.menacheri.app.IGameRoom;
 import org.menacheri.app.IPlayerSession;
 import org.menacheri.app.ISession;
-import org.menacheri.communication.DeliveryGuaranty;
+import org.menacheri.communication.IDeliveryGuaranty;
+import org.menacheri.communication.IDeliveryGuaranty.DeliveryGuaranty;
 import org.menacheri.event.Events;
 import org.menacheri.event.IEvent;
 import org.menacheri.event.IEventHandler;
@@ -157,16 +158,17 @@ public abstract class GameRoomSession extends Session implements IGameRoom
 	}
 
 	@Override
-	public void sendBroadcast(Object message, int deliveryGuaranty)
+	public void sendBroadcast(Object message, IDeliveryGuaranty deliveryGuaranty)
 	{
+		DeliveryGuaranty guaranty = (DeliveryGuaranty)deliveryGuaranty;
 		// Create a udp or tcp message based on the deliveryGuaranty.
 		IEvent event = null;
-		switch (deliveryGuaranty)
+		switch (guaranty)
 		{
-		case DeliveryGuaranty.FAST:
+		case FAST:
 			event = Events.dataOutUdpEvent(message);
 			break;
-		case DeliveryGuaranty.RELIABLE:
+		case RELIABLE:
 		default:
 			event = Events.dataOutTcpEvent(message);
 			break;

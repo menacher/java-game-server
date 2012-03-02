@@ -18,8 +18,8 @@ public interface IMessage
 	Object getMessage();
 
 	/**
-	 * @return By default the guaranty would be
-	 *         {@link DeliveryGuaranty#RELIABLE}.
+	 * @return By default the guaranty would be {@link IDeliveryGuaranty.DeliveryGuaranty#RELIABLE}
+	 *         
 	 */
-	int getDeliveryGuaranty();
+	IDeliveryGuaranty getDeliveryGuaranty();
 }

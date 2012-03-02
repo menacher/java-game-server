@@ -5,13 +5,14 @@ import java.net.SocketAddress;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.socket.DatagramChannel;
+import org.menacheri.communication.IDeliveryGuaranty.DeliveryGuaranty;
 
 public class NettyUDPMessage implements INettyMessage
 {
 	private ChannelBuffer buffer;
 	private DatagramChannel channel;
 	private SocketAddress remoteAddress;
-	private static final int DELIVERY_GUARANTY = DeliveryGuaranty.FAST;
+	private static final IDeliveryGuaranty DELIVERY_GUARANTY = DeliveryGuaranty.FAST;
 	
 	public NettyUDPMessage()
 	{
@@ -65,7 +66,7 @@ public class NettyUDPMessage implements INettyMessage
 	}
 
 	@Override
-	public int getDeliveryGuaranty()
+	public IDeliveryGuaranty getDeliveryGuaranty()
 	{
 		return DELIVERY_GUARANTY;
 	}

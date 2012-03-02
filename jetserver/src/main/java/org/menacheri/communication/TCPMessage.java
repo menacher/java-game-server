@@ -1,10 +1,12 @@
 package org.menacheri.communication;
 
+import org.menacheri.communication.IDeliveryGuaranty.DeliveryGuaranty;
+
 
 public class TCPMessage implements IMessage
 {
 	private final Object message;
-	private static final int DELIVERY_GUARANTY = DeliveryGuaranty.RELIABLE;
+	private static final IDeliveryGuaranty DELIVERY_GUARANTY = DeliveryGuaranty.RELIABLE;
 
 	public TCPMessage(final Object message)
 	{
@@ -18,7 +20,7 @@ public class TCPMessage implements IMessage
 	}
 
 	@Override
-	public int getDeliveryGuaranty()
+	public IDeliveryGuaranty getDeliveryGuaranty()
 	{
 		return DELIVERY_GUARANTY;
 	}
