@@ -20,9 +20,9 @@ public class MessageBufferEventDecoder extends OneToOneDecoder
 	protected Object decode(ChannelHandlerContext ctx, Channel channel,
 			Object msg) throws Exception
 	{
-		if(null == msg || !(msg instanceof ChannelBuffer))
+		if(null == msg)
 		{
-			LOG.error("Unexpected message: {} received in EventDecoder",msg);
+			LOG.error("Null message received in MessageBufferEventDecoder");
 			return msg;
 		}
 		ChannelBuffer buffer = (ChannelBuffer)msg;

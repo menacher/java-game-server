@@ -22,9 +22,9 @@ public class MessageBufferEventEncoder extends OneToOneEncoder
 	protected Object encode(ChannelHandlerContext ctx, Channel channel,
 			Object msg) throws Exception
 	{
-		if (null == msg || !(msg instanceof IEvent))
+		if (null == msg)
 		{
-			LOG.error("Unexpected message: {} received in EventDecoder", msg);
+			LOG.error("Null message received in MessageBufferEventEncoder");
 			return msg;
 		}
 		IEvent event = (IEvent) msg;
