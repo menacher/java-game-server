@@ -17,13 +17,13 @@ public interface IGame
 	/**
 	 * @return Returns the unique id associated with this game object.
 	 */
-	public String getUniqueId();
+	public Object getId();
 
 	/**
-	 * @param uniqueId
+	 * @param id
 	 *            Sets the unique id for this game.
 	 */
-	public void setUniqueId(String uniqueId);
+	public void setId(Object id);
 	
 	/**
 	 * Get the name of the game. Preferably should be a unique name.

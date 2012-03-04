@@ -42,9 +42,7 @@ public class ZombieSpringConfig
 	
 	public @Bean IGame zombieGame()
 	{
-		Game game = new Game();
-		game.setId(1);
-		game.setGameName("Zombie");
+		Game game = new Game(1,"Zombie");
 		return game;
 	}
 	

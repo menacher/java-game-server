@@ -6,43 +6,39 @@ import org.menacheri.app.IGameCommandInterpreter;
 /**
  * Domain object representing a game. This is a convenience implementation of
  * the IGame interface so that simple games need not implement their own.
+ * <b>Note</b> This implementation will throw exception if any of the setter
+ * methods are invoked. All variables are final in this class and expected to be
+ * set at object construction.
  * 
  * @author Abraham Menacherry
  * 
  */
-public class Game implements IGame
-{
+public class Game implements IGame {
+
 	/**
 	 * This variable could be used as a database key.
 	 */
-	private long id;
-	/**
-	 * A string version of id is also provided.
-	 */
-	private String uniqueId;
-	
+	private final Object id;
+
 	/**
 	 * The name of the game.
 	 */
-	private String gameName;
+	private final String gameName;
 	/**
 	 * Each game has its own specific commands. This instance will be used to
 	 * transform those commands(most probably in the form of bytes) to actual
 	 * java method calls.
 	 */
-	private IGameCommandInterpreter gameCommandInterpreter;
-	
-	public Game()
-	{
+	private final IGameCommandInterpreter gameCommandInterpreter;
 
+	public Game(Object id, String gameName) {
+		this(id, gameName, null);
 	}
 
-	public Game(long id, String uniqueId, String gameName,
-			IGameCommandInterpreter gameCommandInterpreter)
-	{
+	public Game(Object id, String gameName,
+			IGameCommandInterpreter gameCommandInterpreter) {
 		super();
 		this.id = id;
-		this.uniqueId = uniqueId;
 		this.gameName = gameName;
 		this.gameCommandInterpreter = gameCommandInterpreter;
 	}
@@ -52,8 +48,8 @@ public class Game implements IGame
 	 * 
 	 * @return The unique identifier of this Game.
 	 */
-	public long getId()
-	{
+	@Override
+	public Object getId() {
 		return id;
 	}
 
@@ -63,75 +59,54 @@ public class Game implements IGame
 	 * @param id
 	 *            Set the unique identifier for this game.
 	 */
-	public void setId(long id)
-	{
-		this.id = id;
+	@Override
+	public void setId(Object id) {
+		throw new RuntimeException(new IllegalAccessException(
+				"Game id is a final variable to be set at Game construction. "
+						+ "It cannot be set again."));
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.menacheri.app.IGame#getGameName()
-	 */
-	public String getGameName()
-	{
+	@Override
+	public String getGameName() {
 		return gameName;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.menacheri.app.IGame#setGameName(java.lang.String)
-	 */
-	public void setGameName(String gameName)
-	{
-		this.gameName = gameName;
+	@Override
+	public void setGameName(String gameName) {
+		throw new RuntimeException(new IllegalAccessException(
+				"GameName is a final variable to be set at Game construction. "
+						+ "It cannot be set again."));
 	}
 
 	@Override
-	public IGameCommandInterpreter getGameCommandInterpreter()
-	{
+	public IGameCommandInterpreter getGameCommandInterpreter() {
 		return gameCommandInterpreter;
 	}
-	
+
 	@Override
-	public void setGameCommandInterpreter(IGameCommandInterpreter interpreter)
-	{
-		this.gameCommandInterpreter = interpreter;
+	public void setGameCommandInterpreter(IGameCommandInterpreter interpreter) {
+		throw new RuntimeException(new IllegalAccessException(
+				"Game id is a final variable to be set at Game construction. "
+						+ "It cannot be set again."));
 	}
-	
+
 	@Override
-	public synchronized Object unload()
-	{
+	public synchronized Object unload() {
 		return null;
 	}
 
 	@Override
-	public String getUniqueId()
-	{
-		return uniqueId;
-	}
-
-	@Override
-	public void setUniqueId(String uniqueId)
-	{
-		this.uniqueId = uniqueId;
-	}
-
-	@Override
-	public int hashCode()
-	{
+	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + (int) (id ^ (id >>> 32));
 		result = prime * result
-				+ ((uniqueId == null) ? 0 : uniqueId.hashCode());
+				+ ((gameName == null) ? 0 : gameName.hashCode());
+		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		return result;
 	}
 
 	@Override
-	public boolean equals(Object obj)
-	{
+	public boolean equals(Object obj) {
 		if (this == obj)
 			return true;
 		if (obj == null)
@@ -139,14 +114,15 @@ public class Game implements IGame
 		if (getClass() != obj.getClass())
 			return false;
 		Game other = (Game) obj;
-		if (id != other.id)
-			return false;
-		if (uniqueId == null)
-		{
-			if (other.uniqueId != null)
+		if (gameName == null) {
+			if (other.gameName != null)
 				return false;
-		}
-		else if (!uniqueId.equals(other.uniqueId))
+		} else if (!gameName.equals(other.gameName))
+			return false;
+		if (id == null) {
+			if (other.id != null)
+				return false;
+		} else if (!id.equals(other.id))
 			return false;
 		return true;
 	}
