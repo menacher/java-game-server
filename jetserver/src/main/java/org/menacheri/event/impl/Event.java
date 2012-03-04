@@ -67,4 +67,10 @@ public class Event implements IEvent, Serializable
 
 	}
 
+	@Override
+	public String toString() {
+		return "Event [type=" + type + ", source=" + source + ", timeStamp="
+				+ timeStamp + "]";
+	}
+	
 }
