@@ -29,6 +29,15 @@
 			<version>0.1</version>
 			<type>jar</type>
 		</dependency>
+		
+		<!-- jet client dependency -->
+		<dependency>
+			<groupId>org.menacheri</groupId>
+			<artifactId>jetclient</artifactId>
+			<version>0.1</version>
+			<type>jar</type>
+		</dependency>
+		
 		<!-- SLF4J to LOG4J dependency -->
 		<dependency>
 			<groupId>org.slf4j</groupId>

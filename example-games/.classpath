@@ -21,12 +21,21 @@
       <attribute value="jar:file:/C:/Documents%20and%20Settings/abraham/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/org/menacheri/jetclient/0.1/jetclient-0.1.jar" sourcepath="M2_REPO/org/menacheri/jetclient/0.1/jetclient-0.1-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/C:/Documents%20and%20Settings/abraham/.m2/repository/org/menacheri/jetclient/0.1/jetclient-0.1-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
   <classpathentry kind="var" path="M2_REPO/org/jetlang/jetlang/0.2.9/jetlang-0.2.9.jar" sourcepath="M2_REPO/org/jetlang/jetlang/0.2.9/jetlang-0.2.9-sources.jar">
     <attributes>
       <attribute value="jar:file:/C:/Documents%20and%20Settings/abraham/.m2/repository/org/jetlang/jetlang/0.2.9/jetlang-0.2.9-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
-  <classpathentry kind="src" path="/jetserver"/>
+  <classpathentry kind="var" path="M2_REPO/org/menacheri/jetserver/0.1/jetserver-0.1.jar" sourcepath="M2_REPO/org/menacheri/jetserver/0.1/jetserver-0.1-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/C:/Documents%20and%20Settings/abraham/.m2/repository/org/menacheri/jetserver/0.1/jetserver-0.1-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
   <classpathentry kind="var" path="M2_REPO/junit/junit/4.8.2/junit-4.8.2.jar" sourcepath="M2_REPO/junit/junit/4.8.2/junit-4.8.2-sources.jar">
     <attributes>
       <attribute value="jar:file:/C:/Documents%20and%20Settings/abraham/.m2/repository/junit/junit/4.8.2/junit-4.8.2-javadoc.jar!/" name="javadoc_location"/>
