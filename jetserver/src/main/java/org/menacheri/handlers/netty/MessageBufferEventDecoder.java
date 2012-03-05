@@ -10,7 +10,15 @@ import org.menacheri.event.Events;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
+/**
+ * This decoder will convert a Netty {@link ChannelBuffer} to a
+ * {@link NettyMessageBuffer}. It will also convert
+ * {@link Events#CLIENT_OUT_TCP} and {@link Events#CLIENT_OUT_UDP} events to
+ * {@link Events#SESSION_MESSAGE} event.
+ * 
+ * @author Abraham Menacherry
+ * 
+ */
 @Sharable
 public class MessageBufferEventDecoder extends OneToOneDecoder
 {
@@ -27,6 +35,10 @@ public class MessageBufferEventDecoder extends OneToOneDecoder
 		}
 		ChannelBuffer buffer = (ChannelBuffer)msg;
 		byte opCode = buffer.readByte();
+		if ((opCode == Events.CLIENT_OUT_TCP) || (opCode == Events.CLIENT_OUT_UDP))
+		{
+			opCode = Events.SESSION_MESSAGE;
+		}
 		return Events.event(new NettyMessageBuffer(buffer), opCode);
 	}
 }
