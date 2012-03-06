@@ -5,6 +5,7 @@ import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
 import org.jboss.netty.handler.codec.frame.LengthFieldBasedFrameDecoder;
 import org.jboss.netty.handler.codec.frame.LengthFieldPrepender;
+import org.jboss.netty.handler.execution.ExecutionHandler;
 import org.menacheri.jetclient.app.ISession;
 import org.menacheri.jetclient.communication.IMessageBuffer;
 import org.menacheri.jetclient.event.IEvent;
@@ -38,6 +39,7 @@ public class TCPPipelineFactory implements ChannelPipelineFactory
 	 * {@link IEvent} instance to the next decoder/handler in the chain.
 	 */
 	private static final MessageBufferEventEncoder EVENT_ENCODER = new MessageBufferEventEncoder();
+	private final ExecutionHandler executionHandler;
 	/**
 	 * Used to transmit the message to {@link ISession}.
 	 */
@@ -45,13 +47,21 @@ public class TCPPipelineFactory implements ChannelPipelineFactory
 
 	public TCPPipelineFactory(ISession session)
 	{
-		this(new DefaultToClientHandler(session));
+		this(new DefaultToClientHandler(session),null);
 	}
 
 	public TCPPipelineFactory(
-			final DefaultToClientHandler defaultToClientHandler)
+			final DefaultToClientHandler defaultToClientHandler, final ExecutionHandler executionHandler)
 	{
 		this.defaultToClientHandler = defaultToClientHandler;
+		if(null == executionHandler)
+		{
+			this.executionHandler = ExecutionHandlerSingleton.getExecutionHandler();
+		}
+		else
+		{
+			this.executionHandler = executionHandler;
+		}
 	}
 
 	@Override
@@ -60,6 +70,7 @@ public class TCPPipelineFactory implements ChannelPipelineFactory
 		ChannelPipeline pipeline = Channels.pipeline();
 		pipeline.addLast("lengthDecoder", new LengthFieldBasedFrameDecoder(
 				Integer.MAX_VALUE, 0, 2, 0, 2));
+		pipeline.addLast("executionHandler", executionHandler);
 		pipeline.addLast("eventDecoder", EVENT_DECODER);
 		pipeline.addLast(DefaultToClientHandler.getName(),
 				defaultToClientHandler);
