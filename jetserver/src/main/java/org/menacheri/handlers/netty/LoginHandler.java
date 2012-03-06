@@ -12,13 +12,12 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
-import org.jboss.netty.channel.group.ChannelGroup;
-import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.menacheri.app.IGameRoom;
 import org.menacheri.app.IPlayer;
 import org.menacheri.app.IPlayerSession;
 import org.menacheri.event.Events;
 import org.menacheri.event.IEvent;
+import org.menacheri.server.netty.NettyServer;
 import org.menacheri.service.ILookupService;
 import org.menacheri.service.ISessionRegistryService;
 import org.menacheri.util.Credentials;
@@ -36,11 +35,6 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 
 	private ILookupService lookupService;
 	ISessionRegistryService sessionRegistryService;
-	/**
-	 * Stores reference to all connected channels to the server. This can be
-	 * used for graceful shutdown later.
-	 */
-	public static final ChannelGroup ALL_CHANNELS = new DefaultChannelGroup("jetserver");
 	/**
 	 * Used for book keeping purpose. It will count all open channels. Currently
 	 * closed channels will not lead to a decrement.
@@ -73,7 +67,7 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 	@Override
 	public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e)
 			throws Exception {
-		ALL_CHANNELS.add(e.getChannel());
+		NettyServer.ALL_CHANNELS.add(e.getChannel());
 		LOG.debug("Added Channel with id: {} as the {}th open channel", e
 				.getChannel().getId(), CHANNEL_COUNTER.incrementAndGet());
 	}

@@ -7,6 +7,7 @@ import java.util.concurrent.Executors;
 import org.jboss.netty.bootstrap.Bootstrap;
 import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelException;
+import org.jboss.netty.channel.group.ChannelGroupFuture;
 import org.jboss.netty.channel.socket.nio.NioServerSocketChannelFactory;
 import org.menacheri.concurrent.NamedThreadFactory;
 import org.slf4j.Logger;
@@ -95,6 +96,19 @@ public class NettyTCPServer extends NettyServer
 		}
 	}
 
+	public void stopServer() throws Exception
+	{
+		LOG.debug("In stopServer method of class: {}",
+				this.getClass().getName());
+		ChannelGroupFuture future = ALL_CHANNELS.close();
+		try {
+			future.await();
+		} catch (InterruptedException e) {
+			LOG.error("Execption occurred while waiting for channels to close: {}",e);
+		}
+		super.stopServer();
+	}
+	
 	public String[] getArgs()
 	{
 		return args;

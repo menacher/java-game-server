@@ -75,16 +75,13 @@ public class NettyUDPServer extends NettyServer
 	}
 
 	@Override
-	public void stopServer()
+	public void stopServer() throws Exception
 	{
-		LOG.debug("In stopServer method of class: {}",
-				this.getClass().getName());
-		serverBootstrap.releaseExternalResources();
 		if(null != channel)
 		{
 			channel.close();
 		}
-		gameAdminService.shutdown();
+		super.stopServer();
 	}
 	
 	public FixedReceiveBufferSizePredictorFactory getBufferSizePredictor()

@@ -4,9 +4,10 @@ import java.net.InetSocketAddress;
 
 import org.jboss.netty.bootstrap.Bootstrap;
 import org.jboss.netty.channel.ChannelPipelineFactory;
+import org.jboss.netty.channel.group.ChannelGroup;
 import org.jboss.netty.channel.group.ChannelGroupFuture;
+import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.menacheri.app.ISession;
-import org.menacheri.handlers.netty.LoginHandler;
 import org.menacheri.service.IGameAdminService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Required;
 public abstract class NettyServer implements INettyServer
 {
 	private static final Logger LOG = LoggerFactory.getLogger(NettyServer.class);
+	public static final ChannelGroup ALL_CHANNELS = new DefaultChannelGroup("JETSERVER-CHANNELS");
 	protected ISession session;
 	protected InetSocketAddress socketAddress;
 	protected int portNumber = 18090;
@@ -33,7 +35,7 @@ public abstract class NettyServer implements INettyServer
 	{
 		LOG.debug("In stopServer method of class: {}",
 				this.getClass().getName());
-		ChannelGroupFuture future = LoginHandler.ALL_CHANNELS.close();
+		ChannelGroupFuture future = ALL_CHANNELS.close();
 		try {
 			future.await();
 		} catch (InterruptedException e) {
@@ -42,7 +44,7 @@ public abstract class NettyServer implements INettyServer
 		serverBootstrap.releaseExternalResources();
 		gameAdminService.shutdown();
 	}
-
+	
 	@Override
 	public void configureServerBootStrap(String[] optionsList)
 	{
