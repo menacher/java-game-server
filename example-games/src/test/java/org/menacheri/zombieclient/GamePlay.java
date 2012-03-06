@@ -1,7 +1,5 @@
 package org.menacheri.zombieclient;
 
-import java.util.TimerTask;
-
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.menacheri.jetclient.app.ISession;
 import org.menacheri.jetclient.communication.IMessageBuffer;
@@ -11,7 +9,7 @@ import org.menacheri.jetclient.event.IEvent;
 import org.menacheri.zombie.domain.IAM;
 import org.menacheri.zombie.domain.ZombieCommands;
 
-public class GamePlay extends TimerTask
+public class GamePlay implements Runnable
 {
 	private final IAM iam;
 	private final ISession session;
