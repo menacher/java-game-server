@@ -5,7 +5,7 @@
 
 	<import resource="server-protocols.xml"></import>
 	
-	<bean id="taskManagerService" class="org.menacheri.service.impl.TaskManagerService">
+	<bean id="taskManagerService" class="org.menacheri.service.impl.TaskManagerService" destroy-method="shutdown">
 		<constructor-arg type="int" index="0" value="2" ></constructor-arg>
 	</bean>
 	
