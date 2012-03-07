@@ -53,14 +53,6 @@ public class UDPUpstreamHandler extends SimpleChannelUpstreamHandler
 		//messageHandler.handleMessage(updMessage);
 	}
 
-	@Override
-	public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e)
-			throws Exception
-	{
-		NettyServer.ALL_CHANNELS.add(e.getChannel());
-		super.channelConnected(ctx, e);
-	}
-	
 	public IEvent getUDPConnectEvent(IEvent event, SocketAddress remoteAddress,
 			DatagramChannel udpChannel)
 	{
