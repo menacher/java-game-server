@@ -35,8 +35,7 @@ public class TaskManagerService extends ScheduledThreadPoolExecutor implements
 	@Override
 	public void execute(ITask task)
 	{
-		Runnable command = new MyRunnableTask(task);
-		super.execute(command);
+		super.execute(task);
 	}
 
 	@Override
@@ -44,8 +43,7 @@ public class TaskManagerService extends ScheduledThreadPoolExecutor implements
 	public ScheduledFuture schedule(final ITask task, long delay, TimeUnit unit)
 	{
 		task.setTaskId("" + taskNum.incrementAndGet());
-		Runnable command = new MyRunnableTask(task);
-		return super.schedule(command, delay, unit);
+		return super.schedule(task, delay, unit);
 	}
 
 	@Override
@@ -54,8 +52,7 @@ public class TaskManagerService extends ScheduledThreadPoolExecutor implements
 			long period, TimeUnit unit)
 	{
 		task.setTaskId("" + taskNum.incrementAndGet());
-		Runnable command = new MyRunnableTask(task);
-		return super.scheduleAtFixedRate(command, initialDelay, period, unit);
+		return super.scheduleAtFixedRate(task, initialDelay, period, unit);
 	}
 
 	@Override
@@ -64,24 +61,7 @@ public class TaskManagerService extends ScheduledThreadPoolExecutor implements
 			long initialDelay, long delay, TimeUnit unit)
 	{
 		task.setTaskId("" + taskNum.incrementAndGet());
-		Runnable command = new MyRunnableTask(task);
-		return super.scheduleWithFixedDelay(command, initialDelay, delay, unit);
-	}
-
-	private static class MyRunnableTask implements Runnable
-	{
-		private final ITask task;
-
-		public MyRunnableTask(ITask task)
-		{
-			this.task = task;
-		}
-
-		@Override
-		public void run()
-		{
-			task.run();
-		}
+		return super.scheduleWithFixedDelay(task, initialDelay, delay, unit);
 	}
 
 }

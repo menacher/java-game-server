@@ -13,13 +13,8 @@ import org.menacheri.service.ITaskManagerService;
  * @author Abraham Menacherry
  * 
  */
-public interface ITask
+public interface ITask extends Runnable
 {
-	/**
-	 * The method that will be executed
-	 */
-	public void run();
-
 	/**
 	 * @return returns the unique task id of the task. For future
 	 *         implementations, this value has to be unique across multiple
