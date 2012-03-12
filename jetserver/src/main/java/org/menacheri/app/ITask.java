@@ -20,11 +20,11 @@ public interface ITask extends Runnable
 	 *         implementations, this value has to be unique across multiple
 	 *         server nodes.
 	 */
-	public String getTaskId();
+	Object getId();
 
 	/**
-	 * @param taskId
+	 * @param id
 	 *            Set the unique task id.
 	 */
-	public void setTaskId(String taskId);
+	void setId(Object id);
 }

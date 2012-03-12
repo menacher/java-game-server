@@ -17,7 +17,8 @@ import org.menacheri.event.impl.EventDispatchers;
  * The default implementation of the session class. This class is responsible
  * for receiving and sending events. For receiving it uses the
  * {@link #onEvent(IEvent)} method and for sending it uses the
- * {@link IEventDispatcher} fireEvent method.
+ * {@link IEventDispatcher} fireEvent method. The Method {@link #setId(Object)}
+ * will throw {@link IllegalArgumentException} in this implementation class.
  * 
  * @author Abraham Menacherry
  * 
@@ -199,7 +200,7 @@ public class Session implements ISession
 	@Override
 	public void setId(Object id)
 	{
-		
+		throw new IllegalArgumentException("id cannot be set in this implementation, since it is final");
 	}
 
 	@Override

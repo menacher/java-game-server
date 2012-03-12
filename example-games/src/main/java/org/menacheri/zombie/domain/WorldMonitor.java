@@ -11,7 +11,7 @@ public class WorldMonitor implements ITask
 	private World world;
 	private IGameRoom room;
 
-	private String taskId;
+	private Object id;
 	
 	public WorldMonitor(World world, IGameRoom room)
 	{
@@ -30,9 +30,9 @@ public class WorldMonitor implements ITask
 	}
 
 	@Override
-	public String getTaskId()
+	public Object getId()
 	{
-		return taskId;
+		return id;
 	}
 
 	@Override
@@ -55,9 +55,9 @@ public class WorldMonitor implements ITask
 	}
 
 	@Override
-	public void setTaskId(String taskId)
+	public void setId(Object id)
 	{
-		this.taskId = taskId;
+		this.id = id;
 	}
 
 	public IGameRoom getRoom()

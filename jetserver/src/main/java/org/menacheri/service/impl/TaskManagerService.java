@@ -42,7 +42,7 @@ public class TaskManagerService extends ScheduledThreadPoolExecutor implements
 	@SuppressWarnings("rawtypes")
 	public ScheduledFuture schedule(final ITask task, long delay, TimeUnit unit)
 	{
-		task.setTaskId("" + taskNum.incrementAndGet());
+		task.setId(taskNum.incrementAndGet());
 		return super.schedule(task, delay, unit);
 	}
 
@@ -51,7 +51,7 @@ public class TaskManagerService extends ScheduledThreadPoolExecutor implements
 	public ScheduledFuture scheduleAtFixedRate(ITask task, long initialDelay,
 			long period, TimeUnit unit)
 	{
-		task.setTaskId("" + taskNum.incrementAndGet());
+		task.setId(taskNum.incrementAndGet());
 		return super.scheduleAtFixedRate(task, initialDelay, period, unit);
 	}
 
@@ -60,7 +60,7 @@ public class TaskManagerService extends ScheduledThreadPoolExecutor implements
 	public ScheduledFuture scheduleWithFixedDelay(ITask task,
 			long initialDelay, long delay, TimeUnit unit)
 	{
-		task.setTaskId("" + taskNum.incrementAndGet());
+		task.setId(taskNum.incrementAndGet());
 		return super.scheduleWithFixedDelay(task, initialDelay, delay, unit);
 	}
 
