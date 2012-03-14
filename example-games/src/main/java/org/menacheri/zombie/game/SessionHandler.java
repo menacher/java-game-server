@@ -66,7 +66,7 @@ public class SessionHandler extends NettySessionEventHandler implements IGameCom
 		int type = buf.readInt();
 		int operation = buf.readInt();
 		IAM iam = IAM.getWho(type);
-		ZombieCommands cmd = ZombieCommands.getCommand(operation);
+		ZombieCommands cmd = ZombieCommands.CommandsEnum.fromInt(operation);
 		switch (iam)
 		{
 		case ZOMBIE:

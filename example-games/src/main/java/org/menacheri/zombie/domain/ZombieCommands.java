@@ -1,43 +1,39 @@
 package org.menacheri.zombie.domain;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public enum ZombieCommands
 {
-	SHOT_GUN(1),EAT_BRAINS(2),SELECT_TEAM(3),APOCALYPSE(4);
+	SHOT_GUN(1),EAT_BRAINS(2),SELECT_TEAM(3),APOCALYPSE(4),UNKNOWN(-1);
+	final int command;
 	
 	ZombieCommands(int cmd){
-		
+		this.command = cmd;
 	}
 	
-	public static ZombieCommands getCommand(int command)
+	public int getCommand()
 	{
-		switch(command){
-		case 1:
-			return SHOT_GUN;
-		case 2:
-			return EAT_BRAINS;
-		case 3:
-			return SELECT_TEAM;
-		case 4:
-			return APOCALYPSE;
-		default:
-			return EAT_BRAINS;
+		return command;
+	}
+	
+	public static class CommandsEnum
+	{
+		private static final Map<Integer, ZombieCommands> INT_COMMAND_MAP;
+		static {
+			INT_COMMAND_MAP = new HashMap<Integer, ZombieCommands>();
+			for(ZombieCommands command: ZombieCommands.values()){
+				INT_COMMAND_MAP.put(command.getCommand(), command);
+			}
 		}
-	}
-	
-	public static int getInt(ZombieCommands cmd)
-	{
-		switch (cmd)
+		
+		public static ZombieCommands fromInt(Integer i)
 		{
-		case SHOT_GUN:
-			return 1;
-		case EAT_BRAINS:
-			return 2;
-		case SELECT_TEAM:
-			return 3;
-		case APOCALYPSE:
-			return 4;
-		default:
-			return 1;
+			ZombieCommands command = INT_COMMAND_MAP.get(i);
+			if(null == command){
+				command = ZombieCommands.UNKNOWN;
+			}
+			return command;
 		}
 	}
 }

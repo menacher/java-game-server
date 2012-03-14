@@ -15,7 +15,7 @@ public class Messages
 	public static ChannelBuffer apocalypse()
 	{
 		ChannelBuffer buffer = ChannelBuffers.buffer(4);
-		int cmd = ZombieCommands.getInt(ZombieCommands.APOCALYPSE);
+		int cmd = ZombieCommands.APOCALYPSE.getCommand();
 		buffer.writeInt(cmd);
 		return buffer;
 	}

@@ -36,7 +36,7 @@ public class TimerCanceller extends SimpleChannelUpstreamHandler
 				if(apocalypse.readableBytes()>=4)
 				{
 					int cmd = apocalypse.readInt();
-					ZombieCommands command = ZombieCommands.getCommand(cmd);
+					ZombieCommands command = ZombieCommands.CommandsEnum.fromInt(cmd);
 					if(command == ZombieCommands.APOCALYPSE)
 					{
 						System.out.println("Cancelling " + type +  " timer due to apocalypse");
@@ -52,7 +52,7 @@ public class TimerCanceller extends SimpleChannelUpstreamHandler
 			if(apocalypse.readableBytes()>=4)
 			{
 				int cmd = apocalypse.readInt();
-				ZombieCommands command = ZombieCommands.getCommand(cmd);
+				ZombieCommands command = ZombieCommands.CommandsEnum.fromInt(cmd);
 				if(command == ZombieCommands.APOCALYPSE)
 				{
 					System.out.println("Cancelling " + type +  " timer");

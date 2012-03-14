@@ -34,10 +34,10 @@ public class WriteByte extends TimerTask
 		switch(iam)
 		{
 		case DEFENDER:
-			operation = ZombieCommands.getInt(ZombieCommands.SHOT_GUN);
+			operation = ZombieCommands.SHOT_GUN.getCommand();
 			break;
 		case ZOMBIE:
-			operation = ZombieCommands.getInt(ZombieCommands.EAT_BRAINS);
+			operation = ZombieCommands.EAT_BRAINS.getCommand();
 			break;
 		}
 		ChannelBuffer buf = null;
