@@ -5,10 +5,7 @@ import java.util.Set;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.menacheri.app.impl.Player;
-import org.menacheri.communication.IDeliveryGuaranty;
-import org.menacheri.communication.IDeliveryGuaranty.DeliveryGuaranty;
-import org.menacheri.communication.IMessage;
-import org.menacheri.handlers.IMessageSender;
+import org.menacheri.event.INetworkEvent;
 import org.menacheri.protocols.IProtocol;
 import org.menacheri.service.IGameStateManagerService;
 
@@ -177,33 +174,14 @@ public interface IGameRoom
 	/**
 	 * Method used to send a broadcast message to all sessions in the group. It
 	 * is the easiest way to update the state of all connected {@link Player} s
-	 * to the same state. This method delegates to
-	 * {@link #sendBroadcast(Object, IDeliveryGuaranty)} with delivery guaranty
-	 * set to the default {@link DeliveryGuaranty#RELIABLE}.
+	 * to the same state. This method will transmit messages using the delivery
+	 * guaranty provided in the {@link INetworkEvent}.
 	 * 
-	 * @param message
+	 * @param networkEvent
 	 *            The message that is to be broadcast to all user sessions of
 	 *            this game room
 	 */
-	public abstract void sendBroadcast(Object message);
-
-	/**
-	 * This method is used to send a broadcast message to all sessions in the
-	 * room. Using this method it is easy to send the latest state to connected
-	 * clients while synchronizing. The method also accepts the delivery
-	 * guaranty, values could be {@link DeliveryGuaranty#RELIABLE},
-	 * {@link DeliveryGuaranty#FAST} etc. Behavior is unspecified if an
-	 * unsupported delivery guaranty is provided.
-	 * 
-	 * @param message
-	 *            The message to be broadcast, preferably an {@link IMessage}
-	 *            implementation.
-	 * @param deliveryGuaranty
-	 *            The {@link DeliveryGuaranty} to be used while sending this
-	 *            message. Based on this value the {@link IMessageSender}
-	 *            implementation would be switched.
-	 */
-	public abstract void sendBroadcast(Object message, IDeliveryGuaranty deliveryGuaranty);
+	public abstract void sendBroadcast(INetworkEvent networkEvent);
 
 	/**
 	 * This method will close down the game room. It can be used to disconnect
