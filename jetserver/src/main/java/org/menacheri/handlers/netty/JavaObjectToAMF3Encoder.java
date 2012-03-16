@@ -30,7 +30,7 @@ public class JavaObjectToAMF3Encoder extends OneToOneEncoder
 		AMFSerializer serializer = new AMFSerializer(contextProvider.get());
 		ByteArrayOutputStream baos = null;
 		IEvent event = (IEvent)msg;
-		if(event.getType() == Events.SERVER_OUT_TCP || event.getType() == Events.SERVER_OUT_UDP)
+		if(event.getType() == Events.NETWORK_MESSAGE)
 		{
 			try {
 				baos = serializer.toAmf(event.getSource());
