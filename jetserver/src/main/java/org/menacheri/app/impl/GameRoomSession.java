@@ -7,13 +7,9 @@ import org.menacheri.app.IGame;
 import org.menacheri.app.IGameRoom;
 import org.menacheri.app.IPlayerSession;
 import org.menacheri.app.ISession;
-import org.menacheri.communication.IDeliveryGuaranty;
-import org.menacheri.communication.IDeliveryGuaranty.DeliveryGuaranty;
-import org.menacheri.event.Events;
-import org.menacheri.event.IEvent;
 import org.menacheri.event.IEventHandler;
-import org.menacheri.event.impl.DataOutTcpListener;
-import org.menacheri.event.impl.DataOutUDPListener;
+import org.menacheri.event.INetworkEvent;
+import org.menacheri.event.impl.NetworkEventListener;
 import org.menacheri.protocols.IProtocol;
 import org.menacheri.service.IGameStateManagerService;
 import org.slf4j.Logger;
@@ -152,37 +148,11 @@ public abstract class GameRoomSession extends Session implements IGameRoom
 	}
 
 	@Override
-	public void sendBroadcast(Object message)
+	public void sendBroadcast(INetworkEvent networkEvent)
 	{
-		sendBroadcast(message,DeliveryGuaranty.RELIABLE);
+		onEvent(networkEvent);
 	}
 
-	@Override
-	public void sendBroadcast(Object message, IDeliveryGuaranty deliveryGuaranty)
-	{
-		DeliveryGuaranty guaranty = (DeliveryGuaranty)deliveryGuaranty;
-		// Create a udp or tcp message based on the deliveryGuaranty.
-		IEvent event = null;
-		switch (guaranty)
-		{
-		case FAST:
-			event = Events.dataOutUdpEvent(message);
-			break;
-		case RELIABLE:
-		default:
-			event = Events.dataOutTcpEvent(message);
-			break;
-		}
-		
-		if(null != event)
-		{
-			System.out.println("Going to broadcast event: " + event.getType());
-			// publish it on the channel, it will be picked up by the player
-			// sessions because their fibers are subscribed to this channel
-			onEvent(event);
-		}
-	}
-	
 	@Override
 	public synchronized void close()
 	{
@@ -298,11 +268,9 @@ public abstract class GameRoomSession extends Session implements IGameRoom
 	public void createAndAddEventHandlers(IPlayerSession playerSession)
 	{
 		//TODO only add the UDP handler if the session can handle it. For e.g flash can't.
-		IEventHandler tcpHandler = new DataOutTcpListener(playerSession);
-		IEventHandler udpHandler = new DataOutUDPListener(playerSession);
+		IEventHandler networkEventHandler = new NetworkEventListener(playerSession);
 		// Add a listener to the game room which will in turn pass game room events to session.
-		this.eventDispatcher.addHandler(tcpHandler);
-		this.eventDispatcher.addHandler(udpHandler);
+		this.eventDispatcher.addHandler(networkEventHandler);
 		LOG.trace("Added the tcp and udp handler to "
 				+ "EventDispatcher of GameRoom {} for session: {}", this,
 				playerSession);
