@@ -1,6 +1,7 @@
 package org.menacheri.jetclient.event.impl;
 
 import org.menacheri.jetclient.communication.IDeliveryGuaranty;
+import org.menacheri.jetclient.communication.IDeliveryGuaranty.DeliveryGuaranty;
 import org.menacheri.jetclient.event.Events;
 import org.menacheri.jetclient.event.IEvent;
 import org.menacheri.jetclient.event.INetworkEvent;
@@ -39,7 +40,7 @@ public class NetworkEvent extends Event implements INetworkEvent
 	 */
 	public NetworkEvent(IEvent event)
 	{
-		this(event, IDeliveryGuaranty.DeliveryGuaranty.RELIABLE);
+		this(event, DeliveryGuaranty.RELIABLE);
 	}
 	
 	/**
@@ -48,7 +49,7 @@ public class NetworkEvent extends Event implements INetworkEvent
 	 * {@link Events#NETWORK_MESSAGE}. {@link DeliveryGuaranty} is set to the
 	 * value passed in
 	 * 
-	 * @param eventevent
+	 * @param event
 	 *            The instance from which payload, create time etc will be
 	 *            copied
 	 * 

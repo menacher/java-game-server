@@ -1,6 +1,7 @@
 package org.menacheri.jetclient.event;
 
 import org.menacheri.jetclient.communication.IDeliveryGuaranty;
+import org.menacheri.jetclient.communication.IDeliveryGuaranty.DeliveryGuaranty;
 import org.menacheri.jetclient.event.impl.AbstractSessionEventHandler;
 import org.menacheri.jetclient.event.impl.ChangeAttributeEvent;
 import org.menacheri.jetclient.event.impl.Event;
@@ -86,7 +87,7 @@ public class Events
 	 */
 	public static INetworkEvent networkEvent(Object source)
 	{
-		return networkEvent(source,IDeliveryGuaranty.DeliveryGuaranty.RELIABLE);
+		return networkEvent(source, DeliveryGuaranty.RELIABLE);
 	}
 	
 	/**

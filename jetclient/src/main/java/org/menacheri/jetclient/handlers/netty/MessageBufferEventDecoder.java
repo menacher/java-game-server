@@ -11,8 +11,8 @@ import org.menacheri.jetclient.event.Events;
 /**
  * This decoder will convert a Netty {@link ChannelBuffer} to a
  * {@link NettyMessageBuffer}. It will also convert
- * {@link Events#SERVER_OUT_TCP} and {@link Events#SERVER_OUT_UDP} events to
- * {@link Events#SESSION_MESSAGE} event.
+ * {@link Events#NETWORK_MESSAGE} events to {@link Events#SESSION_MESSAGE}
+ * event.
  * 
  * @author Abraham Menacherry
  * 
