@@ -2,10 +2,12 @@ package org.menacheri.zombie.game;
 
 import org.menacheri.app.IGameCommandInterpreter;
 import org.menacheri.app.impl.InvalidCommandException;
+import org.menacheri.communication.IDeliveryGuaranty;
 import org.menacheri.communication.IMessageBuffer;
 import org.menacheri.communication.NettyMessageBuffer;
 import org.menacheri.event.Events;
 import org.menacheri.event.IEvent;
+import org.menacheri.event.INetworkEvent;
 import org.menacheri.event.impl.NettySessionEventHandler;
 import org.menacheri.zombie.domain.Defender;
 import org.menacheri.zombie.domain.IAM;
@@ -107,7 +109,7 @@ public class SessionHandler extends NettySessionEventHandler implements IGameCom
 			buffer.writeInt(cmdCount);
 //			IEvent tcpEvent = Events.dataOutTcpEvent(buffer);
 //			getSession().onEvent(tcpEvent);
-			IEvent udpEvent = Events.dataOutUdpEvent(buffer);
+			INetworkEvent udpEvent = Events.networkEvent(buffer, IDeliveryGuaranty.DeliveryGuaranty.FAST);
 			getSession().onEvent(udpEvent);
 		}
 	}

@@ -2,8 +2,10 @@ package org.menacheri.zombie.domain;
 
 import org.menacheri.app.IGameRoom;
 import org.menacheri.app.ITask;
-import org.menacheri.communication.IDeliveryGuaranty.DeliveryGuaranty;
+import org.menacheri.communication.IDeliveryGuaranty;
 import org.menacheri.communication.NettyMessageBuffer;
+import org.menacheri.event.Events;
+import org.menacheri.event.INetworkEvent;
 import org.menacheri.zombie.game.Messages;
 
 public class WorldMonitor implements ITask
@@ -42,13 +44,15 @@ public class WorldMonitor implements ITask
 		{
 			// Send it to all players
 			System.out.println("Apocalypse is here");
-			room.sendBroadcast(Messages.apocalypse());
+			INetworkEvent networkEvent = Events.networkEvent(Messages.apocalypse());
+			room.sendBroadcast(networkEvent);
 		}
 		else
 		{
 			NettyMessageBuffer buffer = new NettyMessageBuffer();
 			buffer.writeInt(world.getAlive());
-			room.sendBroadcast(buffer,DeliveryGuaranty.FAST);
+			INetworkEvent networkEvent = Events.networkEvent(buffer,IDeliveryGuaranty.DeliveryGuaranty.FAST);
+			room.sendBroadcast(networkEvent);
 		}
 		
 		world.report();
