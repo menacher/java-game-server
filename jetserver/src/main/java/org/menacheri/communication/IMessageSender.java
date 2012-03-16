@@ -29,5 +29,24 @@ public interface IMessageSender
 	 * @return The guaranty instance  associated with the implementation.
 	 */
 	public IDeliveryGuaranty getDeliveryGuaranty();
+	
+	/**
+	 * An interface whose implementations would transmit messages reliably to
+	 * the remote machine/vm. The transport for instance could be TCP.
+	 * 
+	 * @author Abraham Menacherry
+	 * 
+	 */
+	public interface IReliable extends IMessageSender{}
+	
+	/**
+	 * An interface whose implementations would transmit messages fast but
+	 * <b>unreliably</b> to the remote machine/vm. The transport for instance
+	 * could be UDP.
+	 * 
+	 * @author Abraham Menacherry
+	 * 
+	 */
+	public interface IFast extends IMessageSender{}
 
 }
