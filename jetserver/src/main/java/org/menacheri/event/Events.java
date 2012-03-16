@@ -1,10 +1,13 @@
 package org.menacheri.event;
 
 import org.menacheri.app.ISession;
+import org.menacheri.communication.IDeliveryGuaranty;
+import org.menacheri.communication.IDeliveryGuaranty.DeliveryGuaranty;
 import org.menacheri.event.impl.AbstractSessionEventHandler;
 import org.menacheri.event.impl.ChangeAttributeEvent;
 import org.menacheri.event.impl.Event;
 import org.menacheri.event.impl.EventContext;
+import org.menacheri.event.impl.NetworkEvent;
 
 
 public class Events
@@ -48,41 +51,22 @@ public class Events
 	/**
 	 * Incoming data from another machine/JVM to this JVM (server or client)
 	 */
-	public final static byte SESSION_MESSAGE = 0x1c;
+	public static final byte SESSION_MESSAGE = 0x1c;
 
 	/**
-	 * Outgoing data from the server to a remote client using TCP as the socket
-	 * transport protocol
+	 * This event is used to send data from the current machine to remote
+	 * machines using TCP or UDP transports. It is an out-going event.
 	 */
-	public final static byte SERVER_OUT_TCP = 0x1d;
+	public static final byte NETWORK_MESSAGE = 0x1d;
 	
-	/**
-	 * Outgoing data from the server to a remote client using UDP as the socket
-	 * transport protocol
-	 */
-	public final static byte SERVER_OUT_UDP = 0x1e;
 	
-	/**
-	 * Outgoing data from this client to the server using TCP as the socket
-	 * transport protocol. <b>Note</b> that the op-code is the same as
-	 * {@link #SERVER_OUT_TCP}, this variable is defined for use at client side.
-	 */
-	public final static byte CLIENT_OUT_TCP = 0x1d;
-	
-	/**
-	 * Outgoing data from the client to server using UDP as the socket transport
-	 * protocol. <b>Note</b> that the op-code is the same as
-	 * {@link #SERVER_OUT_UDP}, this variable is defined for use at client side.
-	 */
-	public final static byte CLIENT_OUT_UDP = 0x1e;
-	
-	public final static byte CHANGE_ATTRIBUTE = 0x20;
+	public static final byte CHANGE_ATTRIBUTE = 0x20;
 	
 	/**
 	 * If a remote connection is disconnected or closed then raise this event.
 	 */
-	public final static byte DISCONNECT = 0x22;
-	public final static byte EXCEPTION = 0x24;
+	public static final byte DISCONNECT = 0x22;
+	public static final byte EXCEPTION = 0x24;
 	
 	public static IEvent event(Object source, int eventType)
 	{
@@ -109,14 +93,41 @@ public class Events
 		return event;
 	}
 	
-	public static IEvent dataOutTcpEvent(Object source)
+	/**
+	 * Creates a network event with the source set to the object passed in as
+	 * parameter and the {@link IDeliveryGuaranty} set to
+	 * {@link DeliveryGuaranty#RELIABLE}. This method delegates to
+	 * {@link #networkEvent(Object, IDeliveryGuaranty)}.
+	 * 
+	 * @param source
+	 *            The payload of the event. This is the actual data that gets
+	 *            transmitted to remote machine.
+	 * @return An instance of {@link INetworkEvent}
+	 */
+	public static INetworkEvent networkEvent(Object source)
 	{
-		return event(source,Events.SERVER_OUT_TCP);
+		return networkEvent(source,IDeliveryGuaranty.DeliveryGuaranty.RELIABLE);
 	}
 	
-	public static IEvent dataOutUdpEvent(Object source)
+	/**
+	 * Creates a network event with the source set to the object passed in as
+	 * parameter and the {@link IDeliveryGuaranty} set to the incoming
+	 * parameter.
+	 * 
+	 * @param source
+	 *            The payload of the event. This is the actual data that gets
+	 *            transmitted to remote machine.
+	 * @param deliveryGuaranty
+	 *            This decides which transport TCP or UDP to be used to send the
+	 *            message to remote machine.
+	 * @return An instance of {@link INetworkEvent}
+	 */
+	public static INetworkEvent networkEvent(Object source, IDeliveryGuaranty deliveryGuaranty)
 	{
-		return event(source,Events.SERVER_OUT_UDP);
+		IEvent event = event(source,Events.NETWORK_MESSAGE);
+		INetworkEvent networkEvent = new NetworkEvent(event);
+		networkEvent.setDeliveryGuaranty(deliveryGuaranty);
+		return networkEvent;
 	}
 	
 	public static IEvent dataInEvent(Object source)
