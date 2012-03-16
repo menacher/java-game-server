@@ -1,9 +1,11 @@
 package org.menacheri.jetclient.event.impl;
 
 import org.menacheri.jetclient.app.ISession;
+import org.menacheri.jetclient.communication.IDeliveryGuaranty;
 import org.menacheri.jetclient.communication.IMessageSender;
 import org.menacheri.jetclient.event.Events;
 import org.menacheri.jetclient.event.IEvent;
+import org.menacheri.jetclient.event.INetworkEvent;
 import org.menacheri.jetclient.event.ISessionEventHandler;
 
 /**
@@ -48,11 +50,8 @@ public abstract class AbstractSessionEventHandler implements
 		case Events.SESSION_MESSAGE:
 			onDataIn(event);
 			break;
-		case Events.CLIENT_OUT_TCP:
-			onTcpDataOut(event);
-			break;
-		case Events.CLIENT_OUT_UDP:
-			onUdpDataOut(event);
+		case Events.NETWORK_MESSAGE:
+			onNetworkMessage((INetworkEvent)event);
 			break;
 		case Events.LOG_IN_UDP:
 			onLoginUdp(event);
@@ -89,29 +88,26 @@ public abstract class AbstractSessionEventHandler implements
 
 	public abstract void onDataIn(IEvent event);
 
-	public void onTcpDataOut(IEvent event)
-	{
-		ISession session = getSession();
-		IMessageSender tcpSender = session.getTcpMessageSender();
-		boolean writeable = session.isWriteable();
-		if (null != tcpSender && writeable)
-		{
-			tcpSender.sendMessage(event);
-		}
-	}
-
-	// TODO throw exception if udp sender is null.
-	public void onUdpDataOut(IEvent event)
+	public void onNetworkMessage(INetworkEvent networkEvent)
 	{
 		ISession session = getSession();
 		boolean writeable = session.isWriteable();
-		IMessageSender udpSender = session.getUdpMessageSender();
-		if (null != udpSender && writeable)
+		IMessageSender messageSender = null;
+		if (networkEvent.getDeliveryGuaranty().getGuaranty() == IDeliveryGuaranty.DeliveryGuaranty.FAST
+				.getGuaranty())
 		{
-			udpSender.sendMessage(event);
+			messageSender = session.getUdpMessageSender();
+		}
+		else
+		{
+			messageSender = session.getTcpMessageSender();
+		}
+		if (writeable && null != networkEvent)
+		{
+			messageSender.sendMessage(networkEvent);
 		}
 	}
-
+	
 	public void onLoginUdp(IEvent event)
 	{
 	}

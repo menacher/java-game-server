@@ -31,7 +31,7 @@ public class MessageBufferEventDecoder extends OneToOneDecoder
 		}
 		ChannelBuffer buffer = (ChannelBuffer) msg;
 		byte opCode = buffer.readByte();
-		if (opCode == Events.SERVER_OUT_TCP || opCode == Events.SERVER_OUT_UDP)
+		if (opCode == Events.NETWORK_MESSAGE)
 		{
 			opCode = Events.SESSION_MESSAGE;
 		}
