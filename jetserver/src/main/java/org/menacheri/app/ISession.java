@@ -3,6 +3,8 @@ package org.menacheri.app;
 import java.util.List;
 
 import org.menacheri.communication.IMessageSender;
+import org.menacheri.communication.IMessageSender.IFast;
+import org.menacheri.communication.IMessageSender.IReliable;
 import org.menacheri.event.Events;
 import org.menacheri.event.IEvent;
 import org.menacheri.event.IEventDispatcher;
@@ -105,4 +107,12 @@ public interface ISession
 	List<IEventHandler> getEventHandlers(int eventType);
 	
 	void close();
+
+	public abstract void setUdpSender(IFast udpSender);
+
+	public abstract IFast getUdpSender();
+
+	public abstract void setTcpSender(IReliable tcpSender);
+
+	public abstract IReliable getTcpSender();
 }
