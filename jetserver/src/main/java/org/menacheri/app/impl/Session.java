@@ -6,6 +6,8 @@ import java.util.Map;
 
 import org.jboss.netty.channel.Channel;
 import org.menacheri.app.ISession;
+import org.menacheri.communication.IMessageSender.IFast;
+import org.menacheri.communication.IMessageSender.IReliable;
 import org.menacheri.event.Events;
 import org.menacheri.event.IEvent;
 import org.menacheri.event.IEventDispatcher;
@@ -57,6 +59,10 @@ public class Session implements ISession
 	
 	protected final Map<String, Object> connectParameters;
 
+	protected IReliable tcpSender = null;
+	
+	protected IFast udpSender = null;
+	
 	protected Session(SessionBuilder sessionBuilder)
 	{
 		// validate variables and provide default values if necessary. Normally
@@ -402,5 +408,29 @@ public class Session implements ISession
 		else if (!id.equals(other.id))
 			return false;
 		return true;
+	}
+
+	@Override
+	public IReliable getTcpSender()
+	{
+		return tcpSender;
+	}
+
+	@Override
+	public void setTcpSender(IReliable tcpSender)
+	{
+		this.tcpSender = tcpSender;
+	}
+
+	@Override
+	public IFast getUdpSender()
+	{
+		return udpSender;
+	}
+
+	@Override
+	public void setUdpSender(IFast udpSender)
+	{
+		this.udpSender = udpSender;
 	}
 }
