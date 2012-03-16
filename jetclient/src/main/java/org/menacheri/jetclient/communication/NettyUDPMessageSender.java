@@ -5,6 +5,7 @@ import java.net.SocketAddress;
 import org.jboss.netty.channel.socket.DatagramChannel;
 import org.menacheri.jetclient.NettyUDPClient;
 import org.menacheri.jetclient.app.ISession;
+import org.menacheri.jetclient.communication.IMessageSender.IFast;
 import org.menacheri.jetclient.event.Events;
 
 /**
@@ -15,7 +16,7 @@ import org.menacheri.jetclient.event.Events;
  * @author Abraham Menacherry
  * 
  */
-public class NettyUDPMessageSender implements IMessageSender
+public class NettyUDPMessageSender implements IFast
 {
 	private final SocketAddress remoteAddress;
 	private final DatagramChannel channel;

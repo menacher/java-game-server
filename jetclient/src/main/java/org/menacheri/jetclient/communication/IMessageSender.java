@@ -1,5 +1,6 @@
 package org.menacheri.jetclient.communication;
 
+
 /**
  * This interface declares method for sending a message to client. Different
  * implementations would be used by the server for sending based on the delivery
@@ -36,4 +37,7 @@ public interface IMessageSender
 	 */
 	void close();
 
+	public interface IReliable extends IMessageSender{}
+	
+	public interface IFast extends IMessageSender{}
 }

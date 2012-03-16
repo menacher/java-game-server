@@ -2,10 +2,18 @@ package org.menacheri.jetclient.communication;
 
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFutureListener;
+import org.menacheri.jetclient.communication.IMessageSender.IReliable;
 import org.menacheri.jetclient.event.Events;
 import org.menacheri.jetclient.event.IEvent;
 
-public class NettyTCPMessageSender implements IMessageSender
+/**
+ * A class that transmits messages reliably to remote machines/vm's. Internally
+ * this class uses Netty tcp {@link Channel} to transmit the message.
+ * 
+ * @author Abraham Menacherry
+ * 
+ */
+public class NettyTCPMessageSender implements IReliable
 {
 	private final Channel channel;
 	private static final IDeliveryGuaranty DELIVERY_GUARANTY = IDeliveryGuaranty.DeliveryGuaranty.RELIABLE;
