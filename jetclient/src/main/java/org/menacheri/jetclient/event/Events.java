@@ -1,8 +1,10 @@
 package org.menacheri.jetclient.event;
 
+import org.menacheri.jetclient.communication.IDeliveryGuaranty;
+import org.menacheri.jetclient.event.impl.AbstractSessionEventHandler;
 import org.menacheri.jetclient.event.impl.ChangeAttributeEvent;
 import org.menacheri.jetclient.event.impl.Event;
-import org.menacheri.jetclient.event.impl.AbstractSessionEventHandler;
+import org.menacheri.jetclient.event.impl.NetworkEvent;
 /**
  * Defines the event constants. Server and client communicate to each other
  * using these constants. However, since Netty can be used to support any binary
@@ -58,31 +60,11 @@ public class Events
 	public final static byte SESSION_MESSAGE = 0x1c;
 
 	/**
-	 * Outgoing data from the server to a remote client using TCP as the socket
-	 * transport protocol
+	 * This event is used to send data from the current machine to remote
+	 * machines using TCP or UDP transports. It is an out-going event.
 	 */
-	public final static byte SERVER_OUT_TCP = 0x1d;
-
-	/**
-	 * Outgoing data from the server to a remote client using UDP as the socket
-	 * transport protocol
-	 */
-	public final static byte SERVER_OUT_UDP = 0x1e;
-
-	/**
-	 * Outgoing data from this client to the server using TCP as the socket
-	 * transport protocol. <b>Note</b> that the op-code is the same as
-	 * {@link #SERVER_OUT_TCP}, this variable is defined for use at client side.
-	 */
-	public final static byte CLIENT_OUT_TCP = 0x1d;
-
-	/**
-	 * Outgoing data from the client to server using UDP as the socket transport
-	 * protocol. <b>Note</b> that the op-code is the same as
-	 * {@link #SERVER_OUT_UDP}, this variable is defined for use at client side.
-	 */
-	public final static byte CLIENT_OUT_UDP = 0x1e;
-
+	public static final byte NETWORK_MESSAGE = 0x1d;
+	
 	public final static byte CHANGE_ATTRIBUTE = 0x20;
 
 	/**
@@ -91,21 +73,41 @@ public class Events
 	public final static byte DISCONNECT = 0x22;
 	public final static byte EXCEPTION = 0x24;
 
-	public static IEvent clientOutTCP(Object source)
+	/**
+	 * Creates a network event with the source set to the object passed in as
+	 * parameter and the {@link IDeliveryGuaranty} set to
+	 * {@link DeliveryGuaranty#RELIABLE}. This method delegates to
+	 * {@link #networkEvent(Object, IDeliveryGuaranty)}.
+	 * 
+	 * @param source
+	 *            The payload of the event. This is the actual data that gets
+	 *            transmitted to remote machine.
+	 * @return An instance of {@link INetworkEvent}
+	 */
+	public static INetworkEvent networkEvent(Object source)
 	{
-		return event(source,CLIENT_OUT_TCP);
+		return networkEvent(source,IDeliveryGuaranty.DeliveryGuaranty.RELIABLE);
 	}
 	
 	/**
-	 * Creates an event with CLIENT_OUT_UDP( byte 0x1e) as its event type.
+	 * Creates a network event with the source set to the object passed in as
+	 * parameter and the {@link IDeliveryGuaranty} set to the incoming
+	 * parameter.
 	 * 
 	 * @param source
-	 *            The payload to set on the created event.
-	 * @return The event instance created.
+	 *            The payload of the event. This is the actual data that gets
+	 *            transmitted to remote machine.
+	 * @param deliveryGuaranty
+	 *            This decides which transport TCP or UDP to be used to send the
+	 *            message to remote machine.
+	 * @return An instance of {@link INetworkEvent}
 	 */
-	public static IEvent clientOutUDP(Object source)
+	public static INetworkEvent networkEvent(Object source, IDeliveryGuaranty deliveryGuaranty)
 	{
-		return event(source, CLIENT_OUT_UDP);
+		IEvent event = event(source,Events.NETWORK_MESSAGE);
+		INetworkEvent networkEvent = new NetworkEvent(event);
+		networkEvent.setDeliveryGuaranty(deliveryGuaranty);
+		return networkEvent;
 	}
 	
 	public static IEvent event(Object source, int eventType)
