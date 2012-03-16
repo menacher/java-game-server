@@ -4,10 +4,15 @@ import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.socket.DatagramChannel;
 import org.menacheri.app.IPlayerSession;
 import org.menacheri.app.ISession;
+import org.menacheri.communication.IDeliveryGuaranty;
+import org.menacheri.communication.IDeliveryGuaranty.DeliveryGuaranty;
 import org.menacheri.communication.IMessageSender;
+import org.menacheri.communication.IMessageSender.IFast;
+import org.menacheri.communication.IMessageSender.IReliable;
 import org.menacheri.communication.NettyUDPMessage;
 import org.menacheri.event.Events;
 import org.menacheri.event.IEvent;
+import org.menacheri.event.INetworkEvent;
 import org.menacheri.event.ISessionEventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,9 +24,6 @@ public abstract class AbstractSessionEventHandler implements ISessionEventHandle
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractSessionEventHandler.class);
 	protected final int eventType;
 
-	protected IMessageSender tcpSender = null;
-	protected IMessageSender udpSender = null;
-	
 	private ISession session = null;
 	
 	public AbstractSessionEventHandler()
@@ -54,11 +56,8 @@ public abstract class AbstractSessionEventHandler implements ISessionEventHandle
 		case Events.SESSION_MESSAGE:
 			onDataIn(event);
 			break;
-		case Events.SERVER_OUT_TCP:
-			onTcpDataOut(event);
-			break;
-		case Events.SERVER_OUT_UDP:
-			onUdpDataOut(event);
+		case Events.NETWORK_MESSAGE:
+			onNetworkMessage((INetworkEvent)event);
 			break;
 		case Events.LOG_IN_UDP:
 			onLoginUdp(event);
@@ -101,69 +100,75 @@ public abstract class AbstractSessionEventHandler implements ISessionEventHandle
 	
 	public void onDataIn(IEvent event)
 	{
-		if(null != session)
+		if(null != getSession())
 		{
-			IPlayerSession pSession = (IPlayerSession)session;
-			pSession.getGameRoom().sendBroadcast(event.getSource());
+			IPlayerSession pSession = (IPlayerSession)getSession();
+			INetworkEvent networkEvent = new NetworkEvent(event);
+			networkEvent.setDeliveryGuaranty(IDeliveryGuaranty.DeliveryGuaranty.FAST);
+			pSession.getGameRoom().sendBroadcast(networkEvent);
 		}
 	}
 
-	public void onTcpDataOut(IEvent event)
+	public void onNetworkMessage(INetworkEvent event)
 	{
-		if (null != tcpSender)
-		{
-			tcpSender.sendMessage(event);
-		}
-	}
-
-	public void onUdpDataOut(IEvent event)
-	{
-		if(null != udpSender)
-		{
-			udpSender.sendMessage(event);
+		IDeliveryGuaranty guaranty = event.getDeliveryGuaranty();
+		if(guaranty.getGuaranty() == DeliveryGuaranty.FAST.getGuaranty()){
+			IFast udpSender = getSession().getUdpSender();
+			if(null != udpSender)
+			{
+				udpSender.sendMessage(event);
+			}
+			else
+			{
+				LOG.trace("Going to discard event: {} since udpSender is null in session: {}",event,session);
+			}
+		}else{
+			getSession().getTcpSender().sendMessage(event);
 		}
 	}
 	
 	public void onLoginUdp(IEvent event)
 	{
-		if (null != tcpSender)
+		if (null != getSession().getTcpSender())
 		{
-			tcpSender.sendMessage(event);
+			getSession().getTcpSender().sendMessage(event);
 		}
 	}
 	
 	public void onLoginSuccess(IEvent event)
 	{
-		onTcpDataOut(event);
+		getSession().getTcpSender().sendMessage(event);
 	}
 	
 	public void onLoginFailure(IEvent event)
 	{
-		onTcpDataOut(event);
+		getSession().getTcpSender().sendMessage(event);
 	}
 	
 	public void onTcpConnect(IEvent event)
 	{
-		tcpSender = createMessageSender(event.getSource());
+		IReliable tcpSender = (IReliable)createMessageSender(event.getSource());
+		getSession().setTcpSender(tcpSender);
 	}
 
 	public void onUdpConnect(IEvent event)
 	{
-		udpSender = createMessageSender(event.getSource());
+		IFast udpSender = (IFast)createMessageSender(event.getSource());
 		if(null != udpSender)
 		{
+			getSession().setUdpSender((IFast)udpSender);
 			getSession().setUDPEnabled(true);
 		}
 	}
 
 	public void onStart(IEvent event)
 	{
-		onTcpDataOut(event);
+		getSession().getTcpSender().sendMessage(event);
 	}
 	
 	public void onStop(IEvent event)
 	{
-		onTcpDataOut(event);
+		getSession().getTcpSender().sendMessage(event);
 	}
 	
 	public void onConnectFailed(IEvent event)
