@@ -49,7 +49,7 @@ public class NetworkEvent extends Event implements INetworkEvent
 	 * {@link Events#NETWORK_MESSAGE}. {@link DeliveryGuaranty} is set to the
 	 * value passed in
 	 * 
-	 * @param eventevent
+	 * @param event
 	 *            The instance from which payload, create time etc will be
 	 *            copied
 	 * 

@@ -13,8 +13,8 @@ import org.slf4j.LoggerFactory;
 /**
  * This decoder will convert a Netty {@link ChannelBuffer} to a
  * {@link NettyMessageBuffer}. It will also convert
- * {@link Events#CLIENT_OUT_TCP} and {@link Events#CLIENT_OUT_UDP} events to
- * {@link Events#SESSION_MESSAGE} event.
+ * {@link Events#NETWORK_MESSAGE} events to {@link Events#SESSION_MESSAGE}
+ * event.
  * 
  * @author Abraham Menacherry
  * 
