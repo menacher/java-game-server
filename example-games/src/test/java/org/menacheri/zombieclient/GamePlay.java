@@ -2,6 +2,7 @@ package org.menacheri.zombieclient;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.menacheri.jetclient.app.ISession;
+import org.menacheri.jetclient.communication.IDeliveryGuaranty;
 import org.menacheri.jetclient.communication.IMessageBuffer;
 import org.menacheri.jetclient.communication.NettyMessageBuffer;
 import org.menacheri.jetclient.event.Events;
@@ -38,7 +39,7 @@ public class GamePlay implements Runnable
 		IMessageBuffer<ChannelBuffer> messageBuffer = new NettyMessageBuffer();
 		messageBuffer.writeInt(type);
 		messageBuffer.writeInt(operation);
-		IEvent event = Events.clientOutUDP(messageBuffer);
+		IEvent event = Events.networkEvent(messageBuffer,IDeliveryGuaranty.DeliveryGuaranty.FAST);
 		session.onEvent(event);
 	}
 }
