@@ -14,7 +14,8 @@ import org.menacheri.jetclient.app.IPlayerSession;
 import org.menacheri.jetclient.app.ISession;
 import org.menacheri.jetclient.app.impl.Session.SessionBuilder;
 import org.menacheri.jetclient.communication.IMessageBuffer;
-import org.menacheri.jetclient.communication.IMessageSender;
+import org.menacheri.jetclient.communication.IMessageSender.IFast;
+import org.menacheri.jetclient.communication.IMessageSender.IReliable;
 import org.menacheri.jetclient.communication.NettyTCPMessageSender;
 import org.menacheri.jetclient.communication.NettyUDPMessageSender;
 import org.menacheri.jetclient.event.Events;
@@ -144,7 +145,7 @@ public class SessionFactory
 				}
 			};
 			session.addHandler(startEventHandler);
-			IMessageSender udpMessageSender = new NettyUDPMessageSender(
+			IFast udpMessageSender = new NettyUDPMessageSender(
 					udpClient.getServerAddress(), datagramChannel);
 			session.setUdpMessageSender(udpMessageSender);
 		}
@@ -157,7 +158,7 @@ public class SessionFactory
 		// This will in turn invoke the startEventHandler when server sends
 		// Events.START event.
 		Channel channel = tcpClient.connect(tcpFactory, loginEvent);
-		IMessageSender tcpMessageSender = new NettyTCPMessageSender(channel);
+		IReliable tcpMessageSender = new NettyTCPMessageSender(channel);
 		session.setTcpMessageSender(tcpMessageSender);
 	}
 
