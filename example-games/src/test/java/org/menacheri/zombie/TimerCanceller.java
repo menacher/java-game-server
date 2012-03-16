@@ -30,7 +30,7 @@ public class TimerCanceller extends SimpleChannelUpstreamHandler
 		if(message instanceof IEvent)
 		{
 			IEvent event = (IEvent)message;
-			if(Events.SERVER_OUT_TCP == event.getType() || Events.SERVER_OUT_UDP == event.getType())
+			if(Events.NETWORK_MESSAGE == event.getType())
 			{
 				ChannelBuffer apocalypse = (ChannelBuffer) event.getSource();
 				if(apocalypse.readableBytes()>=4)

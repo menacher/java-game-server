@@ -56,7 +56,7 @@ public class PipelineFactory implements ChannelPipelineFactory
 				int started = counter.incrementAndGet();
 				System.out.println("Started: " + started);
 			}
-			else if(Events.SERVER_OUT_TCP == event.getType())
+			else if(Events.NETWORK_MESSAGE == event.getType())
 			{
 				System.out.println("Client Recieved Data No: " + INTEGER.addAndGet(5000));
 			}
