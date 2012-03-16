@@ -23,7 +23,7 @@ public class ZombieJetclient
 				.jetserverUdpHostName("255.255.255.255").udpPort(18090);
 		LoginHelper loginHelper = builder.build();
 		SessionFactory sessionFactory = new SessionFactory(loginHelper);
-		ScheduledExecutorService taskExecutor = Executors.newSingleThreadScheduledExecutor();
+		ScheduledExecutorService taskExecutor = Executors.newScheduledThreadPool(15);//Executors.newSingleThreadScheduledExecutor();
 		for(int i = 1; i<=50; i++){
 			ISession session = getSession(sessionFactory);
 			GamePlay task = null;
@@ -33,7 +33,7 @@ public class ZombieJetclient
 			else{
 				task = new GamePlay(IAM.ZOMBIE, session);
 			}
-			taskExecutor.scheduleAtFixedRate(task, 5000, 100, TimeUnit.MILLISECONDS);
+			taskExecutor.scheduleAtFixedRate(task, 2000, 200, TimeUnit.MILLISECONDS);
 		}
 	}
 	
