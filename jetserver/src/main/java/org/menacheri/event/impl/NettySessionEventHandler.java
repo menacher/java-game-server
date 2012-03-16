@@ -121,28 +121,28 @@ public class NettySessionEventHandler extends AbstractSessionEventHandler
 		LOG.trace("In onClose method of class: {}", this.getClass().getName());
 
 		// Close the tcpSender.
-		if (null != tcpSender)
+		if (null != getSession().getTcpSender())
 		{
 			LOG.info("Going to close tcp connection in class: {}", this
 					.getClass().getName());
-			NettyTCPMessageSender nettyTcpSender = (NettyTCPMessageSender) tcpSender;
+			NettyTCPMessageSender nettyTcpSender = (NettyTCPMessageSender) getSession().getTcpSender();
 			// Close the channel after flushing the pending writes.
 			nettyTcpSender.close(Events.event(null, Events.DISCONNECT));
-			tcpSender = null;
+			getSession().setTcpSender(null);
 		}
 		else
 		{
-			LOG.trace("TCPSender is null in class {}, no need to close", this
+			LOG.trace("TCPSender is null in class {}, no need to close", getSession()
 					.getClass().getName());
 		}
 
-		if (null != udpSender)
+		if (null != getSession().getUdpSender())
 		{
 			// Close the udpSender
 			LOG.info("Going to remove session from sessions map in class: {}",
 					this.getClass().getName());
 			
-			NettyUDPMessageSender nettyUdpSender = (NettyUDPMessageSender) udpSender;
+			NettyUDPMessageSender nettyUdpSender = (NettyUDPMessageSender) getSession().getUdpSender();
 			SocketAddress remoteAddress = nettyUdpSender.getRemoteAddress();
 			ISessionRegistryService udpSessions = (ISessionRegistryService) AppContext
 					.getBean(AppContext.SESSION_REGISTRY_SERVICE);
@@ -152,14 +152,14 @@ public class NettySessionEventHandler extends AbstractSessionEventHandler
 			}
 			else
 			{
-				LOG.warn("No session found for address: {} in class: {}",
-						remoteAddress, this.getClass().getName());
+				LOG.trace("No session found for address: {} in class: {}",
+						remoteAddress, getSession().getClass().getName());
 			}
-			udpSender = null;
+			getSession().setUdpSender(null);
 		}
 		else
 		{
-			LOG.trace("UDPSender is null in class {}, no need to close", this
+			LOG.trace("UDPSender is null in class {}, no need to close", getSession()
 					.getClass().getName());
 		}
 	}
