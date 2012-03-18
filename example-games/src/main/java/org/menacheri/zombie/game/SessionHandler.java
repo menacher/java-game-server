@@ -37,27 +37,17 @@ public class SessionHandler extends NettySessionEventHandler implements IGameCom
 	
 	public void onDataIn(IEvent event)
 	{
-		onMessage((IMessageBuffer)event.getSource());
-	}
-	
-	/**
-	 * This method gets called due to dynamic dispatch. When the event handler
-	 * does the connection.send(), the message gets routed here asynchronously.
-	 * 
-	 * @param message
-	 */
-	public void onMessage(IMessageBuffer message)
-	{
-		try
+		try 
 		{
-			interpretCommand(message);
-		}
-		catch (InvalidCommandException e)
+			interpretCommand(event.getSource());
+		} 
+		catch (InvalidCommandException e) 
 		{
 			e.printStackTrace();
 			LOG.error("{}",e);
 		}
 	}
+	
 	
 	@Override
 	public void interpretCommand(Object command) throws InvalidCommandException
