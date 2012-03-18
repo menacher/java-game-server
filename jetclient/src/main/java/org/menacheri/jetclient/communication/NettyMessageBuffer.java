@@ -1,7 +1,5 @@
 package org.menacheri.jetclient.communication;
 
-import java.io.Serializable;
-
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.buffer.DynamicChannelBuffer;
@@ -285,39 +283,6 @@ public class NettyMessageBuffer implements IMessageBuffer<ChannelBuffer>
 	{
 		ChannelBuffer strMultiBuf = NettyUtils.writeStrings(messages);
 		buffer.writeBytes(strMultiBuf);
-		return this;
-	}
-
-	/**
-	 * Writes a serializable java object to the underlying {@link ChannelBuffer}
-	 * . This uses Netty specific serialization, hence the client which decodes
-	 * this object should also be using Netty decoder
-	 * 
-	 * @param serializable
-	 * @return Returns the same buffer instance. Can be used for easy chained
-	 *         message creation.
-	 */
-	public IMessageBuffer<ChannelBuffer> writeObject(Serializable serializable)
-	{
-		ChannelBuffer objBuf = NettyUtils.writeObject(serializable);
-		buffer.writeBytes(objBuf);
-		return this;
-	}
-
-	/**
-	 * Writes a serializable java object to the underlying {@link ChannelBuffer}
-	 * . This uses Netty specific serialization, hence the client which decodes
-	 * this object should also be using Netty decoder
-	 * 
-	 * @param serializable
-	 * @return Returns the same buffer instance. Can be used for easy chained
-	 *         message creation.
-	 */
-	public IMessageBuffer<ChannelBuffer> writeObjects(
-			Serializable... serializable)
-	{
-		ChannelBuffer objBuf = NettyUtils.writeObjects(serializable);
-		buffer.writeBytes(objBuf);
 		return this;
 	}
 

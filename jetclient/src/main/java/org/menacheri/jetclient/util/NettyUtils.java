@@ -1,6 +1,5 @@
 package org.menacheri.jetclient.util;
 
-import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.util.NoSuchElementException;
 
@@ -25,7 +24,6 @@ public class NettyUtils
 	private static final StringDecoderWrapper STRING_DECODER = new StringDecoderWrapper();
 	private static final StringEncoderWrapper STRING_ENCODER = new StringEncoderWrapper();
 	private static final ObjectDecoderWrapper OBJECT_DECODER = new ObjectDecoderWrapper();
-	private static final ObjectEncoderWrapper OBJECT_ENCODER = new ObjectEncoderWrapper();
 
 	public static final String NETTY_CHANNEL = "NETTY_CHANNEL";
 
@@ -285,69 +283,6 @@ public class NettyUtils
 		}
 		;
 		return obj;
-	}
-
-	/**
-	 * Writes a collection of objects to a channel buffer and returns the
-	 * channel buffer. Each object will be written in the format. This method
-	 * will internall use writeObject(Object message) method.
-	 * objlength.objbytes.
-	 * 
-	 * @param messages
-	 *            The collection of objects to be written to the
-	 *            {@link ChannelBuffer}
-	 * @return The {@link ChannelBuffer} created from writing all these
-	 *         messages.
-	 */
-	public static ChannelBuffer writeObjects(Serializable... messages)
-	{
-		ChannelBuffer buffer = null;
-		for (Serializable msg : messages)
-		{
-			if (null == buffer)
-			{
-				buffer = writeObject(msg);
-			}
-			else
-			{
-				ChannelBuffer theBuffer = writeObject(msg);
-				if (null != theBuffer)
-				{
-					buffer = ChannelBuffers.wrappedBuffer(buffer, theBuffer);
-				}
-			}
-		}
-		return buffer;
-	}
-
-	/**
-	 * This method will write an Object to a {@link ChannelBuffer} in the format
-	 * objlength.objbytes and return that buffer.
-	 * 
-	 * @param message
-	 *            The message to be written.
-	 * @return The {@link ChannelBuffer} created from writing this message.
-	 */
-	public static ChannelBuffer writeObject(Serializable message)
-	{
-		ChannelBuffer buffer = null;
-		ChannelBuffer objectBuffer;
-		try
-		{
-			objectBuffer = OBJECT_ENCODER.encode(message);
-		}
-		catch (Exception e)
-		{
-			throw new RuntimeException(e);
-		}
-		if (null != objectBuffer)
-		{
-			int length = objectBuffer.readableBytes();
-			ChannelBuffer lengthBuffer = ChannelBuffers.buffer(2);
-			lengthBuffer.writeShort(length);
-			buffer = ChannelBuffers.wrappedBuffer(lengthBuffer, objectBuffer);
-		}
-		return buffer;
 	}
 
 	public static <V> ChannelBuffer writeObject(
