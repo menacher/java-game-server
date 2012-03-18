@@ -1,6 +1,5 @@
 package org.menacheri.util;
 
-import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.util.NoSuchElementException;
 
@@ -8,9 +7,6 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.handler.codec.serialization.ClassResolvers;
-import org.jboss.netty.handler.codec.serialization.ObjectDecoder;
-import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
 import org.jboss.netty.handler.codec.string.StringDecoder;
 import org.jboss.netty.handler.codec.string.StringEncoder;
 import org.menacheri.app.IPlayerSession;
@@ -31,8 +27,6 @@ public class NettyUtils
 	private static final Logger LOG = LoggerFactory.getLogger(NettyUtils.class);
 	private static final StringDecoderWrapper STRING_DECODER = new StringDecoderWrapper();
 	private static final StringEncoderWrapper STRING_ENCODER = new StringEncoderWrapper();
-	private static final ObjectDecoderWrapper OBJECT_DECODER = new ObjectDecoderWrapper();
-	private static final ObjectEncoderWrapper OBJECT_ENCODER = new ObjectEncoderWrapper();
 	
 	public static final String NETTY_CHANNEL = "NETTY_CHANNEL";
 	
@@ -234,77 +228,6 @@ public class NettyUtils
 		return buffer;
 	}
 	
-	/**
-	 * This method will read multiple objects of the buffer and return them as
-	 * an object array. It internally uses the readObject(ChannelBuffer buffer)
-	 * to accomplish this task. The objects are read back in the order they are
-	 * written.
-	 * 
-	 * @param buffer
-	 *            The buffer containing the objects, with each object being a
-	 *            objlength-objbytes combination.
-	 * @param numOfObjects
-	 *            The number of objects to be read. Should not be negative or 0
-	 * @return the objects read from the buffer as an array.
-	 */
-	public static Object[] readObjects(ChannelBuffer buffer, int numOfObjects)
-	{
-		Object[] objects = new String[numOfObjects]; 
-		for(int i=0;i<numOfObjects;i++)
-		{
-			Object theObject = readObject(buffer);
-			if(null == theObject) break;
-			objects[i] = theObject;
-		}
-		return objects;
-	}
-	
-	/**
-	 * This method will first read an unsigned short to find the length of the
-	 * object and then read the actual object based on the length. It sets
-	 * the reader index of the buffer to current reader index + 2(length bytes)
-	 * + actual length.
-	 * 
-	 * @param buffer
-	 *            The Netty buffer containing at least one unsigned short
-	 *            followed by an Object of that length.
-	 * @return Returns the String or throws {@link IndexOutOfBoundsException} if
-	 *         the length is greater than expected.
-	 */
-	public static Object readObject(ChannelBuffer buffer)
-	{
-		Object readObj = null;
-		if (null != buffer && buffer.readableBytes() > 2)
-		{
-			int length = buffer.readUnsignedShort();
-			readObj = readObject(buffer, length);
-		}
-		return readObj;
-	}
-
-	/**
-	 * Read an object from a channel buffer with the specified length. It sets
-	 * the reader index of the buffer to current reader index + 2(length bytes)
-	 * + actual length.
-	 * 
-	 * @param buffer
-	 *            The Netty buffer containing the Object.
-	 * @param length
-	 *            The number of bytes in the Object.
-	 * @return Returns the read object.
-	 */
-	public static Object readObject(ChannelBuffer buffer, int length)
-	{
-		ChannelBuffer objBuffer = buffer.readSlice(length);
-		Object obj = null;
-		try{
-			obj = OBJECT_DECODER.decode(objBuffer);
-		}catch(Exception e){
-			LOG.error("Error occurred while trying to read string from buffer: {}",e);
-		}
-		return obj;
-	}
-
 	public static <T,V> V readObject(ChannelBuffer buffer, ITransform<ChannelBuffer, V> decoder)
 	{
 		int length = 0;
@@ -323,65 +246,6 @@ public class NettyUtils
 		return obj;
 	}
 	
-	/**
-	 * Writes a collection of objects to a channel buffer and returns the
-	 * channel buffer. Each object will be written in the format. This method
-	 * will internall use writeObject(Object message) method.
-	 * objlength.objbytes.
-	 * 
-	 * @param messages
-	 *            The collection of objects to be written to the
-	 *            {@link ChannelBuffer}
-	 * @return The {@link ChannelBuffer} created from writing all these
-	 *         messages.
-	 */
-	public static ChannelBuffer writeObjects(Serializable... messages)
-	{
-		ChannelBuffer buffer = null;
-		for (Serializable msg : messages)
-		{
-			if (null == buffer)
-			{
-				buffer = writeObject(msg);
-			}
-			else
-			{
-				ChannelBuffer theBuffer = writeObject(msg);
-				if(null != theBuffer)
-				{
-					buffer = ChannelBuffers.wrappedBuffer(buffer,theBuffer);
-				}
-			}
-		}
-		return buffer;
-	}
-	
-	/**
-	 * This method will write an Object to a {@link ChannelBuffer} in the format
-	 * objlength.objbytes and return that buffer.
-	 * 
-	 * @param message
-	 *            The message to be written.
-	 * @return The {@link ChannelBuffer} created from writing this message.
-	 */
-	public static ChannelBuffer writeObject(Serializable message) {
-		ChannelBuffer buffer = null;
-		try {
-			ChannelBuffer objectBuffer = OBJECT_ENCODER.encode(message);
-			if (null != objectBuffer) {
-				int length = objectBuffer.readableBytes();
-				ChannelBuffer lengthBuffer = ChannelBuffers.buffer(2);
-				lengthBuffer.writeShort(length);
-				buffer = ChannelBuffers.wrappedBuffer(lengthBuffer,
-						objectBuffer);
-			}
-
-		} catch (Exception e) {
-			LOG.error("Error occurred while writing object to buffer: {}", e);
-		}
-		return buffer;
-	}
-
 	public static <V> ChannelBuffer writeObject(
 			ITransform<V, ChannelBuffer> converter, V object) {
 		ChannelBuffer buffer = null;
@@ -456,24 +320,5 @@ public class NettyUtils
 		}
 	}
 	
-	public static class ObjectDecoderWrapper extends ObjectDecoder
-	{
-		public ObjectDecoderWrapper()
-		{
-			super(ClassResolvers.weakCachingResolver(null));
-		}
-		public Object decode(ChannelBuffer buffer) throws Exception
-		{
-			return super.decode(null, null, buffer);
-		}
-	}
 	
-	public static class ObjectEncoderWrapper extends ObjectEncoder
-	{
-		protected ChannelBuffer encode(Object msg) throws Exception
-		{
-			ChannelBuffer objBuffer = (ChannelBuffer)super.encode(null, null, msg);
-			return objBuffer;
-		}
-	}
 }
