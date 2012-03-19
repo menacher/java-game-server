@@ -18,7 +18,7 @@ import org.menacheri.jetclient.event.impl.NetworkEvent;
 public class Events
 {
 	/**
-	 * Events should <b>never<b> have this type. But event handlers can choose
+	 * Events should <b>NEVER</b> have this type. But event handlers can choose
 	 * to have this type to signify that they will handle any type of incoming
 	 * event. For e.g. {@link AbstractSessionEventHandler}
 	 */

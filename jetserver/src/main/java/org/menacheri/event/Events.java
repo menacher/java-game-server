@@ -13,9 +13,9 @@ import org.menacheri.event.impl.NetworkEvent;
 public class Events
 {
 	/**
-	 * Events should never have this type. But event handlers can choose to have
-	 * this type to signify that they will handle any type of incoming event.
-	 * For e.g. {@link AbstractSessionEventHandler}
+	 * Events should <b>NEVER</b> have this type. But event handlers can choose
+	 * to have this type to signify that they will handle any type of incoming
+	 * event. For e.g. {@link AbstractSessionEventHandler}
 	 */
 	public final static byte ANY = 0x00;
 	// Lifecycle events.
