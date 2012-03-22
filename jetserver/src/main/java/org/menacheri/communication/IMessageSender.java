@@ -31,6 +31,13 @@ public interface IMessageSender
 	public IDeliveryGuaranty getDeliveryGuaranty();
 	
 	/**
+	 * Since message sender would have a network connection, it would require
+	 * some cleanup. This method can be overriden to close underlying channels
+	 * and so on.
+	 */
+	public void close();
+	
+	/**
 	 * An interface whose implementations would transmit messages reliably to
 	 * the remote machine/vm. The transport for instance could be TCP.
 	 * 
