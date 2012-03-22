@@ -15,6 +15,7 @@ import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.menacheri.app.IGameRoom;
 import org.menacheri.app.IPlayer;
 import org.menacheri.app.IPlayerSession;
+import org.menacheri.communication.NettyTCPMessageSender;
 import org.menacheri.event.Events;
 import org.menacheri.event.IEvent;
 import org.menacheri.server.netty.NettyServer;
@@ -33,8 +34,8 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 	private static final Logger LOG = LoggerFactory
 			.getLogger(LoginHandler.class);
 
-	private ILookupService lookupService;
-	ISessionRegistryService sessionRegistryService;
+	protected ILookupService lookupService;
+	protected ISessionRegistryService sessionRegistryService;
 	/**
 	 * Used for book keeping purpose. It will count all open channels. Currently
 	 * closed channels will not lead to a decrement.
@@ -119,12 +120,12 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 		{
 			IPlayerSession playerSession = gameRoom.createPlayerSession();
 			playerSession.setConnectParameter(NettyUtils.NETTY_CHANNEL,
-					channel);
+					channel); // TODO is this required?
 			gameRoom.onLogin(playerSession);
 			LOG.trace("Sending GAME_ROOM_JOIN_SUCCESS to channel {}", channel.getId());
 			ChannelFuture future = channel.write(NettyUtils.createBufferForOpcode(Events.GAME_ROOM_JOIN_SUCCESS));
 			connectToGameRoom(gameRoom, playerSession, future);
-			loginUdp(playerSession,buffer);
+			loginUdp(playerSession, buffer);
 		}
 		else
 		{
@@ -153,9 +154,7 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 					// Connect the pipeline to the game room.
 					gameRoom.connectSession(playerSession);
 					// Send the connect event to session so that it can create its message sender
-					playerSession.onEvent(Events.event(channel, Events.CONNECT_TCP));
-					// Add a data out listener so that it can write back stuff.
-					//playerSession.addHandler(new NettyDataOutTCPListener(channel));
+					playerSession.onEvent(Events.connectEvent(new NettyTCPMessageSender(channel)));
 				}
 				else
 				{
@@ -166,7 +165,17 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 		});
 	}
 	
-	protected void loginUdp(IPlayerSession playerSession,ChannelBuffer buffer)
+	/**
+	 * This method adds the player session to the
+	 * {@link ISessionRegistryService}. The key being the remote udp address of
+	 * the client and the session being the value.
+	 * 
+	 * @param playerSession
+	 * @param buffer
+	 *            Used to read the remote address of the client which is
+	 *            attempting to connect via udp.
+	 */
+	protected void loginUdp(IPlayerSession playerSession, ChannelBuffer buffer)
 	{
 		InetSocketAddress remoteAdress = NettyUtils.readSocketAddress(buffer);
 		if(null != remoteAdress)
