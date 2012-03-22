@@ -2,14 +2,13 @@ package org.menacheri.handlers.netty;
 
 import java.net.SocketAddress;
 
-import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.jboss.netty.channel.socket.DatagramChannel;
 import org.menacheri.app.ISession;
-import org.menacheri.communication.NettyMessageBuffer;
-import org.menacheri.communication.NettyUDPMessage;
+import org.menacheri.communication.IMessageSender;
+import org.menacheri.communication.NettyUDPMessageSender;
 import org.menacheri.event.Events;
 import org.menacheri.event.IEvent;
 import org.menacheri.service.ISessionRegistryService;
@@ -35,13 +34,27 @@ public class UDPUpstreamHandler extends SimpleChannelUpstreamHandler
 		ISession session = sessionRegistryService.getSession(remoteAddress);
 		if(null != session)
 		{
-			IEvent event = (IEvent)e.getMessage();
-			// If the session's UDP has not been connected yet then send a UDP_CONNECT event.
-			if(!session.isUDPEnabled()){
-				event = getUDPConnectEvent(event, remoteAddress, (DatagramChannel)e.getChannel());
+			IEvent event = (IEvent) e.getMessage();
+			// If the session's UDP has not been connected yet then send a
+			// CONNECT event.
+			if (!session.isUDPEnabled())
+			{
+				event = getUDPConnectEvent(event, remoteAddress,
+						(DatagramChannel) e.getChannel());
+				// Pass the connect event on to the session
+				session.onEvent(event);
 			}
-			// Pass the event on to the session
-			session.onEvent(event);
+			else if (event.getType() == Events.CONNECT)
+			{
+				// Duplicate connect just discard.
+				LOG.trace("Duplicate CONNECT {} received in UDP channel, "
+						+ "for session: {} going to discard", event, session);
+			}
+			else
+			{
+				// Pass the original event on to the session
+				session.onEvent(event);
+			}
 		}
 		else
 		{
@@ -54,31 +67,18 @@ public class UDPUpstreamHandler extends SimpleChannelUpstreamHandler
 	{
 		LOG.debug("Incoming udp connection remote address : {}",
 				remoteAddress);
-		NettyMessageBuffer messageBuffer = (NettyMessageBuffer) event.getSource();
-		if (event.getType() != Events.CONNECT_UDP)
+		
+		if (event.getType() != Events.CONNECT)
 		{
 			LOG.warn("Going to discard UDP Message Event with type {} "
-					+ "It will get converted to a UDP_CONNECT event since "
+					+ "It will get converted to a CONNECT event since "
 					+ "the UDP MessageSender is not initialized till now",
 					event.getType());
-			messageBuffer = null;
-			event.setType(Events.CONNECT_UDP);
 		}
+		IMessageSender messageSender = new NettyUDPMessageSender(remoteAddress, udpChannel, sessionRegistryService);
+		IEvent connectEvent = Events.connectEvent(messageSender);
 		
-		NettyUDPMessage updMessage = new NettyUDPMessage();
-		if(null != messageBuffer)
-		{
-			updMessage.setChannelBuffer((ChannelBuffer)messageBuffer.getNativeBuffer()).setChannel(udpChannel)
-					.setSocketAddress(remoteAddress);
-		}
-		else
-		{
-			updMessage.setChannel(udpChannel).setSocketAddress(remoteAddress);
-		}
-		// The source is now a updMessage.
-		event.setSource(updMessage);
-		
-		return event;
+		return connectEvent;
 	}
 	
 	public ISessionRegistryService getSessionRegistryService()
