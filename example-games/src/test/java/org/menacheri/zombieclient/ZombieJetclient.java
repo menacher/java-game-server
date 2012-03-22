@@ -25,7 +25,8 @@ public class ZombieJetclient
 		SessionFactory sessionFactory = new SessionFactory(loginHelper);
 		ScheduledExecutorService taskExecutor = Executors.newScheduledThreadPool(15);//Executors.newSingleThreadScheduledExecutor();
 		for(int i = 1; i<=50; i++){
-			ISession session = getSession(sessionFactory);
+			ISession session = sessionFactory.createAndConnectSession();
+			addDefaultHandlerToSession(session);
 			GamePlay task = null;
 			if((i % 2) == 0){
 				task = new GamePlay(IAM.DEFENDER, session);
@@ -37,9 +38,9 @@ public class ZombieJetclient
 		}
 	}
 	
-	private static ISession getSession(SessionFactory sessionFactory) throws Exception
+	private static void addDefaultHandlerToSession(ISession session)
 	{
-		ISession session = sessionFactory.createAndConnectSession();
+		// we are only interested in data in, so override only that method.
 		AbstractSessionEventHandler handler = new AbstractSessionEventHandler(session)
 		{
 			@Override
@@ -50,6 +51,5 @@ public class ZombieJetclient
 			}
 		};
 		session.addHandler(handler);
-		return session;
 	}
 }

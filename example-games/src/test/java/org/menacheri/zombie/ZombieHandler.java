@@ -7,10 +7,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
@@ -18,19 +15,18 @@ import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.jboss.netty.channel.socket.DatagramChannel;
 import org.menacheri.event.Events;
 import org.menacheri.event.IEvent;
-import org.menacheri.util.NettyUtils;
 import org.menacheri.zombie.domain.IAM;
 
 public class ZombieHandler extends SimpleChannelUpstreamHandler
 {
-	private static final IAM iam = IAM.ZOMBIE;
-	private static final Map<InetSocketAddress, DatagramChannel> clients = new HashMap<InetSocketAddress, DatagramChannel>();
-	private UDPClient udpClient;
+	private static final IAM I_AM = IAM.ZOMBIE;
+	private static final Map<InetSocketAddress, DatagramChannel> CLIENTS = new HashMap<InetSocketAddress, DatagramChannel>();
+	private final UDPClient udpClient;
 
 	public ZombieHandler()
 	{
-		udpClient = new UDPClient(this, iam, "255.255.255.255", 18090,
-				DefenderHandler.getService());
+		udpClient = new UDPClient(this, I_AM, "255.255.255.255", 18090,
+				ZombieClient.SERVICE);
 	}
 
 	@Override
@@ -43,15 +39,17 @@ public class ZombieHandler extends SimpleChannelUpstreamHandler
 			IEvent event = (IEvent) message;
 			if (Events.START == event.getType())
 			{
-				loginUDP(e.getChannel());
+				// TCP write to server
 				WriteByte write = new WriteByte(e.getChannel(), null,
 						IAM.ZOMBIE);
-				DefenderHandler.getService().scheduleAtFixedRate(write, 2000l,
+				ZombieClient.SERVICE.scheduleAtFixedRate(write, 2000l,
 						500l, TimeUnit.MILLISECONDS);
+				// For UDP write to server
+				connectUDP(e.getChannel());
 			}
 			else if (Events.LOG_IN_SUCCESS == event.getType())
 			{
-				connectUDP(event);
+				
 			}
 			else if (Events.NETWORK_MESSAGE == event.getType())
 			{
@@ -76,45 +74,19 @@ public class ZombieHandler extends SimpleChannelUpstreamHandler
 
 	}
 
-	public void loginUDP(Channel channel) throws UnknownHostException
+	public InetSocketAddress connectLocal() throws UnknownHostException
 	{
-		ChannelBuffer opCode = NettyUtils
-				.createBufferForOpcode(Events.LOG_IN_UDP);
-		final DatagramChannel c = udpClient.createDatagramChannel();
-		final InetSocketAddress localAddress = udpClient.getLocalAddress(c);
-		ChannelBuffer hostName = NettyUtils.writeString(localAddress
-				.getHostName());
-		ChannelBuffer portNum = ChannelBuffers.buffer(4);
-		portNum.writeInt(localAddress.getPort());
-		ChannelBuffer login = ChannelBuffers.wrappedBuffer(opCode, hostName,
-				portNum);
-		ChannelFuture loginFuture = channel.write(login);
-		loginFuture.addListener(new ChannelFutureListener()
-		{
-			@Override
-			public void operationComplete(ChannelFuture future)
-					throws Exception
-			{
-				if (future.isSuccess())
-				{
-					clients.put(localAddress, c);
-				}
-				else
-				{
-					System.out
-							.println("Sending UDP login from ZombieHandler was a failure.");
-				}
-			}
-		});
-		loginFuture.awaitUninterruptibly();
+		DatagramChannel c = udpClient.createDatagramChannel();
+		InetSocketAddress localAddress = udpClient.getLocalAddress(c);
+		CLIENTS.put(localAddress, c);
+		return localAddress;
 	}
-
-	public void connectUDP(IEvent event)
+	
+	public void connectUDP(Channel channel)
 	{
-		ChannelBuffer buffer = (ChannelBuffer) event.getSource();
-		InetSocketAddress address = NettyUtils.readSocketAddress(buffer);
+		InetSocketAddress address = ZombieClient.CHANNEL_ID_ADDRESS_MAP.get(channel.getId());
 		System.out.println("UDP address for connect UDP: " + address);
-		final DatagramChannel c = clients.get(address);
+		final DatagramChannel c = CLIENTS.get(address);
 		if ((udpClient != null) && (c != null))
 		{
 			// Connect the UDP
@@ -127,7 +99,7 @@ public class ZombieHandler extends SimpleChannelUpstreamHandler
 					udpClient.start(c);
 				}
 			};
-			DefenderHandler.getService().submit(runnable);
+			ZombieClient.SERVICE.submit(runnable);
 		}
 	}
 

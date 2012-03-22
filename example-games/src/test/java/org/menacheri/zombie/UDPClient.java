@@ -71,8 +71,8 @@ public class UDPClient
 			if(c.isBound())
 			{
 				// Write the connect statement. TODO repeat till we get start.
-				System.out.println("Events.CONNECT_UDP: " + Events.CONNECT_UDP);
-				ChannelBuffer buf = NettyUtils.createBufferForOpcode(Events.CONNECT_UDP);
+				System.out.println("Events.CONNECT: " + Events.CONNECT);
+				ChannelBuffer buf = NettyUtils.createBufferForOpcode(Events.CONNECT);
 				
 				ChannelFuture future = c.write(buf, serverAddress);
 				future.addListener(new ChannelFutureListener()
@@ -89,7 +89,7 @@ public class UDPClient
 				
 				future.awaitUninterruptibly();
 				WriteByte write = new WriteByte(c, serverAddress,iam);
-				DefenderHandler.getService().scheduleAtFixedRate(write,10000l,5000l, TimeUnit.MILLISECONDS);
+				ZombieClient.SERVICE.scheduleAtFixedRate(write,10000l,5000l, TimeUnit.MILLISECONDS);
 			}
 			else
 			{

@@ -19,7 +19,7 @@ import org.menacheri.handlers.netty.EventDecoder;
 public class PipelineFactory implements ChannelPipelineFactory
 {
 	private static final LengthFieldPrepender LENGTH_FIELD_PREPENDER = new LengthFieldPrepender(2);
-	private static final TimerCanceller CANCELLER = new TimerCanceller("Zombie",DefenderHandler.getService());
+	private static final TimerCanceller CANCELLER = new TimerCanceller("Zombie",ZombieClient.SERVICE);
 	private static final EventDecoder EVENT_DECODER = new EventDecoder();
 	private static final StartEventCounter COUNTER = new StartEventCounter();
 	private final ChannelHandler businessHandler;
