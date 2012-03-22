@@ -357,10 +357,18 @@ public class Session implements ISession
 	}
 	
 	@Override
-	public void close()
+	public synchronized void close()
 	{
 		isShuttingDown = true;
 		eventDispatcher.close();
+		if(null != tcpSender){
+			tcpSender.close();
+			tcpSender = null;
+		}
+		if(null != udpSender){
+			udpSender.close();
+			udpSender = null;
+		}
 		this.status = Status.CLOSED;
 	}
 	
