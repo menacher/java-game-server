@@ -1,15 +1,11 @@
 package org.menacheri.event.impl;
 
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.socket.DatagramChannel;
 import org.menacheri.app.IPlayerSession;
 import org.menacheri.app.ISession;
 import org.menacheri.communication.IDeliveryGuaranty;
 import org.menacheri.communication.IDeliveryGuaranty.DeliveryGuaranty;
-import org.menacheri.communication.IMessageSender;
 import org.menacheri.communication.IMessageSender.IFast;
 import org.menacheri.communication.IMessageSender.IReliable;
-import org.menacheri.communication.NettyUDPMessage;
 import org.menacheri.event.Events;
 import org.menacheri.event.IEvent;
 import org.menacheri.event.INetworkEvent;
@@ -29,11 +25,6 @@ public abstract class AbstractSessionEventHandler implements ISessionEventHandle
 	public AbstractSessionEventHandler()
 	{
 		this.eventType = Events.ANY;
-	}
-
-	public AbstractSessionEventHandler(int eventType)
-	{
-		this.eventType = eventType;
 	}
 
 	@Override
@@ -59,20 +50,14 @@ public abstract class AbstractSessionEventHandler implements ISessionEventHandle
 		case Events.NETWORK_MESSAGE:
 			onNetworkMessage((INetworkEvent)event);
 			break;
-		case Events.LOG_IN_UDP:
-			onLoginUdp(event);
-			break;
 		case Events.LOG_IN_SUCCESS:
 			onLoginSuccess(event);
 			break;
 		case Events.LOG_IN_FAILURE:
 			onLoginFailure(event);
 			break;
-		case Events.CONNECT_TCP:
-			onTcpConnect(event);
-			break;
-		case Events.CONNECT_UDP:
-			onUdpConnect(event);
+		case Events.CONNECT:
+			onConnect(event);
 			break;
 		case Events.START:
 			onStart(event);
@@ -100,11 +85,14 @@ public abstract class AbstractSessionEventHandler implements ISessionEventHandle
 	
 	public void onDataIn(IEvent event)
 	{
-		if(null != getSession())
+		if (null != getSession())
 		{
-			IPlayerSession pSession = (IPlayerSession)getSession();
+			IPlayerSession pSession = (IPlayerSession) getSession();
 			INetworkEvent networkEvent = new NetworkEvent(event);
-			networkEvent.setDeliveryGuaranty(IDeliveryGuaranty.DeliveryGuaranty.FAST);
+			if (pSession.isUDPEnabled())
+			{
+				networkEvent.setDeliveryGuaranty(DeliveryGuaranty.FAST);
+			}
 			pSession.getGameRoom().sendBroadcast(networkEvent);
 		}
 	}
@@ -127,14 +115,6 @@ public abstract class AbstractSessionEventHandler implements ISessionEventHandle
 		}
 	}
 	
-	public void onLoginUdp(IEvent event)
-	{
-		if (null != getSession().getTcpSender())
-		{
-			getSession().getTcpSender().sendMessage(event);
-		}
-	}
-	
 	public void onLoginSuccess(IEvent event)
 	{
 		getSession().getTcpSender().sendMessage(event);
@@ -145,19 +125,24 @@ public abstract class AbstractSessionEventHandler implements ISessionEventHandle
 		getSession().getTcpSender().sendMessage(event);
 	}
 	
-	public void onTcpConnect(IEvent event)
+	public void onConnect(IEvent event)
 	{
-		IReliable tcpSender = (IReliable)createMessageSender(event.getSource());
-		getSession().setTcpSender(tcpSender);
-	}
-
-	public void onUdpConnect(IEvent event)
-	{
-		IFast udpSender = (IFast)createMessageSender(event.getSource());
-		if(null != udpSender)
+		Object source = event.getSource();
+		if (source instanceof IReliable)
 		{
-			getSession().setUdpSender((IFast)udpSender);
-			getSession().setUDPEnabled(true);
+			getSession().setTcpSender((IReliable) source);
+		}
+		else
+		{
+			if(null == getSession().getTcpSender())
+			{
+				logNullTcpConnection(event);
+			}
+			else
+			{
+				getSession().setUDPEnabled(true);
+				getSession().setUdpSender((IFast) source);
+			}
 		}
 	}
 
@@ -197,7 +182,7 @@ public abstract class AbstractSessionEventHandler implements ISessionEventHandle
 
 	public void onClose(IEvent event)
 	{
-		session.close();
+		getSession().close();
 	}
 	
 	public void onCustomEvent(IEvent event)
@@ -205,21 +190,6 @@ public abstract class AbstractSessionEventHandler implements ISessionEventHandle
 
 	}
 
-	/**
-	 * Depending on the type of incoming connection, tcp, upd or even based on
-	 * the type of network api used, Netty, MINA the connection would be
-	 * different. This method will capture the incoming connection and create an
-	 * appropriate {@link IMessageSender} for it.
-	 * 
-	 * @param nativeConnection
-	 *            For Netty implementation it will be the {@link Channel} or a
-	 *            {@link NettyUDPMessage} containing the {@link DatagramChannel}
-	 *            and remote address of the udp client.
-	 * @return Returns the created message sender for that particular network
-	 *         type.
-	 */
-	public abstract IMessageSender createMessageSender(Object nativeConnection);
-	
 	public ISession getSession()
 	{
 		return session;
@@ -228,5 +198,10 @@ public abstract class AbstractSessionEventHandler implements ISessionEventHandle
 	public void setSession(ISession session)
 	{
 		this.session = session;
+	}
+	
+	private void logNullTcpConnection(IEvent event){
+		LOG.warn("Discarding {} as TCP connection is not fully "
+				+ "established for this {}", event, getSession());
 	}
 }
