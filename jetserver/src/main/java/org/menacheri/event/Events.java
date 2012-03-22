@@ -3,8 +3,10 @@ package org.menacheri.event;
 import org.menacheri.app.ISession;
 import org.menacheri.communication.IDeliveryGuaranty;
 import org.menacheri.communication.IDeliveryGuaranty.DeliveryGuaranty;
+import org.menacheri.communication.IMessageSender;
 import org.menacheri.event.impl.AbstractSessionEventHandler;
 import org.menacheri.event.impl.ChangeAttributeEvent;
+import org.menacheri.event.impl.ConnectEvent;
 import org.menacheri.event.impl.Event;
 import org.menacheri.event.impl.EventContext;
 import org.menacheri.event.impl.NetworkEvent;
@@ -19,11 +21,9 @@ public class Events
 	 */
 	public final static byte ANY = 0x00;
 	// Lifecycle events.
-	public final static byte CONNECT_TCP = 0x02;
-	public final static byte CONNECT_UDP = 0x04;
+	public final static byte CONNECT = 0x02;
 	public final static byte CONNECT_FAILED = 0x06;
 	public static final byte LOG_IN = 0x08;
-	public static final byte LOG_IN_UDP = 0x09;
 	public static final byte LOG_OUT = 0x0a;
 	public static final byte LOG_IN_SUCCESS = 0x0b;
 	public static final byte LOG_IN_FAILURE = 0x0c;
@@ -128,6 +128,13 @@ public class Events
 		INetworkEvent networkEvent = new NetworkEvent(event);
 		networkEvent.setDeliveryGuaranty(deliveryGuaranty);
 		return networkEvent;
+	}
+	
+	public static IEvent connectEvent(IMessageSender messageSender){
+		IEvent event = new ConnectEvent();
+		event.setSource(messageSender);
+		event.setTimeStamp(System.currentTimeMillis());
+		return event;
 	}
 	
 	public static IEvent dataInEvent(Object source)
