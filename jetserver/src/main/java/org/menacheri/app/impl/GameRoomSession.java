@@ -271,7 +271,7 @@ public abstract class GameRoomSession extends Session implements IGameRoom
 		IEventHandler networkEventHandler = new NetworkEventListener(playerSession);
 		// Add a listener to the game room which will in turn pass game room events to session.
 		this.eventDispatcher.addHandler(networkEventHandler);
-		LOG.trace("Added the tcp and udp handler to "
+		LOG.trace("Added Network handler to "
 				+ "EventDispatcher of GameRoom {} for session: {}", this,
 				playerSession);
 	}
