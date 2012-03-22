@@ -300,10 +300,12 @@ public class Session implements ISession
 		if (null != tcpMessageSender)
 		{
 			tcpMessageSender.close();
+			tcpMessageSender = null;
 		}
 		if (null != udpMessageSender)
 		{
 			udpMessageSender.close();
+			udpMessageSender = null;
 		}
 	}
 

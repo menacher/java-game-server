@@ -185,12 +185,12 @@ public class NettyUDPClient
 
 	/**
 	 * This method will connect the datagram channel with the server and send
-	 * the {@link Events#CONNECT_UDP} message to server. This method will use
+	 * the {@link Events#CONNECT} message to server. This method will use
 	 * {@link #serverAddress} by default when sending the
-	 * {@link Events#CONNECT_UDP} message. <b>Note</b> Even if this connect
+	 * {@link Events#CONNECT} message. <b>Note</b> Even if this connect
 	 * message does not reach server, the first UDP message that the server
 	 * receives from this particular DatagramChannels local address will be
-	 * converted by server and used as {@link Events#CONNECT_UDP}.
+	 * converted by server and used as {@link Events#CONNECT}.
 	 * 
 	 * @param session
 	 *            The session for which the datagram channel is being created.
@@ -213,7 +213,7 @@ public class NettyUDPClient
 
 	/**
 	 * This method will connect the datagram channel with the server and send
-	 * the {@link Events#CONNECT_UDP} message to server.
+	 * the {@link Events#CONNECT} message to server.
 	 * 
 	 * @param session
 	 *            The session for which the datagram channel is being created.
@@ -250,7 +250,7 @@ public class NettyUDPClient
 					+ " Passed to connect method is not bound");
 		}
 
-		IEvent event = Events.event(null, Events.CONNECT_UDP);
+		IEvent event = Events.event(null, Events.CONNECT);
 		ChannelFuture future = datagramChannel.write(event, serverAddress);
 		future.addListener(new ChannelFutureListener()
 		{

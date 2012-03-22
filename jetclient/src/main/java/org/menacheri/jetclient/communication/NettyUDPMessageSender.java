@@ -10,7 +10,7 @@ import org.menacheri.jetclient.event.Events;
 
 /**
  * This class is used to send messages to a remote UDP client or server. An
- * instance of this class will be created when the {@link Events#CONNECT_UDP}
+ * instance of this class will be created when the {@link Events#CONNECT}
  * event is sent to a {@link ISession}
  * 
  * @author Abraham Menacherry

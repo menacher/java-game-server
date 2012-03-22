@@ -1,7 +1,7 @@
 package org.menacheri.jetclient.event.impl;
 
 import org.menacheri.jetclient.app.ISession;
-import org.menacheri.jetclient.communication.IDeliveryGuaranty;
+import org.menacheri.jetclient.communication.IDeliveryGuaranty.DeliveryGuaranty;
 import org.menacheri.jetclient.communication.IMessageSender;
 import org.menacheri.jetclient.event.Events;
 import org.menacheri.jetclient.event.IEvent;
@@ -53,9 +53,6 @@ public abstract class AbstractSessionEventHandler implements
 		case Events.NETWORK_MESSAGE:
 			onNetworkMessage((INetworkEvent)event);
 			break;
-		case Events.LOG_IN_UDP:
-			onLoginUdp(event);
-			break;
 		case Events.LOG_IN_SUCCESS:
 			onLoginSuccess(event);
 			break;
@@ -93,7 +90,7 @@ public abstract class AbstractSessionEventHandler implements
 		ISession session = getSession();
 		boolean writeable = session.isWriteable();
 		IMessageSender messageSender = null;
-		if (networkEvent.getDeliveryGuaranty().getGuaranty() == IDeliveryGuaranty.DeliveryGuaranty.FAST
+		if (networkEvent.getDeliveryGuaranty().getGuaranty() == DeliveryGuaranty.FAST
 				.getGuaranty())
 		{
 			messageSender = session.getUdpMessageSender();
@@ -108,10 +105,6 @@ public abstract class AbstractSessionEventHandler implements
 		}
 	}
 	
-	public void onLoginUdp(IEvent event)
-	{
-	}
-
 	public void onLoginSuccess(IEvent event)
 	{
 	}
