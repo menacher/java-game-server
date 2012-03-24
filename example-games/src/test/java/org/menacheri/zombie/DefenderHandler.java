@@ -4,6 +4,7 @@ import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import org.jboss.netty.buffer.ChannelBuffer;
@@ -26,7 +27,7 @@ public class DefenderHandler extends SimpleChannelUpstreamHandler
 	public DefenderHandler()
 	{
 		this.udpClient = new UDPClient(this, I_AM, "255.255.255.255", 18090,
-				ZombieClient.SERVICE);
+				Executors.newCachedThreadPool());
 	}
 
 	@Override
