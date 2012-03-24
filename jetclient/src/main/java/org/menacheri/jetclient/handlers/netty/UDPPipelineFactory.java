@@ -30,7 +30,6 @@ public class UDPPipelineFactory implements ChannelPipelineFactory
 	static ChannelPipeline init()
 	{
 		ChannelPipeline pipeline = Channels.pipeline();
-		pipeline.addLast("executionHandler", ExecutionHandlerSingleton.getExecutionHandler());
 		pipeline.addLast("eventDecoder", EVENT_DECODER);
 		pipeline.addLast("eventEncoder", EVENT_ENCODER);
 		pipeline.addLast("UDPUpstreamHandler",UDP_UPSTREAM_HANDLER);
