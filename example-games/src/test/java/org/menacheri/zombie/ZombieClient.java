@@ -26,7 +26,7 @@ public class ZombieClient
 	public static final Map<Integer, InetSocketAddress> CHANNEL_ID_ADDRESS_MAP;
 	
 	static {
-		SERVICE = Executors.newScheduledThreadPool(15);
+		SERVICE = Executors.newSingleThreadScheduledExecutor();
 		CHANNEL_ID_ADDRESS_MAP = new HashMap<Integer, InetSocketAddress>();
 		Runtime.getRuntime().addShutdownHook(new Thread(){
 			@Override
