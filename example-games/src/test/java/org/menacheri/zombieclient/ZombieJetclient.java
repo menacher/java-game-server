@@ -23,7 +23,7 @@ public class ZombieJetclient
 				.jetserverUdpHostName("255.255.255.255").udpPort(18090);
 		LoginHelper loginHelper = builder.build();
 		SessionFactory sessionFactory = new SessionFactory(loginHelper);
-		ScheduledExecutorService taskExecutor = Executors.newScheduledThreadPool(15);//Executors.newSingleThreadScheduledExecutor();
+		ScheduledExecutorService taskExecutor = Executors.newSingleThreadScheduledExecutor();
 		for(int i = 1; i<=50; i++){
 			ISession session = sessionFactory.createAndConnectSession();
 			addDefaultHandlerToSession(session);
