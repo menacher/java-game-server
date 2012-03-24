@@ -27,7 +27,6 @@ public class Events
 	public static final byte LOG_OUT = 0x0a;
 	public static final byte LOG_IN_SUCCESS = 0x0b;
 	public static final byte LOG_IN_FAILURE = 0x0c;
-	public static final byte LOG_IN_FAILURE_UDP = 0x0d;
 	public static final byte LOG_OUT_SUCCESS = 0x0e;
 	public static final byte LOG_OUT_FAILURE = 0x0f;
 	
