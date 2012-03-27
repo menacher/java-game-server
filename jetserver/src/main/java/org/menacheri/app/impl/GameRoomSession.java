@@ -113,12 +113,11 @@ public abstract class GameRoomSession extends Session implements IGameRoom
 			sessions.add(playerSession);
 			LOG.trace("Protocol to be applied is: {}",protocol.getClass().getName());
 			protocol.applyProtocol(playerSession);
-			// Create tcp and udp event handlers and add it to the game rooms event dispatcher.
 			createAndAddEventHandlers(playerSession);
 			playerSession.setStatus(ISession.Status.CONNECTED);
 			afterSessionConnect(playerSession);
 			return true;
-			// TODO send event to all other sessions.
+			// TODO send event to all other sessions?
 		}
 		else
 		{
@@ -128,13 +127,6 @@ public abstract class GameRoomSession extends Session implements IGameRoom
 		}
 	}
 
-	@Override
-	public boolean connectSession(IPlayerSession session, Object protocolKey,
-			Object nativeConnection)
-	{
-		return false;
-	}
-	
 	@Override
 	public void afterSessionConnect(IPlayerSession playerSession)
 	{
@@ -241,17 +233,18 @@ public abstract class GameRoomSession extends Session implements IGameRoom
 	}
 
 	/**
-	 * Method which will create and add event handlers to the player session as
-	 * well as the EventDispatcher.
+	 * Method which will create and add event handlers of the player session to
+	 * the Game Room's EventDispatcher.
 	 * 
 	 * @param playerSession
 	 *            The session for which the event handlers are created.
 	 */
-	public void createAndAddEventHandlers(IPlayerSession playerSession)
+	protected void createAndAddEventHandlers(IPlayerSession playerSession)
 	{
-		//TODO only add the UDP handler if the session can handle it. For e.g flash can't.
+		// Create a network event listener for the player session.
 		IEventHandler networkEventHandler = new NetworkEventListener(playerSession);
-		// Add a listener to the game room which will in turn pass game room events to session.
+		// Add the handler to the game room's EventDispatcher so that it will
+		// pass game room network events to player session session.
 		this.eventDispatcher.addHandler(networkEventHandler);
 		LOG.trace("Added Network handler to "
 				+ "EventDispatcher of GameRoom {}, for session: {}", this,

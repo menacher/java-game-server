@@ -46,22 +46,6 @@ public interface IGameRoom
 	 * @param playerSession
 	 *            The incoming user session. If we are using netty, it would be
 	 *            a {@link Channel} object wrapped in a {@link IPlayerSession}.
-	 * @param protocolKey
-	 *            If client has control to set protocol, then this key is used.
-	 * @param nativeConnection
-	 *            The actual connection object used, for netty it would be
-	 *            {@link Channel}
-	 * @return true if session is connected successfully.
-	 */
-	public abstract boolean connectSession(IPlayerSession playerSession, Object protocolKey, Object nativeConnection);
-	
-	/**
-	 * When a new user connects to the game, this method will be invoked to add
-	 * the incoming session to the game room.
-	 * 
-	 * @param playerSession
-	 *            The incoming user session. If we are using netty, it would be
-	 *            a {@link Channel} object wrapped in a {@link IPlayerSession}.
 	 * @return true if session is connected successfully.
 	 */
 	public abstract boolean connectSession(IPlayerSession playerSession);
