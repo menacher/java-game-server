@@ -169,6 +169,7 @@ public abstract class GameRoomSession extends Session implements IGameRoom
 		return playerSession;
 	}
 	
+	@Override
 	public Set<IPlayerSession> getSessions()
 	{
 		return sessions;
@@ -180,57 +181,37 @@ public abstract class GameRoomSession extends Session implements IGameRoom
 		this.sessions = sessions;
 	}
 	
+	@Override
 	public String getGameRoomName()
 	{
 		return gameRoomName;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.menacheri.app.IGameRoom#setGameRoomName(java.lang.String)
-	 */
+	@Override
 	public void setGameRoomName(String gameRoomName)
 	{
 		this.gameRoomName = gameRoomName;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.menacheri.app.IGameRoom#getParentGame()
-	 */
+	@Override
 	public IGame getParentGame()
 	{
 		return parentGame;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.menacheri.app.IGameRoom#setParentGame(org.menacheri.app.IGame)
-	 */
+	@Override
 	public void setParentGame(IGame parentGame)
 	{
 		this.parentGame = parentGame;
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @seecom.menacher.game.IGameRoom#setStateManager(org.menacheri.app.
-	 * IGameStateManagerService)
-	 */
+	@Override
 	public void setStateManager(IGameStateManagerService stateManager)
 	{
 		this.stateManager = stateManager;
 	}
 	
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see org.menacheri.app.IGameRoom#getStateManager()
-	 */
+	@Override
 	public IGameStateManagerService getStateManager()
 	{
 		return stateManager;
@@ -248,6 +229,7 @@ public abstract class GameRoomSession extends Session implements IGameRoom
 		this.protocol = protocol;
 	}
 	
+	@Override
 	public boolean isShuttingDown()
 	{
 		return isShuttingDown;
@@ -272,7 +254,7 @@ public abstract class GameRoomSession extends Session implements IGameRoom
 		// Add a listener to the game room which will in turn pass game room events to session.
 		this.eventDispatcher.addHandler(networkEventHandler);
 		LOG.trace("Added Network handler to "
-				+ "EventDispatcher of GameRoom {} for session: {}", this,
+				+ "EventDispatcher of GameRoom {}, for session: {}", this,
 				playerSession);
 	}
 }
