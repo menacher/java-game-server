@@ -14,16 +14,28 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-//TODO make it implement IEventlistener, session listener is not required the IEvent has context which can have the session attached.
+/**
+ * This class will handle any event that gets published to a
+ * {@link ISession#onEvent(IEvent)}. The event dispatcher will route all events
+ * to this class's {@link #onEvent(IEvent)} method. It provides default
+ * implementations for common events defined in the server. <b>Note</b> invoking
+ * {@link #setSession(ISession)} method on this class will result in an
+ * {@link UnsupportedOperationException} since the session is a final variable
+ * of this class.
+ * 
+ * @author Abraham Menacherry
+ * 
+ */
 public abstract class AbstractSessionEventHandler implements ISessionEventHandler
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractSessionEventHandler.class);
 	protected final int eventType;
 
-	private ISession session = null;
+	private final ISession session;
 	
-	public AbstractSessionEventHandler()
+	public AbstractSessionEventHandler(ISession session)
 	{
+		this.session = session;
 		this.eventType = Events.ANY;
 	}
 
@@ -197,7 +209,7 @@ public abstract class AbstractSessionEventHandler implements ISessionEventHandle
 
 	public void setSession(ISession session)
 	{
-		this.session = session;
+		throw new UnsupportedOperationException("Session is a final variable and cannot be reset.");
 	}
 	
 	private void logNullTcpConnection(IEvent event){
