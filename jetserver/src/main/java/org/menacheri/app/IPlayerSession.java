@@ -1,14 +1,13 @@
 package org.menacheri.app;
 
 import org.menacheri.protocols.IProtocol;
-import org.menacheri.service.IGameConnectionService;
 
 
 /**
- * This interface abstracts a user session to a {@link IGame}. The
- * implementation class of this interface will not be used in isolation but
- * would be connected by the {@link IGameConnectionService} to a
- * {@link IGameRoom} based on some reference key or other input.
+ * This interface model's a human player's session to jetserver. It declares
+ * methods to get and set the {@link IPlayer}, the {@link IGameRoom} to which
+ * this session will connect and the network {@link IProtocol} that will be used
+ * for communication.
  * 
  * @author Abraham Menacherry
  * 
@@ -44,15 +43,15 @@ public interface IPlayerSession extends ISession
 	/**
 	 * Get the {@link IProtocol} associated with this session.
 	 * 
-	 * @return Returns the associated enumeration or default AMF3_STRING.
+	 * @return Returns the associated protocol instance.
 	 */
 	public IProtocol getProtocol();
 
 	/**
-	 * Set the protocol on the user session.
+	 * Set the network protocol on the user session.
 	 * 
 	 * @param protocol
-	 *            The {@link IProtocol} enumeration to set.
+	 *            The {@link IProtocol} to set.
 	 */
 	public void setProtocol(IProtocol protocol);
 }
