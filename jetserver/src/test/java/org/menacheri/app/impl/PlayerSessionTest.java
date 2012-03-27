@@ -1,10 +1,12 @@
 package org.menacheri.app.impl;
 
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import static org.junit.Assert.assertTrue;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.menacheri.app.IGame;
@@ -40,9 +42,9 @@ public class PlayerSessionTest
 	private static final int NUM_OF_GAME_ROOMS = 1000;
 	private static final int SESSIONS_PER_GAME_ROOM = 50;
 	private static final int EVENTS_PER_SESSION = 10;
-	private static final CountDownLatch LATCH = new CountDownLatch(
-			(NUM_OF_GAME_ROOMS * SESSIONS_PER_GAME_ROOM)
-					* (EVENTS_PER_SESSION * SESSIONS_PER_GAME_ROOM));
+	private static final int LATCH_COUNT = ((NUM_OF_GAME_ROOMS * SESSIONS_PER_GAME_ROOM) * (EVENTS_PER_SESSION * SESSIONS_PER_GAME_ROOM))
+			+ (EVENTS_PER_SESSION * SESSIONS_PER_GAME_ROOM * NUM_OF_GAME_ROOMS);
+	private static final CountDownLatch LATCH = new CountDownLatch(LATCH_COUNT);
 	private IGame game;
 	private List<IGameRoom> gameRoomList;
 	private List<ISession> sessionList;
@@ -102,9 +104,10 @@ public class PlayerSessionTest
 		assertTrue(LATCH.await(20, TimeUnit.SECONDS));
 		long time = System.nanoTime() - start;
 		System.out.printf(
-				"Took  %.3f seconds to pass %d messages between sessions",
-				time / 1e9, (COUNTER.get() + (EVENTS_PER_SESSION
-						* SESSIONS_PER_GAME_ROOM * NUM_OF_GAME_ROOMS)));
+				"Took  %.3f seconds to pass %d messages between sessions\n",
+				time / 1e9, COUNTER.get());
+		System.out.printf("Message passing rate was %.3f million messages/sec",
+				COUNTER.get() / ((time / 1e9) * 1000000));
 	}
 
 	private static class TestGameRoom extends GameRoomSession
@@ -133,7 +136,8 @@ public class PlayerSessionTest
 		@Override
 		public void onNetworkMessage(INetworkEvent event)
 		{
-
+			COUNTER.incrementAndGet();
+			LATCH.countDown();
 		}
 	}
 
