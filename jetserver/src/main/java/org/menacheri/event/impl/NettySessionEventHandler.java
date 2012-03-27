@@ -1,5 +1,6 @@
 package org.menacheri.event.impl;
 
+import org.menacheri.app.ISession;
 import org.menacheri.communication.NettyMessageBuffer;
 import org.menacheri.communication.IMessageSender.IReliable;
 import org.menacheri.event.Events;
@@ -8,6 +9,11 @@ import org.menacheri.event.IEvent;
 
 public class NettySessionEventHandler extends AbstractSessionEventHandler
 {
+	public NettySessionEventHandler(ISession session)
+	{
+		super(session);
+	}
+	
 	@Override
 	public void onConnect(IEvent event)
 	{
