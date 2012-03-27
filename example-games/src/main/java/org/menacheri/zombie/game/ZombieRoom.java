@@ -32,10 +32,9 @@ public class ZombieRoom extends GameRoomSession
 	@Override
 	public void onLogin(IPlayerSession playerSession)
 	{
-		SessionHandler listener = new SessionHandler(defender, zombie,
+		SessionHandler listener = new SessionHandler(playerSession,defender, zombie,
 				IAM.ZOMBIE);
 		playerSession.addHandler(listener);
-		listener.setSession(playerSession);
 		LOG.trace("Added event listener in Zombie Room");
 	}
 	

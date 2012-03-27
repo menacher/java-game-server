@@ -1,6 +1,7 @@
 package org.menacheri.zombie.game;
 
 import org.menacheri.app.IGameCommandInterpreter;
+import org.menacheri.app.ISession;
 import org.menacheri.app.impl.InvalidCommandException;
 import org.menacheri.communication.IDeliveryGuaranty;
 import org.menacheri.communication.IMessageBuffer;
@@ -28,8 +29,9 @@ public class SessionHandler extends NettySessionEventHandler implements IGameCom
 	private Zombie zombie;
 	private IAM iam;
 	
-	public SessionHandler(Defender defender, Zombie zombie, IAM iam)
+	public SessionHandler(ISession session,Defender defender, Zombie zombie, IAM iam)
 	{
+		super(session);
 		this.defender = defender;
 		this.zombie = zombie;
 		this.iam = iam;
