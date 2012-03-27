@@ -18,7 +18,20 @@ import org.menacheri.event.ISessionEventHandler;
 
 public class EventDispatcher implements IEventDispatcher
 {
-	private static final ExecutorService EXECUTOR = Executors.newSingleThreadExecutor();
+	private static final ExecutorService EXECUTOR = Executors
+			.newSingleThreadExecutor();
+	static
+	{
+		Runtime.getRuntime().addShutdownHook(new Thread()
+		{
+			@Override
+			public void run()
+			{
+				EXECUTOR.shutdown();
+			}
+		});
+	}
+
 	private Map<Integer, List<IEventHandler>> handlersByEventType;
 	private List<IEventHandler> genericHandlers;
 	private boolean isShuttingDown;
@@ -153,7 +166,7 @@ public class EventDispatcher implements IEventDispatcher
 		{
 			EXECUTOR.submit(new Runnable()
 			{
-				
+
 				@Override
 				public void run()
 				{
@@ -162,10 +175,11 @@ public class EventDispatcher implements IEventDispatcher
 						handler.onEvent(event);
 					}
 
-					// retrieval is not thread safe, but since we are not setting it to
+					// retrieval is not thread safe, but since we are not
+					// setting it to
 					// null anywhere it should be fine.
-					List<IEventHandler> handlers = handlersByEventType.get(event
-							.getType());
+					List<IEventHandler> handlers = handlersByEventType
+							.get(event.getType());
 					// Iteration is thread safe since we use copy on write.
 					if (null != handlers)
 					{
@@ -174,10 +188,10 @@ public class EventDispatcher implements IEventDispatcher
 							handler.onEvent(event);
 						}
 					}
-					
+
 				}
 			});
-			
+
 		}
 		else
 		{
