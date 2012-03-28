@@ -31,12 +31,12 @@ public class PlayerSession extends Session implements IPlayerSession
 	 * Each incoming connection is made to a game room. This reference holds the
 	 * association to the game room.
 	 */
-	IGameRoom parentGameRoom;
+	protected IGameRoom parentGameRoom;
 	/**
 	 * This variable holds information about the type of binary communication
 	 * protocol to be used with this session.
 	 */
-	IProtocol protocol;
+	protected IProtocol protocol;
 
 	protected PlayerSession(PlayerSessionBuilder playerSessionBuilder)
 	{
