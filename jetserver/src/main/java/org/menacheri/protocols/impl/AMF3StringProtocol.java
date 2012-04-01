@@ -1,7 +1,5 @@
 package org.menacheri.protocols.impl;
 
-import java.io.ByteArrayInputStream;
-
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.handler.codec.base64.Base64Decoder;
 import org.jboss.netty.handler.codec.base64.Base64Encoder;
@@ -10,12 +8,10 @@ import org.jboss.netty.handler.codec.frame.Delimiters;
 import org.jboss.netty.handler.codec.frame.TooLongFrameException;
 import org.menacheri.app.IPlayerSession;
 import org.menacheri.handlers.netty.AMF3ToJavaObjectDecoder;
-import org.menacheri.handlers.netty.ByteArrayStreamDecoder;
 import org.menacheri.handlers.netty.JavaObjectToAMF3Encoder;
 import org.menacheri.handlers.netty.NulEncoder;
 import org.menacheri.protocols.AbstractNettyProtocol;
 import org.menacheri.util.NettyUtils;
-import org.springframework.beans.factory.annotation.Required;
 
 
 /**
@@ -32,20 +28,12 @@ public class AMF3StringProtocol extends AbstractNettyProtocol
 	 * {@link DelimiterBasedFrameDecoder} will use this value in order to throw
 	 * a {@link TooLongFrameException}.
 	 */
-	int frameSize;
+	int maxFrameSize;
 	/**
 	 * The flash client would encode the AMF3 bytes into a base 64 encoded
 	 * string, this decoder is used to decode it back.
 	 */
 	private Base64Decoder base64Decoder;
-	/**
-	 * After the frame decoder retrieves the bytes from the incoming stream,
-	 * this decoder will convert it to a {@link ByteArrayInputStream} object
-	 * which is provided as input to the {@link AMF3ToJavaObjectDecoder}. The
-	 * game can add more handlers at this point to do business logic and write
-	 * back to the pipeline.
-	 */
-	private ByteArrayStreamDecoder byteArrayStreamDecoder;
 	/**
 	 * This decoder will do the actual serialization to java object. Any game
 	 * handlers need to be added after this in the pipeline so that they can
@@ -75,22 +63,6 @@ public class AMF3StringProtocol extends AbstractNettyProtocol
 		super("AMF3_STRING");
 	}
 
-	public AMF3StringProtocol(int frameSize, Base64Decoder base64Decoder,
-			ByteArrayStreamDecoder byteArrayStreamDecoder,
-			AMF3ToJavaObjectDecoder amf3ToJavaObjectDecoder,
-			JavaObjectToAMF3Encoder javaObjectToAMF3Encoder,
-			Base64Encoder base64Encoder, NulEncoder nulEncoder)
-	{
-		super("AMF3_STRING");
-		this.frameSize = frameSize;
-		this.base64Decoder = base64Decoder;
-		this.byteArrayStreamDecoder = byteArrayStreamDecoder;
-		this.amf3ToJavaObjectDecoder = amf3ToJavaObjectDecoder;
-		this.javaObjectToAMF3Encoder = javaObjectToAMF3Encoder;
-		this.base64Encoder = base64Encoder;
-		this.nulEncoder = nulEncoder;
-	}
-
 	@Override
 	public void applyProtocol(IPlayerSession playerSession)
 	{
@@ -99,10 +71,9 @@ public class AMF3StringProtocol extends AbstractNettyProtocol
 
 		// Upstream handlers or encoders (i.e towards server) are added to
 		// pipeline now.
-		pipeline.addLast("framer", new DelimiterBasedFrameDecoder(frameSize,
+		pipeline.addLast("framer", new DelimiterBasedFrameDecoder(maxFrameSize,
 				Delimiters.nulDelimiter()));
 		pipeline.addLast("base64Decoder", base64Decoder);
-		pipeline.addLast("byteArrayStreamDecoder", byteArrayStreamDecoder);
 		pipeline.addLast("amf3ToJavaObjectDecoder", amf3ToJavaObjectDecoder);
 
 		// Downstream handlers - Filter for data which flows from server to
@@ -113,15 +84,14 @@ public class AMF3StringProtocol extends AbstractNettyProtocol
 		pipeline.addLast("javaObjectToAMF3Encoder", javaObjectToAMF3Encoder);
 	}
 
-	public int getFrameSize()
+	public int getMaxFrameSize()
 	{
-		return frameSize;
+		return maxFrameSize;
 	}
 
-	@Required
-	public void setFrameSize(int frameSize)
+	public void setMaxFrameSize(int frameSize)
 	{
-		this.frameSize = frameSize;
+		this.maxFrameSize = frameSize;
 	}
 
 	public Base64Decoder getBase64Decoder()
@@ -129,22 +99,9 @@ public class AMF3StringProtocol extends AbstractNettyProtocol
 		return base64Decoder;
 	}
 
-	@Required
 	public void setBase64Decoder(Base64Decoder base64Decoder)
 	{
 		this.base64Decoder = base64Decoder;
-	}
-
-	public ByteArrayStreamDecoder getByteArrayStreamDecoder()
-	{
-		return byteArrayStreamDecoder;
-	}
-
-	@Required
-	public void setByteArrayStreamDecoder(
-			ByteArrayStreamDecoder byteArrayStreamDecoder)
-	{
-		this.byteArrayStreamDecoder = byteArrayStreamDecoder;
 	}
 
 	public AMF3ToJavaObjectDecoder getAmf3ToJavaObjectDecoder()
@@ -152,7 +109,6 @@ public class AMF3StringProtocol extends AbstractNettyProtocol
 		return amf3ToJavaObjectDecoder;
 	}
 
-	@Required
 	public void setAmf3ToJavaObjectDecoder(
 			AMF3ToJavaObjectDecoder amf3ToJavaObjectDecoder)
 	{
@@ -164,7 +120,6 @@ public class AMF3StringProtocol extends AbstractNettyProtocol
 		return javaObjectToAMF3Encoder;
 	}
 
-	@Required
 	public void setJavaObjectToAMF3Encoder(
 			JavaObjectToAMF3Encoder javaObjectToAMF3Encoder)
 	{
@@ -176,7 +131,6 @@ public class AMF3StringProtocol extends AbstractNettyProtocol
 		return base64Encoder;
 	}
 
-	@Required
 	public void setBase64Encoder(Base64Encoder base64Encoder)
 	{
 		this.base64Encoder = base64Encoder;
@@ -187,7 +141,6 @@ public class AMF3StringProtocol extends AbstractNettyProtocol
 		return nulEncoder;
 	}
 
-	@Required
 	public void setNulEncoder(NulEncoder nulEncoder)
 	{
 		this.nulEncoder = nulEncoder;
