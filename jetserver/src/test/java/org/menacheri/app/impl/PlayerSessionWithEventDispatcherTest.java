@@ -20,28 +20,16 @@ import org.menacheri.event.INetworkEvent;
 import org.menacheri.event.impl.AbstractSessionEventHandler;
 import org.menacheri.event.impl.EventDispatcher;
 import org.menacheri.protocols.IProtocol;
+import org.menacheri.protocols.impl.DummyProtocol;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
 
 public class PlayerSessionWithEventDispatcherTest
 {
-	private static final IProtocol DUMMY_PROTOCOL = new IProtocol()
-	{
-		@Override
-		public String getProtocolName()
-		{
-			return null;
-		}
-
-		@Override
-		public void applyProtocol(IPlayerSession playerSession)
-		{
-
-		}
-	};
+	private static final IProtocol DUMMY_PROTOCOL = new DummyProtocol();
 	private static final AtomicLong COUNTER = new AtomicLong(0l);
 	private static final int NUM_OF_GAME_ROOMS = 1000;
-	private static final int SESSIONS_PER_GAME_ROOM = 50;
+	private static final int SESSIONS_PER_GAME_ROOM = 25;
 	private static final int EVENTS_PER_SESSION = 10;
 	private static final int LATCH_COUNT = ((NUM_OF_GAME_ROOMS * SESSIONS_PER_GAME_ROOM) * (EVENTS_PER_SESSION * SESSIONS_PER_GAME_ROOM))
 			+ (EVENTS_PER_SESSION * SESSIONS_PER_GAME_ROOM * NUM_OF_GAME_ROOMS);
