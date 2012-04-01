@@ -24,11 +24,10 @@
 	</bean>
 	
 	<bean id="amf3StringProtocol" class="org.menacheri.protocols.impl.AMF3StringProtocol">
-		<property name="frameSize" value="4096"></property>
+		<property name="maxFrameSize" value="4096"></property>
 		<property name="nulEncoder" ref="nulEncoder"></property>
 		<property name="base64Decoder" ref="base64Decoder"></property>
 		<property name="base64Encoder" ref="base64Encoder"></property>
-		<property name="byteArrayStreamDecoder" ref="byteArrayStreamDecoder"></property>
 		<property name="amf3ToJavaObjectDecoder" ref="AMF3ToJavaObjectDecoder"></property>
 		<property name="javaObjectToAMF3Encoder" ref="javaToAMF3Encoder"></property>
 	</bean>
