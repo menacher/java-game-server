@@ -1,6 +1,7 @@
 package org.menacheri.protocols;
 
 import org.jboss.netty.channel.ChannelHandler;
+import org.jboss.netty.handler.codec.frame.LengthFieldBasedFrameDecoder;
 
 /**
  * This abstract class defines common methods across all protocols. Individual
@@ -25,9 +26,7 @@ public abstract class AbstractNettyProtocol implements IProtocol
 
 	public ChannelHandler createLengthBasedFrameDecoder()
 	{
-		// This will be overriden by spring.
-		//return new LengthFieldBasedFrameDecoder(4096, 0, 2, 0, 2);
-		return null;
+		return new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 2, 0, 2);
 	}
 
 	@Override
