@@ -7,13 +7,11 @@ import java.io.IOException;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelHandler.Sharable;
+import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.handler.codec.oneone.OneToOneEncoder;
 import org.menacheri.convert.flex.AMFSerializer;
 import org.menacheri.convert.flex.SerializationContextProvider;
-import org.menacheri.event.Events;
-import org.menacheri.event.IEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,18 +27,16 @@ public class JavaObjectToAMF3Encoder extends OneToOneEncoder
 		SerializationContextProvider contextProvider = new SerializationContextProvider();
 		AMFSerializer serializer = new AMFSerializer(contextProvider.get());
 		ByteArrayOutputStream baos = null;
-		IEvent event = (IEvent)msg;
-		if(event.getType() == Events.NETWORK_MESSAGE)
+		try 
 		{
-			try {
-				baos = serializer.toAmf(event.getSource());
-			} catch (IOException e) {
-				LOG.error("IO Error: {}",e);
-				throw e;
-			}
+			baos = serializer.toAmf(msg);
+		} 
+		catch (IOException e) 
+		{
+			LOG.error("IO Error: {}",e);
+			throw e;
 		}
-		event.setSource(convertBAOSToChannelBuffer(baos));
-		return event;
+		return convertBAOSToChannelBuffer(baos);
 	}
 
 	/**
