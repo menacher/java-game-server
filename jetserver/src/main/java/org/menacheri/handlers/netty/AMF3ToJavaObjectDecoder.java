@@ -10,10 +10,8 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.handler.codec.oneone.OneToOneDecoder;
 import org.menacheri.convert.ITransform;
 import org.menacheri.convert.flex.AMFDeSerializer;
-import org.menacheri.event.IEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 import flex.messaging.io.SerializationContext;
 
@@ -40,12 +38,9 @@ public class AMF3ToJavaObjectDecoder extends OneToOneDecoder implements ITransfo
 			return msg;
 		}
 		
-		// Cast object to correct type and pass it on to the de serializer
-		IEvent event = (IEvent)msg;
-		ChannelBuffer buffer = (ChannelBuffer)event.getSource();
+		ChannelBuffer buffer = (ChannelBuffer)msg;
 		ByteArrayInputStream bis = new ByteArrayInputStream(buffer.array());
-		event.setSource(deSerializeObjectFromStream(bis));
-		return event;
+		return deSerializeObjectFromStream(bis);
 	}
 
 	@Override
