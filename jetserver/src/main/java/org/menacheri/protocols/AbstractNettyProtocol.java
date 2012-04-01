@@ -1,6 +1,5 @@
 package org.menacheri.protocols;
 
-import org.jboss.netty.channel.ChannelHandler;
 import org.jboss.netty.handler.codec.frame.LengthFieldBasedFrameDecoder;
 
 /**
@@ -24,7 +23,7 @@ public abstract class AbstractNettyProtocol implements IProtocol
 		this.protocolName = protocolName;
 	}
 
-	public ChannelHandler createLengthBasedFrameDecoder()
+	public LengthFieldBasedFrameDecoder createLengthBasedFrameDecoder()
 	{
 		return new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 2, 0, 2);
 	}
