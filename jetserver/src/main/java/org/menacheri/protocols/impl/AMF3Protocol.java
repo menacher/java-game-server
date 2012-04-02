@@ -5,10 +5,11 @@ import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.handler.codec.frame.LengthFieldPrepender;
 import org.menacheri.app.IPlayerSession;
 import org.menacheri.event.IEvent;
-import org.menacheri.handlers.netty.AMF3ToJavaObjectDecoder;
+import org.menacheri.handlers.netty.AMF3ToEventSourceDecoder;
 import org.menacheri.handlers.netty.DefaultToServerHandler;
 import org.menacheri.handlers.netty.EventDecoder;
-import org.menacheri.handlers.netty.JavaObjectToAMF3Encoder;
+import org.menacheri.handlers.netty.EventEncoder;
+import org.menacheri.handlers.netty.EventSourceToAMF3Encoder;
 import org.menacheri.protocols.AbstractNettyProtocol;
 import org.menacheri.util.NettyUtils;
 
@@ -17,8 +18,8 @@ import org.menacheri.util.NettyUtils;
  * This protocol defines AMF3 as a byte array being sent over the wire. Used by
  * flash clients that use Socket class. This class applies the flash AMF3
  * protocol to the {@link IPlayerSession}'s pipeline. The major handlers
- * involved are {@link AMF3ToJavaObjectDecoder} and
- * {@link JavaObjectToAMF3Encoder}.
+ * involved are {@link AMF3ToEventSourceDecoder} and
+ * {@link EventSourceToAMF3Encoder}.
  * 
  * @author Abraham Menacherry
  * 
@@ -39,15 +40,22 @@ public class AMF3Protocol extends AbstractNettyProtocol
 	 * handlers need to be added after this in the pipeline so that they can
 	 * operate on the java object.
 	 */
-	private AMF3ToJavaObjectDecoder amf3ToJavaObjectDecoder;
+	private AMF3ToEventSourceDecoder amf3ToEventSourceDecoder;
 	
 	/**
 	 * Once the game handler is done with its operations, it writes back the
 	 * java object to the client. When writing back to flash client, it needs to
 	 * use this encoder to encode it to AMF3 format.
 	 */
-	private JavaObjectToAMF3Encoder javaObjectToAMF3Encoder;
+	private EventSourceToAMF3Encoder eventSourceToAMF3Encoder;
 
+	/**
+	 * This encoder will take the event parsed by the java object to AMF3
+	 * encoder and create a single wrapped {@link ChannelBuffer} with the opcode
+	 * as header and amf3 bytes as body.
+	 */
+	private EventEncoder eventEncoder;
+	
 	/**
 	 * Utility handler provided by netty to add the length of the outgoing
 	 * message to the message as a header.
@@ -69,24 +77,20 @@ public class AMF3Protocol extends AbstractNettyProtocol
 		// pipeline now.
 		pipeline.addLast("lengthDecoder", createLengthBasedFrameDecoder());
 		pipeline.addLast("eventDecoder",eventDecoder);
-		pipeline.addLast("amf3ToJavaObjectDecoder", amf3ToJavaObjectDecoder);
+		pipeline.addLast("amf3ToEventSourceDecoder", amf3ToEventSourceDecoder);
 		pipeline.addLast("eventHandler", new DefaultToServerHandler(
 				playerSession));
 		
 		// Downstream handlers (i.e towards client) are added to pipeline now.
 		// NOTE the last encoder in the pipeline is the first encoder to be called.
 		pipeline.addLast("lengthFieldPrepender", lengthFieldPrepender);
-		pipeline.addLast("javaObjectToAMF3Encoder", javaObjectToAMF3Encoder);
+		pipeline.addLast("eventEncoder",eventEncoder);
+		pipeline.addLast("eventSourceToAMF3Encoder", eventSourceToAMF3Encoder);
 	}
 
-	public AMF3ToJavaObjectDecoder getAmf3ToJavaObjectDecoder()
+	public EventSourceToAMF3Encoder getEventSourceToAMF3Encoder()
 	{
-		return amf3ToJavaObjectDecoder;
-	}
-
-	public JavaObjectToAMF3Encoder getJavaObjectToAMF3Encoder()
-	{
-		return javaObjectToAMF3Encoder;
+		return eventSourceToAMF3Encoder;
 	}
 
 	public LengthFieldPrepender getLengthFieldPrepender()
@@ -99,26 +103,41 @@ public class AMF3Protocol extends AbstractNettyProtocol
 		return eventDecoder;
 	}
 
+	public EventEncoder getEventEncoder()
+	{
+		return eventEncoder;
+	}
+
+	public AMF3ToEventSourceDecoder getAmf3ToEventSourceDecoder()
+	{
+		return amf3ToEventSourceDecoder;
+	}
+	
 	public void setEventDecoder(EventDecoder eventDecoder)
 	{
 		this.eventDecoder = eventDecoder;
 	}
 
-	public void setAmf3ToJavaObjectDecoder(
-			AMF3ToJavaObjectDecoder amf3ToJavaObjectDecoder)
+	public void setEventSourceToAMF3Encoder(
+			EventSourceToAMF3Encoder eventToAMF3Encoder)
 	{
-		this.amf3ToJavaObjectDecoder = amf3ToJavaObjectDecoder;
+		this.eventSourceToAMF3Encoder = eventToAMF3Encoder;
 	}
 
-	public void setJavaObjectToAMF3Encoder(
-			JavaObjectToAMF3Encoder javaObjectToAMF3Encoder)
+	public void setEventEncoder(EventEncoder eventEncoder)
 	{
-		this.javaObjectToAMF3Encoder = javaObjectToAMF3Encoder;
+		this.eventEncoder = eventEncoder;
 	}
 
 	public void setLengthFieldPrepender(LengthFieldPrepender lengthFieldPrepender)
 	{
 		this.lengthFieldPrepender = lengthFieldPrepender;
+	}
+
+	public void setAmf3ToEventSourceDecoder(
+			AMF3ToEventSourceDecoder amf3ToEventSourceDecoder)
+	{
+		this.amf3ToEventSourceDecoder = amf3ToEventSourceDecoder;
 	}
 
 }

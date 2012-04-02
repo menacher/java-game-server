@@ -38,7 +38,9 @@
 		<constructor-arg value="${tcp.port}"></constructor-arg>
 	</bean>
 	<bean id="AMF3ToJavaObjectDecoder" class="org.menacheri.handlers.netty.AMF3ToJavaObjectDecoder"></bean>
+	<bean id="AMF3ToEventSourceDecoder" class="org.menacheri.handlers.netty.AMF3ToEventSourceDecoder"></bean>
 	<bean id="javaToAMF3Encoder" class="org.menacheri.handlers.netty.JavaObjectToAMF3Encoder"></bean>
+	<bean id="eventSourceToAMF3Encoder" class="org.menacheri.handlers.netty.EventSourceToAMF3Encoder"></bean>
 	<bean id="eventDecoder" class="org.menacheri.handlers.netty.EventDecoder"></bean>
 	<bean id="eventEncoder" class="org.menacheri.handlers.netty.EventEncoder"></bean>
 	<bean id="messageBufferEventDecoder" class="org.menacheri.handlers.netty.MessageBufferEventDecoder"></bean>
