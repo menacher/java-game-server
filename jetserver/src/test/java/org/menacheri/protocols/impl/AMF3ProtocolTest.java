@@ -14,9 +14,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.menacheri.event.Events;
 import org.menacheri.event.IEvent;
-import org.menacheri.handlers.netty.AMF3ToJavaObjectDecoder;
+import org.menacheri.handlers.netty.AMF3ToEventSourceDecoder;
 import org.menacheri.handlers.netty.EventDecoder;
-import org.menacheri.handlers.netty.JavaObjectToAMF3Encoder;
+import org.menacheri.handlers.netty.EventEncoder;
+import org.menacheri.handlers.netty.EventSourceToAMF3Encoder;
 
 public class AMF3ProtocolTest
 {
@@ -30,8 +31,9 @@ public class AMF3ProtocolTest
 		amf3Protocol = new AMF3Protocol();
 		frameDecoder = amf3Protocol.createLengthBasedFrameDecoder();
 		amf3Protocol.setEventDecoder(new EventDecoder());
-		amf3Protocol.setAmf3ToJavaObjectDecoder(new AMF3ToJavaObjectDecoder());
-		amf3Protocol.setJavaObjectToAMF3Encoder(new JavaObjectToAMF3Encoder());
+		amf3Protocol.setAmf3ToEventSourceDecoder(new AMF3ToEventSourceDecoder());
+		amf3Protocol.setEventSourceToAMF3Encoder(new EventSourceToAMF3Encoder());
+		amf3Protocol.setEventEncoder(new EventEncoder());
 		amf3Protocol
 				.setLengthFieldPrepender(new LengthFieldPrepender(2, false));
 		playerStats = new PlayerStats(10, 11.1f, 12.2f, 10);
@@ -43,11 +45,12 @@ public class AMF3ProtocolTest
 	{
 		DecoderEmbedder<IEvent> decoder = new DecoderEmbedder<IEvent>(
 				frameDecoder, amf3Protocol.getEventDecoder(),
-				amf3Protocol.getAmf3ToJavaObjectDecoder());
+				amf3Protocol.getAmf3ToEventSourceDecoder());
 
 		EncoderEmbedder<ChannelBuffer> encoder = new EncoderEmbedder<ChannelBuffer>(
 				amf3Protocol.getLengthFieldPrepender(),
-				amf3Protocol.getJavaObjectToAMF3Encoder());
+				amf3Protocol.getEventEncoder(),
+				amf3Protocol.getEventSourceToAMF3Encoder());
 		IEvent event = Events.event(playerStats,Events.SESSION_MESSAGE);
 		encoder.offer(event);
 		ChannelBuffer encoded = encoder.peek();
@@ -64,9 +67,9 @@ public class AMF3ProtocolTest
 
 		public PlayerStats()
 		{
-			
+
 		}
-		
+
 		public PlayerStats(int life, float xPos, float yPos, int wealth)
 		{
 			super();
