@@ -10,7 +10,6 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.handler.codec.oneone.OneToOneDecoder;
 import org.menacheri.convert.ITransform;
 import org.menacheri.convert.flex.AMFDeSerializer;
-import org.menacheri.event.IEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,9 +17,7 @@ import flex.messaging.io.SerializationContext;
 
 /**
  * This class takes a {@link ChannelBuffer} containing AMF3 object as input and
- * creates a java object from it using the {@link AMFDeSerializer} class. If the
- * incoming event is of type {@link IEvent} then it will only de-serialize the
- * source of the event rather than the whole object.
+ * creates a java object from it using the {@link AMFDeSerializer} class. 
  * 
  * @author Abraham Menacherry.
  * 
@@ -39,14 +36,11 @@ public class AMF3ToJavaObjectDecoder extends OneToOneDecoder implements ITransfo
 			LOG.warn("Incoming message is null");
 			return msg;
 		}
-		ChannelBuffer buffer;
-		if(msg instanceof IEvent){
-			IEvent event = (IEvent)msg;
-			buffer = (ChannelBuffer)event.getSource();
-		}else{
-			buffer = (ChannelBuffer)msg;
-		}
-		ByteArrayInputStream bis = new ByteArrayInputStream(buffer.array());
+		ChannelBuffer buffer = (ChannelBuffer)msg;
+		// buffer.array() will ignore the readerIndex. Hence readBytes is used
+		// and then .array is called
+		ByteArrayInputStream bis = new ByteArrayInputStream(buffer.readBytes(
+				buffer.readableBytes()).array());
 		return deSerializeObjectFromStream(bis);
 	}
 
