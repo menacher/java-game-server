@@ -9,6 +9,7 @@
       <attribute value="jar:file:/C:/Documents%20and%20Settings/abraham/.m2/repository/backport-util-concurrent/backport-util-concurrent/3.1/backport-util-concurrent-3.1-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/com/adobe/blazeds/blazeds-common/3.2.0.3978/blazeds-common-3.2.0.3978.jar" sourcepath="M2_REPO/com/adobe/blazeds/blazeds-common/3.2.0.3978/blazeds-common-3.2.0.3978-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/adobe/blazeds/blazeds-core/3.2.0.3978/blazeds-core-3.2.0.3978.jar" sourcepath="M2_REPO/com/adobe/blazeds/blazeds-core/3.2.0.3978/blazeds-core-3.2.0.3978-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/cglib/cglib-nodep/2.1_3/cglib-nodep-2.1_3.jar" sourcepath="M2_REPO/cglib/cglib-nodep/2.1_3/cglib-nodep-2.1_3-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar" sourcepath="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-sources.jar">
