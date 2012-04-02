@@ -46,7 +46,7 @@ public class MessageBufferProtocolTest {
 		encoder.offer(event);
 		ChannelBuffer encoded = encoder.peek();
 		
-		Thread.sleep(10);// so that timestamps will differ.
+		Thread.sleep(100);// so that timestamps will differ.
 		decoder.offer(encoded);
 		IEvent decoded = decoder.peek();
 		assertEquals(decoded.getType(),Events.LOG_IN);
