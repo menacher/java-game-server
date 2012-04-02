@@ -16,6 +16,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
+/**
+ * This class will convert the incoming java object to Flex AMF3 byte format and
+ * put them in a Netty {@link ChannelBuffer}. It will return this ChannelBuffer
+ * to downstream handler.
+ * 
+ * @author Abraham Menacherry
+ * 
+ */
 @Sharable
 public class JavaObjectToAMF3Encoder extends OneToOneEncoder
 {
