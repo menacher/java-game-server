@@ -15,7 +15,7 @@ import org.menacheri.event.INetworkEvent;
  */
 public class NetworkEvent extends Event implements INetworkEvent
 {
-	IDeliveryGuaranty guaranty;
+	private IDeliveryGuaranty guaranty = DeliveryGuaranty.RELIABLE;;
 	private static final long serialVersionUID = 6486454029499527617L;
 
 	/**
@@ -25,7 +25,7 @@ public class NetworkEvent extends Event implements INetworkEvent
 	public NetworkEvent()
 	{
 		super.setType(Events.NETWORK_MESSAGE);
-		this.guaranty = IDeliveryGuaranty.DeliveryGuaranty.RELIABLE;
+		this.guaranty = DeliveryGuaranty.RELIABLE;
 	}
 
 	/**
@@ -40,7 +40,7 @@ public class NetworkEvent extends Event implements INetworkEvent
 	 */
 	public NetworkEvent(IEvent event)
 	{
-		this(event, IDeliveryGuaranty.DeliveryGuaranty.RELIABLE);
+		this(event, DeliveryGuaranty.RELIABLE);
 	}
 
 	/**
@@ -60,7 +60,7 @@ public class NetworkEvent extends Event implements INetworkEvent
 		this.setSource(event.getSource());
 		this.setEventContext(event.getEventContext());
 		this.setTimeStamp(event.getTimeStamp());
-		this.guaranty = IDeliveryGuaranty.DeliveryGuaranty.RELIABLE;
+		this.guaranty = DeliveryGuaranty.RELIABLE;
 		super.setType(Events.NETWORK_MESSAGE);
 	}
 
