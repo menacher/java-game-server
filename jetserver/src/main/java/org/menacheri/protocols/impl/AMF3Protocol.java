@@ -8,7 +8,6 @@ import org.menacheri.event.IEvent;
 import org.menacheri.handlers.netty.AMF3ToJavaObjectDecoder;
 import org.menacheri.handlers.netty.DefaultToServerHandler;
 import org.menacheri.handlers.netty.EventDecoder;
-import org.menacheri.handlers.netty.EventEncoder;
 import org.menacheri.handlers.netty.JavaObjectToAMF3Encoder;
 import org.menacheri.protocols.AbstractNettyProtocol;
 import org.menacheri.util.NettyUtils;
@@ -50,13 +49,6 @@ public class AMF3Protocol extends AbstractNettyProtocol
 	private JavaObjectToAMF3Encoder javaObjectToAMF3Encoder;
 
 	/**
-	 * This encoder will take the event parsed by the java object to AMF3
-	 * encoder and create a single wrapped {@link ChannelBuffer} with the opcode
-	 * as header and amf3 bytes as body.
-	 */
-	private EventEncoder eventEncoder;
-	
-	/**
 	 * Utility handler provided by netty to add the length of the outgoing
 	 * message to the message as a header.
 	 */
@@ -84,7 +76,6 @@ public class AMF3Protocol extends AbstractNettyProtocol
 		// Downstream handlers (i.e towards client) are added to pipeline now.
 		// NOTE the last encoder in the pipeline is the first encoder to be called.
 		pipeline.addLast("lengthFieldPrepender", lengthFieldPrepender);
-		pipeline.addLast("eventEncoder",eventEncoder);
 		pipeline.addLast("javaObjectToAMF3Encoder", javaObjectToAMF3Encoder);
 	}
 
@@ -108,11 +99,6 @@ public class AMF3Protocol extends AbstractNettyProtocol
 		return eventDecoder;
 	}
 
-	public EventEncoder getEventEncoder()
-	{
-		return eventEncoder;
-	}
-
 	public void setEventDecoder(EventDecoder eventDecoder)
 	{
 		this.eventDecoder = eventDecoder;
@@ -128,11 +114,6 @@ public class AMF3Protocol extends AbstractNettyProtocol
 			JavaObjectToAMF3Encoder javaObjectToAMF3Encoder)
 	{
 		this.javaObjectToAMF3Encoder = javaObjectToAMF3Encoder;
-	}
-
-	public void setEventEncoder(EventEncoder eventEncoder)
-	{
-		this.eventEncoder = eventEncoder;
 	}
 
 	public void setLengthFieldPrepender(LengthFieldPrepender lengthFieldPrepender)

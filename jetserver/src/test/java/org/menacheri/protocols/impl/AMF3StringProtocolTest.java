@@ -39,7 +39,7 @@ public class AMF3StringProtocolTest {
 	}
 	
 	@Test
-	public void verifyAMF3EncodingAndDecoding() throws InterruptedException
+	public void verifyAMF3StringEncodingAndDecoding() throws InterruptedException
 	{
 		DecoderEmbedder<IEvent> decoder = new DecoderEmbedder<IEvent>(
 				delimiterDecoder, amf3StringProtocol.getBase64Decoder(),

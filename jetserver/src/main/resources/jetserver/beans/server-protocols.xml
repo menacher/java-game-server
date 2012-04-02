@@ -17,7 +17,6 @@
 	
 	<bean id="amf3Protocol"  class="org.menacheri.protocols.impl.AMF3Protocol">
 		<property name="lengthFieldPrepender" ref="lengthFieldPrepender"></property>
-		<property name="eventEncoder" ref="eventEncoder"></property>
 		<property name="eventDecoder" ref="eventDecoder"></property>
 		<property name="amf3ToJavaObjectDecoder" ref="AMF3ToJavaObjectDecoder"></property>
 		<property name="javaObjectToAMF3Encoder" ref="javaToAMF3Encoder"></property>
