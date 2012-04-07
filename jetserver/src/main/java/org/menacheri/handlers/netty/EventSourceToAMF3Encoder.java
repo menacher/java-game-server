@@ -2,9 +2,12 @@ package org.menacheri.handlers.netty;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelHandler.Sharable;
 import org.jboss.netty.channel.ChannelHandlerContext;
+import org.menacheri.event.Events;
 import org.menacheri.event.IEvent;
 
+@Sharable
 public class EventSourceToAMF3Encoder extends JavaObjectToAMF3Encoder
 {
 	@Override
@@ -13,7 +16,6 @@ public class EventSourceToAMF3Encoder extends JavaObjectToAMF3Encoder
 	{
 		IEvent event = (IEvent)msg;
 		ChannelBuffer payload = (ChannelBuffer) super.encode(ctx, channel, event.getSource());
-		event.setSource(payload);
-		return event;
+		return Events.event(payload, event.getType());
 	}
 }
