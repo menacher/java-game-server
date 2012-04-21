@@ -9,7 +9,7 @@ import org.menacheri.communication.NettyMessageBuffer;
 import org.menacheri.event.Events;
 import org.menacheri.event.IEvent;
 import org.menacheri.event.INetworkEvent;
-import org.menacheri.event.impl.NettySessionEventHandler;
+import org.menacheri.event.impl.AbstractSessionEventHandler;
 import org.menacheri.zombie.domain.Defender;
 import org.menacheri.zombie.domain.IAM;
 import org.menacheri.zombie.domain.Zombie;
@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 //public class SessionHandler extends AsyncSessionListener implements IGameCommandInterpreter
 @SuppressWarnings("rawtypes")
-public class SessionHandler extends NettySessionEventHandler implements IGameCommandInterpreter
+public class SessionHandler extends AbstractSessionEventHandler implements IGameCommandInterpreter
 {
 	private static final Logger LOG = LoggerFactory.getLogger(SessionHandler.class);
 	volatile int cmdCount;
