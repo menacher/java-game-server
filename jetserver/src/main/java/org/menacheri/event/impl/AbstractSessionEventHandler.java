@@ -29,20 +29,18 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractSessionEventHandler implements ISessionEventHandler
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractSessionEventHandler.class);
-	protected final int eventType;
 
 	private final ISession session;
 	
 	public AbstractSessionEventHandler(ISession session)
 	{
 		this.session = session;
-		this.eventType = Events.ANY;
 	}
 
 	@Override
 	public int getEventType()
 	{
-		return eventType;
+		return Events.ANY;
 	}
 
 	@Override
@@ -51,7 +49,7 @@ public abstract class AbstractSessionEventHandler implements ISessionEventHandle
 		doEventHandlerMethodLookup(event);
 	}
 
-	public void doEventHandlerMethodLookup(IEvent event)
+	protected void doEventHandlerMethodLookup(IEvent event)
 	{
 		int eventType = event.getType();
 		switch (eventType)
@@ -95,7 +93,7 @@ public abstract class AbstractSessionEventHandler implements ISessionEventHandle
 		}
 	}
 	
-	public void onDataIn(IEvent event)
+	protected void onDataIn(IEvent event)
 	{
 		if (null != getSession())
 		{
@@ -109,7 +107,7 @@ public abstract class AbstractSessionEventHandler implements ISessionEventHandle
 		}
 	}
 
-	public void onNetworkMessage(INetworkEvent event)
+	protected void onNetworkMessage(INetworkEvent event)
 	{
 		IDeliveryGuaranty guaranty = event.getDeliveryGuaranty();
 		if(guaranty.getGuaranty() == DeliveryGuaranty.FAST.getGuaranty()){
@@ -127,22 +125,25 @@ public abstract class AbstractSessionEventHandler implements ISessionEventHandle
 		}
 	}
 	
-	public void onLoginSuccess(IEvent event)
+	protected void onLoginSuccess(IEvent event)
 	{
 		getSession().getTcpSender().sendMessage(event);
 	}
 	
-	public void onLoginFailure(IEvent event)
+	protected void onLoginFailure(IEvent event)
 	{
 		getSession().getTcpSender().sendMessage(event);
 	}
 	
-	public void onConnect(IEvent event)
+	protected void onConnect(IEvent event)
 	{
 		Object source = event.getSource();
+		ISession session = getSession();
 		if (source instanceof IReliable)
 		{
-			getSession().setTcpSender((IReliable) source);
+			session.setTcpSender((IReliable) source);
+			// Now send the start event to session
+			session.onEvent(Events.event(null, Events.START));
 		}
 		else
 		{
@@ -152,52 +153,52 @@ public abstract class AbstractSessionEventHandler implements ISessionEventHandle
 			}
 			else
 			{
-				getSession().setUDPEnabled(true);
-				getSession().setUdpSender((IFast) source);
+				session.setUDPEnabled(true);
+				session.setUdpSender((IFast) source);
 			}
 		}
 	}
 
-	public void onStart(IEvent event)
+	protected void onStart(IEvent event)
 	{
 		getSession().getTcpSender().sendMessage(event);
 	}
 	
-	public void onStop(IEvent event)
+	protected void onStop(IEvent event)
 	{
 		getSession().getTcpSender().sendMessage(event);
 	}
 	
-	public void onConnectFailed(IEvent event)
+	protected void onConnectFailed(IEvent event)
 	{
 		
 	}
 
-	public void onDisconnect(IEvent event)
+	protected void onDisconnect(IEvent event)
 	{
 		LOG.debug("Received disconnect event in session. "
 				+ "Going to close session");
 		onClose(event);
 	}
 	
-	public void onChangeAttribute(IEvent event)
+	protected void onChangeAttribute(IEvent event)
 	{
 
 	}
 
-	public void onException(IEvent event)
+	protected void onException(IEvent event)
 	{
 		LOG.debug("Received exception event in session. "
 				+ "Going to close session");
 		onClose(event);
 	}
 
-	public void onClose(IEvent event)
+	protected void onClose(IEvent event)
 	{
 		getSession().close();
 	}
 	
-	public void onCustomEvent(IEvent event)
+	protected void onCustomEvent(IEvent event)
 	{
 
 	}
