@@ -13,7 +13,7 @@ import org.jboss.netty.handler.codec.frame.LengthFieldPrepender;
 import org.junit.Before;
 import org.junit.Test;
 import org.menacheri.jetserver.event.Events;
-import org.menacheri.jetserver.event.IEvent;
+import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.handlers.netty.AMF3ToEventSourceDecoder;
 import org.menacheri.jetserver.handlers.netty.EventDecoder;
 import org.menacheri.jetserver.handlers.netty.EventEncoder;
@@ -44,7 +44,7 @@ public class AMF3ProtocolTest
 	public void verifyAMF3BinaryEncodingAndDecoding()
 			throws InterruptedException
 	{
-		DecoderEmbedder<IEvent> decoder = new DecoderEmbedder<IEvent>(
+		DecoderEmbedder<Event> decoder = new DecoderEmbedder<Event>(
 				frameDecoder, amf3Protocol.getEventDecoder(),
 				amf3Protocol.getAmf3ToEventSourceDecoder());
 
@@ -52,11 +52,11 @@ public class AMF3ProtocolTest
 				amf3Protocol.getLengthFieldPrepender(),
 				amf3Protocol.getEventEncoder(),
 				amf3Protocol.getEventSourceToAMF3Encoder());
-		IEvent event = Events.event(playerStats,Events.SESSION_MESSAGE);
+		Event event = Events.event(playerStats,Events.SESSION_MESSAGE);
 		encoder.offer(event);
 		ChannelBuffer encoded = encoder.peek();
 		decoder.offer(encoded);
-		IEvent decoded = decoder.peek();
+		Event decoded = decoder.peek();
 		assertTrue(decoded.getType() == Events.SESSION_MESSAGE);
 		PlayerStats playerStats = (PlayerStats) decoded.getSource();
 		assertEquals(playerStats, this.playerStats);

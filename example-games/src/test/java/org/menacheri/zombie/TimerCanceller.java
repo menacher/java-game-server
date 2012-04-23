@@ -8,7 +8,7 @@ import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.menacheri.jetserver.event.Events;
-import org.menacheri.jetserver.event.IEvent;
+import org.menacheri.jetserver.event.Event;
 import org.menacheri.zombie.domain.ZombieCommands;
 
 
@@ -27,9 +27,9 @@ public class TimerCanceller extends SimpleChannelUpstreamHandler
 			throws Exception
 	{
 		Object message = e.getMessage();
-		if(message instanceof IEvent)
+		if(message instanceof Event)
 		{
-			IEvent event = (IEvent)message;
+			Event event = (Event)message;
 			if(Events.NETWORK_MESSAGE == event.getType())
 			{
 				ChannelBuffer apocalypse = (ChannelBuffer) event.getSource();

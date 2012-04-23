@@ -12,7 +12,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.menacheri.jetserver.communication.NettyMessageBuffer;
 import org.menacheri.jetserver.event.Events;
-import org.menacheri.jetserver.event.IEvent;
+import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.handlers.netty.MessageBufferEventDecoder;
 import org.menacheri.jetserver.handlers.netty.MessageBufferEventEncoder;
 import org.menacheri.jetserver.protocols.impl.MessageBufferProtocol;
@@ -35,7 +35,7 @@ public class MessageBufferProtocolTest {
 	@Test
 	public void verifyEventEncodingAndDecoding() throws InterruptedException
 	{
-		DecoderEmbedder<IEvent> decoder = new DecoderEmbedder<IEvent>(
+		DecoderEmbedder<Event> decoder = new DecoderEmbedder<Event>(
 				frameDecoder,
 				messageBufferProtocol.getMessageBufferEventDecoder());
 		EncoderEmbedder<ChannelBuffer> encoder = new EncoderEmbedder<ChannelBuffer>(
@@ -43,13 +43,13 @@ public class MessageBufferProtocolTest {
 				messageBufferProtocol.getMessageBufferEventEncoder());
 		NettyMessageBuffer payload = new NettyMessageBuffer();
 		payload.writeStrings("user","pass","TestRoom1");
-		IEvent event = Events.event(payload, Events.LOG_IN);
+		Event event = Events.event(payload, Events.LOG_IN);
 		encoder.offer(event);
 		ChannelBuffer encoded = encoder.peek();
 		
 		Thread.sleep(100);// so that timestamps will differ.
 		decoder.offer(encoded);
-		IEvent decoded = decoder.peek();
+		Event decoded = decoder.peek();
 		assertEquals(decoded.getType(),Events.LOG_IN);
 		assertFalse("Timestamps should not be same",decoded.getTimeStamp() == event.getTimeStamp());
 		NettyMessageBuffer decodedPayload = (NettyMessageBuffer)decoded.getSource();

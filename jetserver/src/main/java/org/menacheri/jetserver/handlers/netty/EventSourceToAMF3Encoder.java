@@ -5,7 +5,7 @@ import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandler.Sharable;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.menacheri.jetserver.event.Events;
-import org.menacheri.jetserver.event.IEvent;
+import org.menacheri.jetserver.event.Event;
 
 @Sharable
 public class EventSourceToAMF3Encoder extends JavaObjectToAMF3Encoder
@@ -14,7 +14,7 @@ public class EventSourceToAMF3Encoder extends JavaObjectToAMF3Encoder
 	protected Object encode(ChannelHandlerContext ctx, Channel channel,
 			Object msg) throws Exception
 	{
-		IEvent event = (IEvent)msg;
+		Event event = (Event)msg;
 		ChannelBuffer payload = (ChannelBuffer) super.encode(ctx, channel, event.getSource());
 		return Events.event(payload, event.getType());
 	}

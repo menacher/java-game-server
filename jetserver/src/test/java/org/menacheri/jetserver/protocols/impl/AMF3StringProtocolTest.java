@@ -15,7 +15,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.menacheri.jetserver.communication.NettyMessageBuffer;
 import org.menacheri.jetserver.event.Events;
-import org.menacheri.jetserver.event.IEvent;
+import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.handlers.netty.AMF3ToJavaObjectDecoder;
 import org.menacheri.jetserver.handlers.netty.JavaObjectToAMF3Encoder;
 import org.menacheri.jetserver.handlers.netty.NulEncoder;
@@ -42,7 +42,7 @@ public class AMF3StringProtocolTest {
 	@Test
 	public void verifyAMF3StringEncodingAndDecoding() throws InterruptedException
 	{
-		DecoderEmbedder<IEvent> decoder = new DecoderEmbedder<IEvent>(
+		DecoderEmbedder<Event> decoder = new DecoderEmbedder<Event>(
 				delimiterDecoder, amf3StringProtocol.getBase64Decoder(),
 				amf3StringProtocol.getAmf3ToJavaObjectDecoder());
 		
@@ -54,13 +54,13 @@ public class AMF3StringProtocolTest {
 		NettyMessageBuffer payload = new NettyMessageBuffer();
 		payload.writeStrings("user","pass","TestRoom1");
 		
-		IEvent event = Events.event(payload, Events.LOG_IN);
+		Event event = Events.event(payload, Events.LOG_IN);
 		encoder.offer(event);
 		ChannelBuffer encoded = encoder.peek();
 		
 		Thread.sleep(10);// despite delay the timestamps should be same since we are decoding the whole object.
 		decoder.offer(encoded);
-		IEvent decoded = decoder.peek();
+		Event decoded = decoder.peek();
 		assertEquals(decoded.getType(),Events.LOG_IN);
 		assertTrue("Timestamps should be same" ,decoded.getTimeStamp() == event.getTimeStamp());
 		NettyMessageBuffer decodedPayload = (NettyMessageBuffer)decoded.getSource();

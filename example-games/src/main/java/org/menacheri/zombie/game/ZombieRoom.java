@@ -1,6 +1,6 @@
 package org.menacheri.zombie.game;
 
-import org.menacheri.jetserver.app.IPlayerSession;
+import org.menacheri.jetserver.app.PlayerSession;
 import org.menacheri.jetserver.app.impl.GameRoomSession;
 import org.menacheri.zombie.domain.Defender;
 import org.menacheri.zombie.domain.IAM;
@@ -30,7 +30,7 @@ public class ZombieRoom extends GameRoomSession
 	}
 	
 	@Override
-	public void onLogin(IPlayerSession playerSession)
+	public void onLogin(PlayerSession playerSession)
 	{
 		SessionHandler listener = new SessionHandler(playerSession,defender, zombie,
 				IAM.ZOMBIE);

@@ -3,9 +3,9 @@ package org.menacheri.jetserver;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.menacheri.jetserver.app.IGameRoom;
-import org.menacheri.jetserver.service.ILookupService;
-import org.menacheri.jetserver.service.impl.LookupService;
+import org.menacheri.jetserver.app.GameRoom;
+import org.menacheri.jetserver.service.LookupService;
+import org.menacheri.jetserver.service.impl.SimpleLookupService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
@@ -15,10 +15,10 @@ import org.springframework.context.annotation.ImportResource;
 public class JetServerSpringConfig
 {
 
-	public @Bean(name="lookupService") ILookupService lookupService()
+	public @Bean(name="lookupService") LookupService lookupService()
 	{
-		Map<String,IGameRoom> refKeyGameRoomMap = new HashMap<String, IGameRoom>();
-		LookupService service = new LookupService(refKeyGameRoomMap);
+		Map<String,GameRoom> refKeyGameRoomMap = new HashMap<String, GameRoom>();
+		SimpleLookupService service = new SimpleLookupService(refKeyGameRoomMap);
 		return service;
 	}
 }

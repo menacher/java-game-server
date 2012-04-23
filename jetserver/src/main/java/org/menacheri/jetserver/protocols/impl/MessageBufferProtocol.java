@@ -2,7 +2,7 @@ package org.menacheri.jetserver.protocols.impl;
 
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.handler.codec.frame.LengthFieldPrepender;
-import org.menacheri.jetserver.app.IPlayerSession;
+import org.menacheri.jetserver.app.PlayerSession;
 import org.menacheri.jetserver.handlers.netty.DefaultToServerHandler;
 import org.menacheri.jetserver.handlers.netty.MessageBufferEventDecoder;
 import org.menacheri.jetserver.handlers.netty.MessageBufferEventEncoder;
@@ -29,7 +29,7 @@ public class MessageBufferProtocol extends AbstractNettyProtocol
 	}
 	
 	@Override
-	public void applyProtocol(IPlayerSession playerSession)
+	public void applyProtocol(PlayerSession playerSession)
 	{
 		LOG.trace("Going to apply protocol on session: {}" ,playerSession);
 		

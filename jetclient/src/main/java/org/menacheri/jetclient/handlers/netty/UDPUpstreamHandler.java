@@ -7,14 +7,14 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.jboss.netty.channel.socket.DatagramChannel;
 import org.menacheri.jetclient.NettyUDPClient;
-import org.menacheri.jetclient.app.ISession;
+import org.menacheri.jetclient.app.Session;
 import org.menacheri.jetclient.event.Events;
-import org.menacheri.jetclient.event.IEvent;
+import org.menacheri.jetclient.event.Event;
 
 /**
  * This upstream handler handles <b>ALL</b> UDP events. It will lookup the
  * appropriate session from {@link NettyUDPClient#CLIENTS} map and then transmit
- * the event to that {@link ISession}. <b>Note</b> If this class cannot find the
+ * the event to that {@link Session}. <b>Note</b> If this class cannot find the
  * appropriate session to transmit this event to, then the event is
  * <b>silently</b> discarded.
  * 
@@ -34,11 +34,11 @@ public class UDPUpstreamHandler extends SimpleChannelUpstreamHandler
 	{
 		// Lookup the session from the local address.
 		DatagramChannel datagramChannel = (DatagramChannel) e.getChannel();
-		ISession session = NettyUDPClient.CLIENTS.get(datagramChannel
+		Session session = NettyUDPClient.CLIENTS.get(datagramChannel
 				.getLocalAddress());
 		if (null != session)
 		{
-			IEvent event = (IEvent) e.getMessage();
+			Event event = (Event) e.getMessage();
 			// Pass the event on to the session
 			session.onEvent(event);
 		}
@@ -50,11 +50,11 @@ public class UDPUpstreamHandler extends SimpleChannelUpstreamHandler
 	{
 		System.err.println(e.getCause());
 		DatagramChannel datagramChannel = (DatagramChannel) e.getChannel();
-		ISession session = NettyUDPClient.CLIENTS.get(datagramChannel
+		Session session = NettyUDPClient.CLIENTS.get(datagramChannel
 				.getLocalAddress());
 		if (null != session)
 		{
-			IEvent event = Events.event(e, Events.EXCEPTION);
+			Event event = Events.event(e, Events.EXCEPTION);
 			session.onEvent(event);
 		}
 	}
@@ -64,11 +64,11 @@ public class UDPUpstreamHandler extends SimpleChannelUpstreamHandler
 			ChannelStateEvent e) throws Exception
 	{
 		DatagramChannel datagramChannel = (DatagramChannel) e.getChannel();
-		ISession session = NettyUDPClient.CLIENTS.get(datagramChannel
+		Session session = NettyUDPClient.CLIENTS.get(datagramChannel
 				.getLocalAddress());
 		if ((null != session) && !session.isShuttingDown())
 		{
-			IEvent event = Events.event(e, Events.DISCONNECT);
+			Event event = Events.event(e, Events.DISCONNECT);
 			session.onEvent(event);
 		}
 		else if (null != session)
@@ -85,11 +85,11 @@ public class UDPUpstreamHandler extends SimpleChannelUpstreamHandler
 			throws Exception
 	{
 		DatagramChannel datagramChannel = (DatagramChannel) e.getChannel();
-		ISession session = NettyUDPClient.CLIENTS.get(datagramChannel
+		Session session = NettyUDPClient.CLIENTS.get(datagramChannel
 				.getLocalAddress());
 		if ((null != session) && !session.isShuttingDown())
 		{
-			IEvent event = Events.event(e, Events.DISCONNECT);
+			Event event = Events.event(e, Events.DISCONNECT);
 			session.onEvent(event);
 		}
 	}

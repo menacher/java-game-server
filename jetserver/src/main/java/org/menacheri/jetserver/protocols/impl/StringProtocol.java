@@ -7,7 +7,7 @@ import org.jboss.netty.handler.codec.frame.Delimiters;
 import org.jboss.netty.handler.codec.frame.TooLongFrameException;
 import org.jboss.netty.handler.codec.string.StringDecoder;
 import org.jboss.netty.handler.codec.string.StringEncoder;
-import org.menacheri.jetserver.app.IPlayerSession;
+import org.menacheri.jetserver.app.PlayerSession;
 import org.menacheri.jetserver.handlers.netty.NulEncoder;
 import org.menacheri.jetserver.protocols.AbstractNettyProtocol;
 import org.menacheri.jetserver.util.NettyUtils;
@@ -55,7 +55,7 @@ public class StringProtocol extends AbstractNettyProtocol
 	}
 
 	@Override
-	public void applyProtocol(IPlayerSession playerSession)
+	public void applyProtocol(PlayerSession playerSession)
 	{
 		ChannelPipeline pipeline = NettyUtils
 				.getPipeLineOfConnection(playerSession);

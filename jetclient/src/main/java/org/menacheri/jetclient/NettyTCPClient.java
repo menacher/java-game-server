@@ -18,7 +18,7 @@ import org.jboss.netty.channel.group.ChannelGroup;
 import org.jboss.netty.channel.group.ChannelGroupFuture;
 import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
-import org.menacheri.jetclient.event.IEvent;
+import org.menacheri.jetclient.event.Event;
 
 /**
  * Java client class that provides a TCP transport network connection to remote
@@ -155,7 +155,7 @@ public class NettyTCPClient
 
 	/**
 	 * This method delegates to the
-	 * {@link #connect(ChannelPipelineFactory, IEvent, int, TimeUnit)}
+	 * {@link #connect(ChannelPipelineFactory, Event, int, TimeUnit)}
 	 * method internally. It will pass in a default of 5 seconds wait time to
 	 * the delegated method.
 	 * 
@@ -172,7 +172,7 @@ public class NettyTCPClient
 	 * @throws InterruptedException
 	 */
 	public Channel connect(final ChannelPipelineFactory pipelineFactory,
-			final IEvent loginEvent)
+			final Event loginEvent)
 			throws InterruptedException
 	{
 		return connect(pipelineFactory, loginEvent, 5, TimeUnit.SECONDS);
@@ -201,7 +201,7 @@ public class NettyTCPClient
 	 * @throws InterruptedException
 	 */
 	public Channel connect(final ChannelPipelineFactory pipelineFactory,
-			final IEvent loginEvent, int timeout, TimeUnit unit)
+			final Event loginEvent, int timeout, TimeUnit unit)
 			throws InterruptedException
 	{
 		ChannelFuture future;

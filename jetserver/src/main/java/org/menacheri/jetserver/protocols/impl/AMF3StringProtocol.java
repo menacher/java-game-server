@@ -6,7 +6,7 @@ import org.jboss.netty.handler.codec.base64.Base64Encoder;
 import org.jboss.netty.handler.codec.frame.DelimiterBasedFrameDecoder;
 import org.jboss.netty.handler.codec.frame.Delimiters;
 import org.jboss.netty.handler.codec.frame.TooLongFrameException;
-import org.menacheri.jetserver.app.IPlayerSession;
+import org.menacheri.jetserver.app.PlayerSession;
 import org.menacheri.jetserver.handlers.netty.AMF3ToJavaObjectDecoder;
 import org.menacheri.jetserver.handlers.netty.JavaObjectToAMF3Encoder;
 import org.menacheri.jetserver.handlers.netty.NulEncoder;
@@ -64,7 +64,7 @@ public class AMF3StringProtocol extends AbstractNettyProtocol
 	}
 
 	@Override
-	public void applyProtocol(IPlayerSession playerSession)
+	public void applyProtocol(PlayerSession playerSession)
 	{
 		ChannelPipeline pipeline = NettyUtils
 				.getPipeLineOfConnection(playerSession);

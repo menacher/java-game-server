@@ -1,15 +1,15 @@
 package org.menacheri.jetserver.event.impl;
 
-import org.menacheri.jetserver.app.IGameRoom;
-import org.menacheri.jetserver.app.ISession;
+import org.menacheri.jetserver.app.GameRoom;
+import org.menacheri.jetserver.app.Session;
 import org.menacheri.jetserver.event.Events;
-import org.menacheri.jetserver.event.IEvent;
-import org.menacheri.jetserver.event.INetworkEvent;
-import org.menacheri.jetserver.event.ISessionEventHandler;
+import org.menacheri.jetserver.event.Event;
+import org.menacheri.jetserver.event.NetworkEvent;
+import org.menacheri.jetserver.event.SessionEventHandler;
 
 /**
- * A listener class which will be used by {@link IGameRoom} to send
- * {@link INetworkEvent}s to the connected sessions. When the game room
+ * A listener class which will be used by {@link GameRoom} to send
+ * {@link NetworkEvent}s to the connected sessions. When the game room
  * publishes such events to its channel, this listener will pick it up and
  * transmit it to the session which in turn will transmit it to the remote
  * machine/vm.
@@ -17,19 +17,19 @@ import org.menacheri.jetserver.event.ISessionEventHandler;
  * @author Abraham Menacherry
  * 
  */
-public class NetworkEventListener implements ISessionEventHandler
+public class NetworkEventListener implements SessionEventHandler
 {
 
 	private static final int EVENT_TYPE = Events.NETWORK_MESSAGE;
-	private final ISession session;
+	private final Session session;
 
-	public NetworkEventListener(ISession session)
+	public NetworkEventListener(Session session)
 	{
 		this.session = session;
 	}
 
 	@Override
-	public void onEvent(IEvent event)
+	public void onEvent(Event event)
 	{
 		session.onEvent(event);
 	}
@@ -41,13 +41,13 @@ public class NetworkEventListener implements ISessionEventHandler
 	}
 
 	@Override
-	public ISession getSession()
+	public Session getSession()
 	{
 		return session;
 	}
 
 	@Override
-	public void setSession(ISession session)
+	public void setSession(Session session)
 	{
 		throw new UnsupportedOperationException(
 				"Session is a final field in this class. "

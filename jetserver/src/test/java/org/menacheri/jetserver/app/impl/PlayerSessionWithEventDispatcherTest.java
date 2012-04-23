@@ -9,26 +9,26 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.menacheri.jetserver.app.IGame;
-import org.menacheri.jetserver.app.IGameRoom;
-import org.menacheri.jetserver.app.IPlayerSession;
-import org.menacheri.jetserver.app.ISession;
-import org.menacheri.jetserver.app.impl.Game;
+import org.menacheri.jetserver.app.Game;
+import org.menacheri.jetserver.app.GameRoom;
+import org.menacheri.jetserver.app.PlayerSession;
+import org.menacheri.jetserver.app.Session;
+import org.menacheri.jetserver.app.impl.SimpleGame;
 import org.menacheri.jetserver.app.impl.GameRoomSession;
 import org.menacheri.jetserver.app.impl.GameRoomSession.GameRoomSessionBuilder;
 import org.menacheri.jetserver.event.Events;
-import org.menacheri.jetserver.event.IEvent;
-import org.menacheri.jetserver.event.INetworkEvent;
-import org.menacheri.jetserver.event.impl.AbstractSessionEventHandler;
-import org.menacheri.jetserver.event.impl.EventDispatcher;
-import org.menacheri.jetserver.protocols.IProtocol;
+import org.menacheri.jetserver.event.Event;
+import org.menacheri.jetserver.event.NetworkEvent;
+import org.menacheri.jetserver.event.impl.DefaultSessionEventHandler;
+import org.menacheri.jetserver.event.impl.ExecutorEventDispatcher;
+import org.menacheri.jetserver.protocols.Protocol;
 import org.menacheri.jetserver.protocols.impl.DummyProtocol;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
 
 public class PlayerSessionWithEventDispatcherTest
 {
-	private static final IProtocol DUMMY_PROTOCOL = new DummyProtocol();
+	private static final Protocol DUMMY_PROTOCOL = new DummyProtocol();
 	private static final AtomicLong COUNTER = new AtomicLong(0l);
 	private static final int NUM_OF_GAME_ROOMS = 1000;
 	private static final int SESSIONS_PER_GAME_ROOM = 50;
@@ -36,32 +36,32 @@ public class PlayerSessionWithEventDispatcherTest
 	private static final int LATCH_COUNT = ((NUM_OF_GAME_ROOMS * SESSIONS_PER_GAME_ROOM) * (EVENTS_PER_SESSION * SESSIONS_PER_GAME_ROOM))
 			+ (EVENTS_PER_SESSION * SESSIONS_PER_GAME_ROOM * NUM_OF_GAME_ROOMS);
 	private static final CountDownLatch LATCH = new CountDownLatch(LATCH_COUNT);
-	private IGame game;
-	private List<IGameRoom> gameRoomList;
-	private List<ISession> sessionList;
+	private Game game;
+	private List<GameRoom> gameRoomList;
+	private List<Session> sessionList;
 
 	@Before
 	public void setUp()
 	{
-		game = new Game(1, "Test");
-		gameRoomList = new ArrayList<IGameRoom>(NUM_OF_GAME_ROOMS);
-		sessionList = new ArrayList<ISession>(NUM_OF_GAME_ROOMS
+		game = new SimpleGame(1, "Test");
+		gameRoomList = new ArrayList<GameRoom>(NUM_OF_GAME_ROOMS);
+		sessionList = new ArrayList<Session>(NUM_OF_GAME_ROOMS
 				* SESSIONS_PER_GAME_ROOM);
 		for (int i = 1; i <= NUM_OF_GAME_ROOMS; i++)
 		{
 			GameRoomSessionBuilder sessionBuilder = new GameRoomSessionBuilder();
 			sessionBuilder.parentGame(game).gameRoomName("Zombie_ROOM_" + i)
-					.protocol(DUMMY_PROTOCOL).eventDispatcher(new EventDispatcher());
-			ISession gameRoomSession = new TestGameRoom(sessionBuilder);
+					.protocol(DUMMY_PROTOCOL).eventDispatcher(new ExecutorEventDispatcher());
+			Session gameRoomSession = new TestGameRoom(sessionBuilder);
 			gameRoomSession.addHandler(new GameRoomSessionHandler(
 					gameRoomSession));
-			gameRoomList.add((IGameRoom) gameRoomSession);
+			gameRoomList.add((GameRoom) gameRoomSession);
 		}
-		for (IGameRoom gameRoom : gameRoomList)
+		for (GameRoom gameRoom : gameRoomList)
 		{
 			for (int j = 1; j <= SESSIONS_PER_GAME_ROOM; j++)
 			{
-				IPlayerSession playerSession = gameRoom.createPlayerSession();
+				PlayerSession playerSession = gameRoom.createPlayerSession();
 				gameRoom.connectSession(playerSession);
 				playerSession.addHandler(new SessionHandler(playerSession));
 				sessionList.add(playerSession);
@@ -79,11 +79,11 @@ public class PlayerSessionWithEventDispatcherTest
 			@Override
 			public void run()
 			{
-				for (ISession session : sessionList)
+				for (Session session : sessionList)
 				{
 					for (int i = 1; i <= EVENTS_PER_SESSION; i++)
 					{
-						IEvent event = Events.event(null,
+						Event event = Events.event(null,
 								Events.SESSION_MESSAGE);
 						session.onEvent(event);
 					}
@@ -109,7 +109,7 @@ public class PlayerSessionWithEventDispatcherTest
 		}
 
 		@Override
-		public void onLogin(IPlayerSession playerSession)
+		public void onLogin(PlayerSession playerSession)
 		{
 			SessionHandler handler = new SessionHandler(playerSession);
 			playerSession.addHandler(handler);
@@ -117,30 +117,30 @@ public class PlayerSessionWithEventDispatcherTest
 	}
 
 	private static class GameRoomSessionHandler extends
-			AbstractSessionEventHandler
+			DefaultSessionEventHandler
 	{
-		public GameRoomSessionHandler(ISession session)
+		public GameRoomSessionHandler(Session session)
 		{
 			super(session);
 		}
 
 		@Override
-		public void onNetworkMessage(INetworkEvent event)
+		public void onNetworkMessage(NetworkEvent event)
 		{
 			COUNTER.incrementAndGet();
 			LATCH.countDown();
 		}
 	}
 
-	private static class SessionHandler extends AbstractSessionEventHandler
+	private static class SessionHandler extends DefaultSessionEventHandler
 	{
-		public SessionHandler(ISession session)
+		public SessionHandler(Session session)
 		{
 			super(session);
 		}
 
 		@Override
-		public void onNetworkMessage(INetworkEvent event)
+		public void onNetworkMessage(NetworkEvent event)
 		{
 			COUNTER.incrementAndGet();
 			LATCH.countDown();

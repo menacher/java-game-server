@@ -5,7 +5,7 @@ import java.net.InetSocketAddress;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.menacheri.jetclient.app.impl.SessionFactory;
-import org.menacheri.jetclient.communication.IMessageBuffer;
+import org.menacheri.jetclient.communication.MessageBuffer;
 import org.menacheri.jetclient.communication.NettyMessageBuffer;
 
 /**
@@ -210,7 +210,7 @@ public class LoginHelper
 	 *         connection key, udp local bind address etc.
 	 * @throws Exception
 	 */
-	public IMessageBuffer<ChannelBuffer> getLoginBuffer(InetSocketAddress localUDPAddress)
+	public MessageBuffer<ChannelBuffer> getLoginBuffer(InetSocketAddress localUDPAddress)
 			throws Exception
 	{
 		ChannelBuffer loginBuffer;

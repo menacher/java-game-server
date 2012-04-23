@@ -8,9 +8,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Test;
 import org.menacheri.jetclient.event.Events;
-import org.menacheri.jetclient.event.IEvent;
-import org.menacheri.jetclient.event.IEventDispatcher;
-import org.menacheri.jetclient.event.IEventHandler;
+import org.menacheri.jetclient.event.Event;
+import org.menacheri.jetclient.event.EventDispatcher;
+import org.menacheri.jetclient.event.EventHandler;
 
 public class EventDispatcherTest
 {
@@ -18,13 +18,13 @@ public class EventDispatcherTest
 	public void specificEventReceiptOnSpecificEventHandler()
 			throws InterruptedException
 	{
-		IEventDispatcher dispatcher = new EventDispatcher();
+		EventDispatcher dispatcher = new DefaultEventDispatcher();
 		final CountDownLatch latch = new CountDownLatch(1);
-		dispatcher.addHandler(new IEventHandler()
+		dispatcher.addHandler(new EventHandler()
 		{
 
 			@Override
-			public void onEvent(IEvent event)
+			public void onEvent(Event event)
 			{
 				latch.countDown();
 			}
@@ -36,7 +36,7 @@ public class EventDispatcherTest
 			}
 		});
 
-		IEvent event = Events.event(null, Events.SESSION_MESSAGE);
+		Event event = Events.event(null, Events.SESSION_MESSAGE);
 		dispatcher.fireEvent(event);
 		assertTrue(latch.await(1, TimeUnit.SECONDS));
 	}
@@ -44,13 +44,13 @@ public class EventDispatcherTest
 	@Test
 	public void eventReceiptOnANYTypeEventHandler() throws InterruptedException
 	{
-		IEventDispatcher dispatcher = new EventDispatcher();
+		EventDispatcher dispatcher = new DefaultEventDispatcher();
 		final CountDownLatch latch = new CountDownLatch(5);
-		dispatcher.addHandler(new IEventHandler()
+		dispatcher.addHandler(new EventHandler()
 		{
 
 			@Override
-			public void onEvent(IEvent event)
+			public void onEvent(Event event)
 			{
 				latch.countDown();
 			}
@@ -62,7 +62,7 @@ public class EventDispatcherTest
 			}
 		});
 
-		IEvent event = Events.event(null, Events.SESSION_MESSAGE);
+		Event event = Events.event(null, Events.SESSION_MESSAGE);
 		dispatcher.fireEvent(event);
 		event = Events.event(null, Events.NETWORK_MESSAGE);
 		dispatcher.fireEvent(event);
@@ -80,13 +80,13 @@ public class EventDispatcherTest
 	public void nonReceiptOfWrongEventOnSpecificEventHandler()
 			throws InterruptedException
 	{
-		IEventDispatcher dispatcher = new EventDispatcher();
+		EventDispatcher dispatcher = new DefaultEventDispatcher();
 		final CountDownLatch latch = new CountDownLatch(1);
-		dispatcher.addHandler(new IEventHandler()
+		dispatcher.addHandler(new EventHandler()
 		{
 
 			@Override
-			public void onEvent(IEvent event)
+			public void onEvent(Event event)
 			{
 				latch.countDown();
 			}
@@ -98,7 +98,7 @@ public class EventDispatcherTest
 			}
 		});
 
-		IEvent event = Events.event(null, Events.NETWORK_MESSAGE);
+		Event event = Events.event(null, Events.NETWORK_MESSAGE);
 		dispatcher.fireEvent(event);
 		assertFalse(latch.await(1, TimeUnit.SECONDS));
 	}
@@ -106,14 +106,14 @@ public class EventDispatcherTest
 	@Test
 	public void eventPublishingPerformance() throws InterruptedException
 	{
-		IEventDispatcher dispatcher = new EventDispatcher();
+		EventDispatcher dispatcher = new DefaultEventDispatcher();
 		int countOfEvents = 5000000;
 		final CountDownLatch latch = new CountDownLatch(countOfEvents);
-		dispatcher.addHandler(new IEventHandler()
+		dispatcher.addHandler(new EventHandler()
 		{
 
 			@Override
-			public void onEvent(IEvent event)
+			public void onEvent(Event event)
 			{
 				latch.countDown();
 			}
@@ -127,7 +127,7 @@ public class EventDispatcherTest
 		long startTime = System.nanoTime();
 		for (int i = 1; i <= countOfEvents; i++)
 		{
-			IEvent event = Events.event(null, Events.SESSION_MESSAGE);
+			Event event = Events.event(null, Events.SESSION_MESSAGE);
 			dispatcher.fireEvent(event);
 		}
 		long time = System.nanoTime() - startTime;

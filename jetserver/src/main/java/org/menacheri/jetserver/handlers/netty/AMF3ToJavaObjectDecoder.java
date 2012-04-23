@@ -8,7 +8,7 @@ import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandler.Sharable;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.handler.codec.oneone.OneToOneDecoder;
-import org.menacheri.jetserver.convert.ITransform;
+import org.menacheri.jetserver.convert.Transform;
 import org.menacheri.jetserver.convert.flex.AMFDeSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +23,7 @@ import flex.messaging.io.SerializationContext;
  * 
  */
 @Sharable
-public class AMF3ToJavaObjectDecoder extends OneToOneDecoder implements ITransform<ChannelBuffer, Object>
+public class AMF3ToJavaObjectDecoder extends OneToOneDecoder implements Transform<ChannelBuffer, Object>
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AMF3ToJavaObjectDecoder.class);
 	

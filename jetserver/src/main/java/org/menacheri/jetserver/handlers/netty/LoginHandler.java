@@ -12,17 +12,17 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelStateEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
-import org.menacheri.jetserver.app.IGameRoom;
-import org.menacheri.jetserver.app.IPlayer;
-import org.menacheri.jetserver.app.IPlayerSession;
+import org.menacheri.jetserver.app.GameRoom;
+import org.menacheri.jetserver.app.Player;
+import org.menacheri.jetserver.app.PlayerSession;
 import org.menacheri.jetserver.communication.NettyTCPMessageSender;
 import org.menacheri.jetserver.event.Events;
-import org.menacheri.jetserver.event.IEvent;
-import org.menacheri.jetserver.server.netty.NettyServer;
-import org.menacheri.jetserver.service.ILookupService;
-import org.menacheri.jetserver.service.ISessionRegistryService;
+import org.menacheri.jetserver.event.Event;
+import org.menacheri.jetserver.server.netty.AbstractNettyServer;
+import org.menacheri.jetserver.service.LookupService;
+import org.menacheri.jetserver.service.SessionRegistryService;
+import org.menacheri.jetserver.util.SimpleCredentials;
 import org.menacheri.jetserver.util.Credentials;
-import org.menacheri.jetserver.util.ICredentials;
 import org.menacheri.jetserver.util.NettyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,8 +34,8 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 	private static final Logger LOG = LoggerFactory
 			.getLogger(LoginHandler.class);
 
-	protected ILookupService lookupService;
-	protected ISessionRegistryService sessionRegistryService;
+	protected LookupService lookupService;
+	protected SessionRegistryService sessionRegistryService;
 	/**
 	 * Used for book keeping purpose. It will count all open channels. Currently
 	 * closed channels will not lead to a decrement.
@@ -45,13 +45,13 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 	public void messageReceived(final ChannelHandlerContext ctx, final MessageEvent e)
 			throws Exception
 	{
-		final IEvent event = (IEvent)e.getMessage();
+		final Event event = (Event)e.getMessage();
 		final ChannelBuffer buffer = (ChannelBuffer) event.getSource();
 		final Channel channel = e.getChannel();
 		if(event.getType() == Events.LOG_IN)
 		{
 			LOG.trace("Login attempt from {}",channel.getRemoteAddress());
-			IPlayer player = lookupPlayer(buffer, channel);
+			Player player = lookupPlayer(buffer, channel);
 			handleLogin(player,channel);
 			handleGameRoomJoin(player, channel,buffer);
 		}
@@ -68,22 +68,22 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 	@Override
 	public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e)
 			throws Exception {
-		NettyServer.ALL_CHANNELS.add(e.getChannel());
+		AbstractNettyServer.ALL_CHANNELS.add(e.getChannel());
 		LOG.debug("Added Channel with id: {} as the {}th open channel", e
 				.getChannel().getId(), CHANNEL_COUNTER.incrementAndGet());
 	}
 	
-	public IPlayer lookupPlayer(final ChannelBuffer buffer, final Channel channel)
+	public Player lookupPlayer(final ChannelBuffer buffer, final Channel channel)
 	{
-		ICredentials credentials = new Credentials(buffer);
-		IPlayer player = lookupService.playerLookup(credentials);
+		Credentials credentials = new SimpleCredentials(buffer);
+		Player player = lookupService.playerLookup(credentials);
 		if(null == player){
 			LOG.error("Invalid credentials provided by user: {}",credentials);
 		}
 		return player;
 	}
 	
-	public void handleLogin(IPlayer player,Channel channel)
+	public void handleLogin(Player player,Channel channel)
 	{
 		if (null != player)
 		{
@@ -111,14 +111,14 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 		future.addListener(ChannelFutureListener.CLOSE);
 	}
 	
-	public void handleGameRoomJoin(IPlayer player, Channel channel, ChannelBuffer buffer)
+	public void handleGameRoomJoin(Player player, Channel channel, ChannelBuffer buffer)
 	{
 		String refKey = NettyUtils.readString(buffer);
 		
-		IGameRoom gameRoom = lookupService.gameRoomLookup(refKey);
+		GameRoom gameRoom = lookupService.gameRoomLookup(refKey);
 		if(null != gameRoom)
 		{
-			IPlayerSession playerSession = gameRoom.createPlayerSession();
+			PlayerSession playerSession = gameRoom.createPlayerSession();
 			playerSession.setConnectParameter(NettyUtils.NETTY_CHANNEL,
 					channel); // TODO is this required?
 			gameRoom.onLogin(playerSession);
@@ -136,7 +136,7 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 		}
 	}
 	
-	public void connectToGameRoom(final IGameRoom gameRoom, final IPlayerSession playerSession, ChannelFuture future)
+	public void connectToGameRoom(final GameRoom gameRoom, final PlayerSession playerSession, ChannelFuture future)
 	{
 		future.addListener(new ChannelFutureListener()
 		{
@@ -167,7 +167,7 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 	
 	/**
 	 * This method adds the player session to the
-	 * {@link ISessionRegistryService}. The key being the remote udp address of
+	 * {@link SessionRegistryService}. The key being the remote udp address of
 	 * the client and the session being the value.
 	 * 
 	 * @param playerSession
@@ -175,7 +175,7 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 	 *            Used to read the remote address of the client which is
 	 *            attempting to connect via udp.
 	 */
-	protected void loginUdp(IPlayerSession playerSession, ChannelBuffer buffer)
+	protected void loginUdp(PlayerSession playerSession, ChannelBuffer buffer)
 	{
 		InetSocketAddress remoteAdress = NettyUtils.readSocketAddress(buffer);
 		if(null != remoteAdress)
@@ -184,23 +184,23 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 		}
 	}
 	
-	public ILookupService getLookupService()
+	public LookupService getLookupService()
 	{
 		return lookupService;
 	}
 
-	public void setLookupService(ILookupService lookupService)
+	public void setLookupService(LookupService lookupService)
 	{
 		this.lookupService = lookupService;
 	}
 
-	public ISessionRegistryService getSessionRegistryService()
+	public SessionRegistryService getSessionRegistryService()
 	{
 		return sessionRegistryService;
 	}
 
 	public void setSessionRegistryService(
-			ISessionRegistryService sessionRegistryService)
+			SessionRegistryService sessionRegistryService)
 	{
 		this.sessionRegistryService = sessionRegistryService;
 	}

@@ -1,39 +1,11 @@
 package org.menacheri.jetserver.util;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-
-public class Credentials implements ICredentials
+public interface Credentials
 {
-	private final String username;
-	private final String password;
-	
-	public Credentials(ChannelBuffer buffer)
-	{
-		this.username = NettyUtils.readString(buffer);
-		this.password = NettyUtils.readString(buffer);
-	}
 
-	/* (non-Javadoc)
-	 * @see org.menacheri.jetserver.jetserver.util.ICredentials#getUsername()
-	 */
-	@Override
-	public String getUsername()
-	{
-		return username;
-	}
+	public abstract String getUsername();
 
-	/* (non-Javadoc)
-	 * @see org.menacheri.jetserver.jetserver.util.ICredentials#getPassword()
-	 */
-	@Override
-	public String getPassword()
-	{
-		return password;
-	}
+	public abstract String getPassword();
 
-	@Override
-	public String toString()
-	{
-		return username;
-	}
+
 }

@@ -11,7 +11,7 @@ import org.jboss.netty.handler.codec.serialization.ObjectDecoder;
 import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
 import org.jboss.netty.handler.codec.string.StringDecoder;
 import org.jboss.netty.handler.codec.string.StringEncoder;
-import org.menacheri.convert.ITransform;
+import org.menacheri.convert.Transform;
 
 /**
  * This class would be an assortment of netty related utility methods.
@@ -260,7 +260,7 @@ public class NettyUtils
 	}
 
 	public static <T, V> V readObject(ChannelBuffer buffer,
-			ITransform<ChannelBuffer, V> decoder)
+			Transform<ChannelBuffer, V> decoder)
 	{
 		int length = 0;
 		if (null != buffer && buffer.readableBytes() > 2)
@@ -286,7 +286,7 @@ public class NettyUtils
 	}
 
 	public static <V> ChannelBuffer writeObject(
-			ITransform<V, ChannelBuffer> converter, V object)
+			Transform<V, ChannelBuffer> converter, V object)
 	{
 		ChannelBuffer buffer = null;
 		ChannelBuffer objectBuffer;

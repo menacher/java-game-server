@@ -1,6 +1,6 @@
 package org.menacheri.jetserver.event.impl;
 
-public class ChangeAttributeEvent extends Event
+public class ChangeAttributeEvent extends DefaultEvent
 {
 	/**
 	 * 

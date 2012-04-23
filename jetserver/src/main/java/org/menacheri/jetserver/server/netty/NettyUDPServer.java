@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  * @author Abraham Menacherry
  * 
  */
-public class NettyUDPServer extends NettyServer
+public class NettyUDPServer extends AbstractNettyServer
 {
 	private static final Logger LOG = LoggerFactory.getLogger(NettyUDPServer.class);
 	private FixedReceiveBufferSizePredictorFactory bufferSizePredictor;

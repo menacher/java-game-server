@@ -21,7 +21,7 @@ import org.slf4j.LoggerFactory;
  * @author Abraham Menacherry
  * 
  */
-public class NettyTCPServer extends NettyServer
+public class NettyTCPServer extends AbstractNettyServer
 {
 	private static final Logger LOG = LoggerFactory.getLogger(NettyTCPServer.class);
 	

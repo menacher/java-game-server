@@ -1,30 +1,30 @@
 package org.menacheri.jetclient.event.impl;
 
-import org.menacheri.jetclient.app.ISession;
-import org.menacheri.jetclient.communication.IDeliveryGuaranty.DeliveryGuaranty;
-import org.menacheri.jetclient.communication.IMessageSender;
+import org.menacheri.jetclient.app.Session;
+import org.menacheri.jetclient.communication.DeliveryGuaranty.DeliveryGuarantyOptions;
+import org.menacheri.jetclient.communication.MessageSender;
 import org.menacheri.jetclient.event.Events;
-import org.menacheri.jetclient.event.IEvent;
-import org.menacheri.jetclient.event.INetworkEvent;
-import org.menacheri.jetclient.event.ISessionEventHandler;
+import org.menacheri.jetclient.event.Event;
+import org.menacheri.jetclient.event.NetworkEvent;
+import org.menacheri.jetclient.event.SessionEventHandler;
 
 /**
  * Provides default implementation for most of the events. Subclasses can
  * override the event handler method for any particular event,
- * {@link AbstractSessionEventHandler}{@link #onDataIn(IEvent)} to do app
+ * {@link AbstractSessionEventHandler}{@link #onDataIn(Event)} to do app
  * specific logic.
  * 
  * @author Abraham Menacherry
  * 
  */
 public abstract class AbstractSessionEventHandler implements
-		ISessionEventHandler
+		SessionEventHandler
 {
 	protected final int eventType;
 
-	private final ISession session;
+	private final Session session;
 
-	public AbstractSessionEventHandler(ISession session)
+	public AbstractSessionEventHandler(Session session)
 	{
 		this.eventType = Events.ANY;
 		this.session = session;
@@ -37,12 +37,12 @@ public abstract class AbstractSessionEventHandler implements
 	}
 
 	@Override
-	public void onEvent(IEvent event)
+	public void onEvent(Event event)
 	{
 		doEventHandlerMethodLookup(event);
 	}
 
-	public void doEventHandlerMethodLookup(IEvent event)
+	public void doEventHandlerMethodLookup(Event event)
 	{
 		int eventType = event.getType();
 		switch (eventType)
@@ -51,7 +51,7 @@ public abstract class AbstractSessionEventHandler implements
 			onDataIn(event);
 			break;
 		case Events.NETWORK_MESSAGE:
-			onNetworkMessage((INetworkEvent)event);
+			onNetworkMessage((NetworkEvent)event);
 			break;
 		case Events.LOG_IN_SUCCESS:
 			onLoginSuccess(event);
@@ -83,14 +83,14 @@ public abstract class AbstractSessionEventHandler implements
 		}
 	}
 
-	public abstract void onDataIn(IEvent event);
+	public abstract void onDataIn(Event event);
 
-	public void onNetworkMessage(INetworkEvent networkEvent)
+	public void onNetworkMessage(NetworkEvent networkEvent)
 	{
-		ISession session = getSession();
+		Session session = getSession();
 		boolean writeable = session.isWriteable();
-		IMessageSender messageSender = null;
-		if (networkEvent.getDeliveryGuaranty().getGuaranty() == DeliveryGuaranty.FAST
+		MessageSender messageSender = null;
+		if (networkEvent.getDeliveryGuaranty().getGuaranty() == DeliveryGuarantyOptions.FAST
 				.getGuaranty())
 		{
 			messageSender = session.getUdpMessageSender();
@@ -105,60 +105,60 @@ public abstract class AbstractSessionEventHandler implements
 		}
 	}
 	
-	public void onLoginSuccess(IEvent event)
+	public void onLoginSuccess(Event event)
 	{
 	}
 
-	public void onLoginFailure(IEvent event)
+	public void onLoginFailure(Event event)
 	{
 	}
 
-	public void onStart(IEvent event)
+	public void onStart(Event event)
 	{
 		getSession().setWriteable(true);
 	}
 
-	public void onStop(IEvent event)
+	public void onStop(Event event)
 	{
 		getSession().setWriteable(false);
 	}
 
-	public void onConnectFailed(IEvent event)
+	public void onConnectFailed(Event event)
 	{
 
 	}
 
-	public void onDisconnect(IEvent event)
+	public void onDisconnect(Event event)
 	{
 		System.out.println("Received disconnect event in session. "
 				+ "Going to close session");
 		onClose(event);
 	}
 
-	public void onChangeAttribute(IEvent event)
+	public void onChangeAttribute(Event event)
 	{
 
 	}
 
-	public void onException(IEvent event)
+	public void onException(Event event)
 	{
 		System.out.println("Received exception event in session. "
 				+ "Going to close session");
 		onClose(event);
 	}
 
-	public void onClose(IEvent event)
+	public void onClose(Event event)
 	{
 		getSession().close();
 	}
 
-	public void onCustomEvent(IEvent event)
+	public void onCustomEvent(Event event)
 	{
 
 	}
 
 	@Override
-	public ISession getSession()
+	public Session getSession()
 	{
 		return session;
 	}

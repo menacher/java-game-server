@@ -1,21 +1,21 @@
 package org.menacheri.zombie.domain;
 
-import org.menacheri.jetserver.app.IGameRoom;
-import org.menacheri.jetserver.app.ITask;
-import org.menacheri.jetserver.communication.IDeliveryGuaranty;
+import org.menacheri.jetserver.app.GameRoom;
+import org.menacheri.jetserver.app.Task;
+import org.menacheri.jetserver.communication.DeliveryGuaranty.DeliveryGuarantyOptions;
 import org.menacheri.jetserver.communication.NettyMessageBuffer;
 import org.menacheri.jetserver.event.Events;
-import org.menacheri.jetserver.event.INetworkEvent;
+import org.menacheri.jetserver.event.NetworkEvent;
 import org.menacheri.zombie.game.Messages;
 
-public class WorldMonitor implements ITask
+public class WorldMonitor implements Task
 {
 	private World world;
-	private IGameRoom room;
+	private GameRoom room;
 
 	private Object id;
 	
-	public WorldMonitor(World world, IGameRoom room)
+	public WorldMonitor(World world, GameRoom room)
 	{
 		this.world = world;
 		this.room = room;
@@ -44,14 +44,14 @@ public class WorldMonitor implements ITask
 		{
 			// Send it to all players
 			System.out.println("Apocalypse is here");
-			INetworkEvent networkEvent = Events.networkEvent(Messages.apocalypse());
+			NetworkEvent networkEvent = Events.networkEvent(Messages.apocalypse());
 			room.sendBroadcast(networkEvent);
 		}
 		else
 		{
 			NettyMessageBuffer buffer = new NettyMessageBuffer();
 			buffer.writeInt(world.getAlive());
-			INetworkEvent networkEvent = Events.networkEvent(buffer,IDeliveryGuaranty.DeliveryGuaranty.FAST);
+			NetworkEvent networkEvent = Events.networkEvent(buffer,DeliveryGuarantyOptions.FAST);
 			room.sendBroadcast(networkEvent);
 		}
 		
@@ -64,12 +64,12 @@ public class WorldMonitor implements ITask
 		this.id = id;
 	}
 
-	public IGameRoom getRoom()
+	public GameRoom getRoom()
 	{
 		return room;
 	}
 
-	public void setRoom(IGameRoom room)
+	public void setRoom(GameRoom room)
 	{
 		this.room = room;
 	}

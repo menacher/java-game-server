@@ -6,13 +6,13 @@ import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandler.Sharable;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.handler.codec.oneone.OneToOneEncoder;
-import org.menacheri.jetclient.communication.IMessageBuffer;
-import org.menacheri.jetclient.event.IEvent;
+import org.menacheri.jetclient.communication.MessageBuffer;
+import org.menacheri.jetclient.event.Event;
 
 /**
- * Converts an incoming {@link IEvent} which in turn has a
+ * Converts an incoming {@link Event} which in turn has a
  * IMessageBuffer<ChannelBuffer> payload to a Netty {@link ChannelBuffer}.
- * <b>Note that {@link IEvent} instances containing other type of objects as its
+ * <b>Note that {@link Event} instances containing other type of objects as its
  * payload will result in {@link ClassCastException}.
  * 
  * @author Abraham Menacherry.
@@ -30,14 +30,14 @@ public class MessageBufferEventEncoder extends OneToOneEncoder
 		{
 			return msg;
 		}
-		IEvent event = (IEvent) msg;
+		Event event = (Event) msg;
 		ChannelBuffer opCode = ChannelBuffers.buffer(1);
 		opCode.writeByte(event.getType());
 		ChannelBuffer buffer = null;
 		if (null != event.getSource())
 		{
 			@SuppressWarnings("unchecked")
-			IMessageBuffer<ChannelBuffer> msgBuffer = (IMessageBuffer<ChannelBuffer>) event
+			MessageBuffer<ChannelBuffer> msgBuffer = (MessageBuffer<ChannelBuffer>) event
 					.getSource();
 			ChannelBuffer data = msgBuffer.getNativeBuffer();
 			buffer = ChannelBuffers.wrappedBuffer(opCode, data);

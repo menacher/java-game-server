@@ -2,12 +2,12 @@ package org.menacheri.jetserver.service.impl;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.menacheri.jetserver.service.IGameStateManagerService;
+import org.menacheri.jetserver.service.GameStateManagerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class GameStateManager implements IGameStateManagerService
+public class GameStateManager implements GameStateManagerService
 {
 	private static final Logger LOG = LoggerFactory.getLogger(GameStateManager.class);
 	

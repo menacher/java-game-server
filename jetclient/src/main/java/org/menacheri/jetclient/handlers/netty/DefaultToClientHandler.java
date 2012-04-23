@@ -7,9 +7,9 @@ import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.menacheri.jetclient.NettyTCPClient;
-import org.menacheri.jetclient.app.ISession;
+import org.menacheri.jetclient.app.Session;
 import org.menacheri.jetclient.event.Events;
-import org.menacheri.jetclient.event.IEvent;
+import org.menacheri.jetclient.event.Event;
 
 /**
  * A stateful handler whose job is to transmit messages coming on the Netty
@@ -21,9 +21,9 @@ import org.menacheri.jetclient.event.IEvent;
 public class DefaultToClientHandler extends SimpleChannelUpstreamHandler
 {
 	static final String NAME = "defaultHandler";
-	private final ISession session;
+	private final Session session;
 
-	public DefaultToClientHandler(ISession session)
+	public DefaultToClientHandler(Session session)
 	{
 		this.session = session;
 	}
@@ -32,7 +32,7 @@ public class DefaultToClientHandler extends SimpleChannelUpstreamHandler
 	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e)
 			throws Exception
 	{
-		IEvent event = (IEvent) e.getMessage();
+		Event event = (Event) e.getMessage();
 		session.onEvent(event);
 	}
 
@@ -50,7 +50,7 @@ public class DefaultToClientHandler extends SimpleChannelUpstreamHandler
 	{
 		System.err.println("Class:DefaultToClientHandler"
 				+ " Exception occurred in tcp channel: " + e.getCause());
-		IEvent event = Events.event(e, Events.EXCEPTION);
+		Event event = Events.event(e, Events.EXCEPTION);
 		session.onEvent(event);
 	}
 
@@ -60,7 +60,7 @@ public class DefaultToClientHandler extends SimpleChannelUpstreamHandler
 	{
 		if (!session.isShuttingDown())
 		{
-			IEvent event = Events.event(e, Events.DISCONNECT);
+			Event event = Events.event(e, Events.DISCONNECT);
 			session.onEvent(event);
 		}
 		else
@@ -78,7 +78,7 @@ public class DefaultToClientHandler extends SimpleChannelUpstreamHandler
 	{
 		if (!session.isShuttingDown())
 		{
-			IEvent event = Events.event(e, Events.DISCONNECT);
+			Event event = Events.event(e, Events.DISCONNECT);
 			session.onEvent(event);
 		}
 	}

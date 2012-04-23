@@ -5,11 +5,11 @@
 
 	<import resource="server-protocols.xml"></import>
 	
-	<bean id="taskManagerService" class="org.menacheri.jetserver.service.impl.TaskManagerService" destroy-method="shutdown">
+	<bean id="taskManagerService" class="org.menacheri.jetserver.service.impl.SimpleTaskManagerService" destroy-method="shutdown">
 		<constructor-arg type="int" index="0" value="2" ></constructor-arg>
 	</bean>
 	
-	<bean id="gameAdminService" class="org.menacheri.jetserver.service.impl.GameAdminService">
+	<bean id="gameAdminService" class="org.menacheri.jetserver.service.impl.SimpleGameAdminService">
 		<property name="games">
 			<set></set>
 		</property>

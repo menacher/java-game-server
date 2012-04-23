@@ -1,9 +1,9 @@
 package org.menacheri.jetserver.protocols.impl;
 
-import org.menacheri.jetserver.app.IPlayerSession;
-import org.menacheri.jetserver.protocols.IProtocol;
+import org.menacheri.jetserver.app.PlayerSession;
+import org.menacheri.jetserver.protocols.Protocol;
 
-public class DummyProtocol implements IProtocol 
+public class DummyProtocol implements Protocol 
 {
 	@Override
 	public String getProtocolName()
@@ -12,7 +12,7 @@ public class DummyProtocol implements IProtocol
 	}
 
 	@Override
-	public void applyProtocol(IPlayerSession playerSession)
+	public void applyProtocol(PlayerSession playerSession)
 	{
 
 	}

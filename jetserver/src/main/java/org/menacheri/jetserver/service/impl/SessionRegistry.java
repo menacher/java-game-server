@@ -4,27 +4,27 @@ import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.menacheri.jetserver.app.ISession;
-import org.menacheri.jetserver.service.ISessionRegistryService;
+import org.menacheri.jetserver.app.Session;
+import org.menacheri.jetserver.service.SessionRegistryService;
 
 
-public class SessionRegistry implements ISessionRegistryService
+public class SessionRegistry implements SessionRegistryService
 {
-	private final Map<InetSocketAddress, ISession> udpSessions;
+	private final Map<InetSocketAddress, Session> udpSessions;
 	
 	public SessionRegistry()
 	{
-		udpSessions = new ConcurrentHashMap<InetSocketAddress, ISession>(1000);
+		udpSessions = new ConcurrentHashMap<InetSocketAddress, Session>(1000);
 	}
 	
 	@Override
-	public ISession getSession(Object key)
+	public Session getSession(Object key)
 	{
 		return udpSessions.get(key);
 	}
 
 	@Override
-	public boolean putSession(Object key, ISession session)
+	public boolean putSession(Object key, Session session)
 	{
 		if(null == key ||  null == session)
 		{

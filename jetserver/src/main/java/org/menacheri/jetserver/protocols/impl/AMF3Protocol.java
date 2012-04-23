@@ -3,8 +3,8 @@ package org.menacheri.jetserver.protocols.impl;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.handler.codec.frame.LengthFieldPrepender;
-import org.menacheri.jetserver.app.IPlayerSession;
-import org.menacheri.jetserver.event.IEvent;
+import org.menacheri.jetserver.app.PlayerSession;
+import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.handlers.netty.AMF3ToEventSourceDecoder;
 import org.menacheri.jetserver.handlers.netty.DefaultToServerHandler;
 import org.menacheri.jetserver.handlers.netty.EventDecoder;
@@ -17,7 +17,7 @@ import org.menacheri.jetserver.util.NettyUtils;
 /**
  * This protocol defines AMF3 as a byte array being sent over the wire. Used by
  * flash clients that use Socket class. This class applies the flash AMF3
- * protocol to the {@link IPlayerSession}'s pipeline. The major handlers
+ * protocol to the {@link PlayerSession}'s pipeline. The major handlers
  * involved are {@link AMF3ToEventSourceDecoder} and
  * {@link EventSourceToAMF3Encoder}.
  * 
@@ -29,7 +29,7 @@ public class AMF3Protocol extends AbstractNettyProtocol
 {
 	/**
 	 * After the frame decoder retrieves the bytes from the incoming stream,
-	 * this decoder will convert it to an {@link IEvent} with the opCode set as
+	 * this decoder will convert it to an {@link Event} with the opCode set as
 	 * the first byte read from the buffer. And the source object of the event
 	 * created will have the rest of the {@link ChannelBuffer}.
 	 */
@@ -68,7 +68,7 @@ public class AMF3Protocol extends AbstractNettyProtocol
 	}
 
 	@Override
-	public void applyProtocol(IPlayerSession playerSession)
+	public void applyProtocol(PlayerSession playerSession)
 	{
 		ChannelPipeline pipeline = NettyUtils
 				.getPipeLineOfConnection(playerSession);

@@ -1,10 +1,10 @@
 package org.menacheri.jetserver.event.impl;
 
-import org.menacheri.jetserver.event.IEventDispatcher;
+import org.menacheri.jetserver.event.EventDispatcher;
 
 public class EventDispatchers
 {
-	public static IEventDispatcher newJetlangEventDispatcher()
+	public static EventDispatcher newJetlangEventDispatcher()
 	{
 		JetlangEventDispatcher dispatcher = new JetlangEventDispatcher();
 		dispatcher.initialize();

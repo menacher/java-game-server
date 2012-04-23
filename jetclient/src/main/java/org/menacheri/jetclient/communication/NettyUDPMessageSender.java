@@ -4,14 +4,14 @@ import java.net.SocketAddress;
 
 import org.jboss.netty.channel.socket.DatagramChannel;
 import org.menacheri.jetclient.NettyUDPClient;
-import org.menacheri.jetclient.app.ISession;
-import org.menacheri.jetclient.communication.IMessageSender.IFast;
+import org.menacheri.jetclient.app.Session;
+import org.menacheri.jetclient.communication.MessageSender.IFast;
 import org.menacheri.jetclient.event.Events;
 
 /**
  * This class is used to send messages to a remote UDP client or server. An
  * instance of this class will be created when the {@link Events#CONNECT}
- * event is sent to a {@link ISession}
+ * event is sent to a {@link Session}
  * 
  * @author Abraham Menacherry
  * 
@@ -20,7 +20,7 @@ public class NettyUDPMessageSender implements IFast
 {
 	private final SocketAddress remoteAddress;
 	private final DatagramChannel channel;
-	private static final IDeliveryGuaranty DELIVERY_GUARANTY = IDeliveryGuaranty.DeliveryGuaranty.FAST;
+	private static final DeliveryGuaranty DELIVERY_GUARANTY = DeliveryGuaranty.DeliveryGuarantyOptions.FAST;
 
 	public NettyUDPMessageSender(SocketAddress remoteAddress,
 			DatagramChannel channel)
@@ -36,7 +36,7 @@ public class NettyUDPMessageSender implements IFast
 	}
 
 	@Override
-	public IDeliveryGuaranty getDeliveryGuaranty()
+	public DeliveryGuaranty getDeliveryGuaranty()
 	{
 		return DELIVERY_GUARANTY;
 	}
@@ -44,7 +44,7 @@ public class NettyUDPMessageSender implements IFast
 	@Override
 	public void close()
 	{
-		ISession session = NettyUDPClient.CLIENTS.remove(channel
+		Session session = NettyUDPClient.CLIENTS.remove(channel
 				.getLocalAddress());
 		if (null == session)
 		{

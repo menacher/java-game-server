@@ -1,21 +1,21 @@
 package org.menacheri.zombieclient;
 
 import org.jboss.netty.buffer.ChannelBuffer;
-import org.menacheri.jetclient.app.ISession;
-import org.menacheri.jetclient.communication.IDeliveryGuaranty;
-import org.menacheri.jetclient.communication.IMessageBuffer;
+import org.menacheri.jetclient.app.Session;
+import org.menacheri.jetclient.communication.DeliveryGuaranty.DeliveryGuarantyOptions;
+import org.menacheri.jetclient.communication.MessageBuffer;
 import org.menacheri.jetclient.communication.NettyMessageBuffer;
+import org.menacheri.jetclient.event.Event;
 import org.menacheri.jetclient.event.Events;
-import org.menacheri.jetclient.event.IEvent;
 import org.menacheri.zombie.domain.IAM;
 import org.menacheri.zombie.domain.ZombieCommands;
 
 public class GamePlay implements Runnable
 {
 	private final IAM iam;
-	private final ISession session;
+	private final Session session;
 	
-	public GamePlay(IAM iam, ISession session)
+	public GamePlay(IAM iam, Session session)
 	{
 		this.iam = iam;
 		this.session = session;
@@ -36,10 +36,10 @@ public class GamePlay implements Runnable
 			break;
 		}
 		
-		IMessageBuffer<ChannelBuffer> messageBuffer = new NettyMessageBuffer();
+		MessageBuffer<ChannelBuffer> messageBuffer = new NettyMessageBuffer();
 		messageBuffer.writeInt(type);
 		messageBuffer.writeInt(operation);
-		IEvent event = Events.networkEvent(messageBuffer,IDeliveryGuaranty.DeliveryGuaranty.FAST);
+		Event event = Events.networkEvent(messageBuffer,DeliveryGuarantyOptions.FAST);
 		session.onEvent(event);
 	}
 }

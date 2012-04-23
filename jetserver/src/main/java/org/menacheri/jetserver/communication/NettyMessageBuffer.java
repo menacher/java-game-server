@@ -3,12 +3,12 @@ package org.menacheri.jetserver.communication;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.buffer.DynamicChannelBuffer;
-import org.menacheri.jetserver.convert.ITransform;
+import org.menacheri.jetserver.convert.Transform;
 import org.menacheri.jetserver.util.NettyUtils;
 
 
 /**
- * This class is an implementation of the {@link IMessageBuffer} interface. It is a thin
+ * This class is an implementation of the {@link MessageBuffer} interface. It is a thin
  * wrapper over the the Netty {@link ChannelBuffer} with some additional methods
  * for string and object read write. It does not expose all methods of the
  * ChannelBuffer, instead it has a method {@link #getNativeBuffer()} which can
@@ -19,7 +19,7 @@ import org.menacheri.jetserver.util.NettyUtils;
  * @author Abraham Menacherry
  * 
  */
-public class NettyMessageBuffer implements IMessageBuffer<ChannelBuffer>
+public class NettyMessageBuffer implements MessageBuffer<ChannelBuffer>
 {
 	private final ChannelBuffer buffer;
 
@@ -173,76 +173,76 @@ public class NettyMessageBuffer implements IMessageBuffer<ChannelBuffer>
 		return NettyUtils.readStrings(buffer, numOfStrings);
 	}
 
-	public <V> V readObject(ITransform<ChannelBuffer,V> converter)
+	public <V> V readObject(Transform<ChannelBuffer,V> converter)
 	{
 		return NettyUtils.readObject(buffer, converter);
 	}
 		
 	@Override
-	public IMessageBuffer<ChannelBuffer> writeByte(byte b)
+	public MessageBuffer<ChannelBuffer> writeByte(byte b)
 	{
 		buffer.writeByte(b);
 		return this;
 	}
 
 	@Override
-	public IMessageBuffer<ChannelBuffer> writeBytes(byte[] src)
+	public MessageBuffer<ChannelBuffer> writeBytes(byte[] src)
 	{
 		buffer.writeBytes(src);
 		return this;
 	}
 
 	@Override
-	public IMessageBuffer<ChannelBuffer> writeChar(int value)
+	public MessageBuffer<ChannelBuffer> writeChar(int value)
 	{
 		buffer.writeChar(value);
 		return this;
 	}
 
 	@Override
-	public IMessageBuffer<ChannelBuffer> writeShort(int value)
+	public MessageBuffer<ChannelBuffer> writeShort(int value)
 	{
 		buffer.writeShort(value);
 		return this;
 	}
 
 	@Override
-	public IMessageBuffer<ChannelBuffer> writeMedium(int value)
+	public MessageBuffer<ChannelBuffer> writeMedium(int value)
 	{
 		buffer.writeMedium(value);
 		return this;
 	}
 
 	@Override
-	public IMessageBuffer<ChannelBuffer> writeInt(int value)
+	public MessageBuffer<ChannelBuffer> writeInt(int value)
 	{
 		buffer.writeInt(value);
 		return this;
 	}
 
 	@Override
-	public IMessageBuffer<ChannelBuffer> writeLong(long value)
+	public MessageBuffer<ChannelBuffer> writeLong(long value)
 	{
 		buffer.writeLong(value);
 		return this;
 	}
 
 	@Override
-	public IMessageBuffer<ChannelBuffer> writeFloat(float value)
+	public MessageBuffer<ChannelBuffer> writeFloat(float value)
 	{
 		buffer.writeFloat(value);
 		return this;
 	}
 
 	@Override
-	public IMessageBuffer<ChannelBuffer> writeDouble(double value)
+	public MessageBuffer<ChannelBuffer> writeDouble(double value)
 	{
 		buffer.writeDouble(value);
 		return this;
 	}
 
 	@Override
-	public IMessageBuffer<ChannelBuffer> writeString(String message)
+	public MessageBuffer<ChannelBuffer> writeString(String message)
 	{
 		ChannelBuffer strBuf = NettyUtils.writeString(message);
 		buffer.writeBytes(strBuf);
@@ -250,7 +250,7 @@ public class NettyMessageBuffer implements IMessageBuffer<ChannelBuffer>
 	}
 
 	@Override
-	public IMessageBuffer<ChannelBuffer> writeStrings(String... messages)
+	public MessageBuffer<ChannelBuffer> writeStrings(String... messages)
 	{
 		ChannelBuffer strMultiBuf = NettyUtils.writeStrings(messages);
 		buffer.writeBytes(strMultiBuf);
@@ -258,8 +258,8 @@ public class NettyMessageBuffer implements IMessageBuffer<ChannelBuffer>
 	}
 
 	@Override
-	public <V> IMessageBuffer<ChannelBuffer> writeObject(
-			ITransform<V, ChannelBuffer> converter, V object) {
+	public <V> MessageBuffer<ChannelBuffer> writeObject(
+			Transform<V, ChannelBuffer> converter, V object) {
 		ChannelBuffer objBuf = NettyUtils.writeObject(converter, object);
 		buffer.writeBytes(objBuf);
 		return this;

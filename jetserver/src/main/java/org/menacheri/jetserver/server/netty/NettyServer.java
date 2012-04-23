@@ -1,160 +1,63 @@
 package org.menacheri.jetserver.server.netty;
 
-import java.net.InetSocketAddress;
-
 import org.jboss.netty.bootstrap.Bootstrap;
+import org.jboss.netty.bootstrap.ServerBootstrap;
 import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.group.ChannelGroup;
-import org.jboss.netty.channel.group.ChannelGroupFuture;
-import org.jboss.netty.channel.group.DefaultChannelGroup;
-import org.menacheri.jetserver.app.ISession;
-import org.menacheri.jetserver.service.IGameAdminService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Required;
+import org.menacheri.jetserver.server.Server;
 
-
-public abstract class NettyServer implements INettyServer
+/**
+ * An interface specific to the JBoss Netty implementation. It will be
+ * implemented by a class that will start up a Netty server at a specified port.
+ * 
+ * @author Abraham Menacherry
+ * 
+ */
+public interface NettyServer extends Server
 {
-	private static final Logger LOG = LoggerFactory.getLogger(NettyServer.class);
-	public static final ChannelGroup ALL_CHANNELS = new DefaultChannelGroup("JETSERVER-CHANNELS");
-	protected ISession session;
-	protected InetSocketAddress socketAddress;
-	protected int portNumber = 18090;
-	protected Bootstrap serverBootstrap;
-	protected ChannelPipelineFactory pipelineFactory;
-	protected IGameAdminService gameAdminService;
-	
-	public NettyServer()
-	{
-		super();
-	}
+	/**
+	 * Creates a {@link ServerBootstrap} object which is used to start a server.
+	 * 
+	 * @return Returns the created {@link ServerBootstrap}.
+	 */
+	public Bootstrap createServerBootstrap();
 
-	@Override
-	public void stopServer() throws Exception
-	{
-		LOG.debug("In stopServer method of class: {}",
-				this.getClass().getName());
-		ChannelGroupFuture future = ALL_CHANNELS.close();
-		try {
-			future.await();
-		} catch (InterruptedException e) {
-			LOG.error("Execption occurred while waiting for channels to close: {}",e);
-		}
-		serverBootstrap.releaseExternalResources();
-		gameAdminService.shutdown();
-	}
-	
-	@Override
-	public void configureServerBootStrap(String[] optionsList)
-	{
-		// For clients who do not use spring.
-		if(null == serverBootstrap){
-			createServerBootstrap();
-		}
-		serverBootstrap.setPipelineFactory(pipelineFactory);
-		if (null != optionsList && optionsList.length > 0)
-		{
-			for (String option : optionsList)
-			{
-				serverBootstrap.setOption(option, true);
-			}
-		}
-	}
+	/**
+	 * If thread pools or TCP/IP parameters or the pipeline factory need to be
+	 * modified then it is this method that needs to be overriden.
+	 * 
+	 * @param optionsList
+	 *            Used to set tcp ip options like noDelay etc.
+	 */
+	public void configureServerBootStrap(String[] optionsList);
 
-	public int getPortNumber(String[] args)
-	{
-		if (null == args || args.length < 1)
-		{
-			return portNumber;
-		}
+	/**
+	 * createServerBootstrap will create a pipeline factory and save it as a
+	 * class variable. This method can then be used to retrieve that value.
+	 * 
+	 * @return Returns the channel pipeline factory that is associated with this
+	 *         netty server.
+	 */
+	public ChannelPipelineFactory getPipelineFactory();
 
-		try
-		{
-			return Integer.parseInt(args[0]);
-		}
-		catch (NumberFormatException e)
-		{
-			LOG.error("Exception occurred while "
-					+ "trying to parse the port number: {}", args[0]);
-			LOG.error("NumberFormatException: {}",e);
-			throw e;
-		}
-	}
-	
-	@Override
-	public Bootstrap getServerBootstrap()
-	{
-		return serverBootstrap;
-	}
+	/**
+	 * Method can be used to set the pipeline factory that is to be used by the
+	 * netty server.
+	 * 
+	 * @param factory
+	 *            The factory which will create a pipeline on each incoming
+	 *            connection.
+	 */
+	public void setPipelineFactory(ChannelPipelineFactory factory);
 
-	@Override
-	public void setServerBootstrap(Bootstrap serverBootstrap)
-	{
-		this.serverBootstrap = serverBootstrap;
-	}
-	
-	@Override
-	public ChannelPipelineFactory getPipelineFactory()
-	{
-		return pipelineFactory;
-	}
+	/**
+	 * @return Returns the created server bootstrap object.
+	 */
+	public Bootstrap getServerBootstrap();
 
-	@Override
-	@Required
-	public void setPipelineFactory(ChannelPipelineFactory factory)
-	{
-		pipelineFactory = factory;
-	}
-
-	public int getPortNumber()
-	{
-		return portNumber;
-	}
-
-	public void setPortNumber(int portNumber)
-	{
-		this.portNumber = portNumber;
-	}
-
-	public IGameAdminService getGameAdminService()
-	{
-		return gameAdminService;
-	}
-
-	public void setGameAdminService(IGameAdminService gameAdminService)
-	{
-		this.gameAdminService = gameAdminService;
-	}
-
-	@Override
-	public InetSocketAddress getSocketAddress()
-	{
-		return socketAddress;
-	}
-
-	public void setInetAddress(InetSocketAddress inetAddress)
-	{
-		this.socketAddress = inetAddress;
-	}
-
-	@Override
-	public String toString()
-	{
-		return "NettyServer [socketAddress=" + socketAddress + ", portNumber="
-				+ portNumber + "]";
-	}
-
-	@Override
-	public ISession getSession()
-	{
-		return session;
-	}
-
-	@Override
-	public void setSession(ISession session)
-	{
-		this.session = session;
-	}
-
+	/**
+	 * Sets the server bootstrap, could be TCP, UDP bootstrap.
+	 * 
+	 * @param serverBootstrap
+	 */
+	public void setServerBootstrap(Bootstrap serverBootstrap);
 }

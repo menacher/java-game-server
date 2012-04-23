@@ -9,7 +9,7 @@ import org.jboss.netty.handler.codec.frame.LengthFieldBasedFrameDecoder;
  * @author Abraham Menacherry
  * 
  */
-public abstract class AbstractNettyProtocol implements IProtocol
+public abstract class AbstractNettyProtocol implements Protocol
 {
 	/**
 	 * The name of the protocol. This is set by the child class to appropriate

@@ -3,20 +3,20 @@ package org.menacheri.jetserver.app.impl;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.menacheri.jetserver.app.IGame;
-import org.menacheri.jetserver.app.IGameRoom;
-import org.menacheri.jetserver.app.IPlayerSession;
-import org.menacheri.jetserver.app.ISession;
-import org.menacheri.jetserver.event.IEventHandler;
-import org.menacheri.jetserver.event.INetworkEvent;
+import org.menacheri.jetserver.app.Game;
+import org.menacheri.jetserver.app.GameRoom;
+import org.menacheri.jetserver.app.PlayerSession;
+import org.menacheri.jetserver.app.Session;
+import org.menacheri.jetserver.event.EventHandler;
+import org.menacheri.jetserver.event.NetworkEvent;
 import org.menacheri.jetserver.event.impl.NetworkEventListener;
-import org.menacheri.jetserver.protocols.IProtocol;
-import org.menacheri.jetserver.service.IGameStateManagerService;
+import org.menacheri.jetserver.protocols.Protocol;
+import org.menacheri.jetserver.service.GameStateManagerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public abstract class GameRoomSession extends Session implements IGameRoom
+public abstract class GameRoomSession extends DefaultSession implements GameRoom
 {
 	private static final Logger LOG = LoggerFactory.getLogger(GameRoomSession.class);
 	
@@ -25,24 +25,24 @@ public abstract class GameRoomSession extends Session implements IGameRoom
 	 */
 	protected String gameRoomName;
 	/**
-	 * The parent {@link Game} reference of this game room.
+	 * The parent {@link SimpleGame} reference of this game room.
 	 */
-	protected IGame parentGame;
+	protected Game parentGame;
 	/**
 	 * Each game room has separate state manager instances. This variable will
-	 * manage the state for all the {@link Player}s connected to this game room.
+	 * manage the state for all the {@link DefaultPlayer}s connected to this game room.
 	 */
-	protected IGameStateManagerService stateManager;
+	protected GameStateManagerService stateManager;
 
 	/**
 	 * The set of sessions in this object.
 	 */
-	protected Set<IPlayerSession> sessions;
+	protected Set<PlayerSession> sessions;
 	
 	/**
 	 * Each game room has its own protocol for communication with client.
 	 */
-	protected IProtocol protocol;
+	protected Protocol protocol;
 	
 	protected GameRoomSession(GameRoomSessionBuilder gameRoomSessionBuilder)
 	{
@@ -55,27 +55,27 @@ public abstract class GameRoomSession extends Session implements IGameRoom
 	
 	public static class GameRoomSessionBuilder extends SessionBuilder
 	{
-		private Set<IPlayerSession> sessions;
-		private IGame parentGame;
+		private Set<PlayerSession> sessions;
+		private Game parentGame;
 		private String gameRoomName;
-		private IProtocol protocol;
+		private Protocol protocol;
 		
 		@Override
 		protected void validateAndSetValues()
 		{
 			super.validateAndSetValues();// Mandatory call
 			if(null == sessions){
-				sessions = new HashSet<IPlayerSession>();
+				sessions = new HashSet<PlayerSession>();
 			}
 		}
 		
-		public GameRoomSessionBuilder sessions(Set<IPlayerSession> sessions)
+		public GameRoomSessionBuilder sessions(Set<PlayerSession> sessions)
 		{
 			this.sessions = sessions;
 			return this;
 		}
 		
-		public GameRoomSessionBuilder parentGame(IGame parentGame)
+		public GameRoomSessionBuilder parentGame(Game parentGame)
 		{
 			this.parentGame = parentGame;
 			return this;
@@ -87,7 +87,7 @@ public abstract class GameRoomSession extends Session implements IGameRoom
 			return this;
 		}
 		
-		public GameRoomSessionBuilder protocol(IProtocol protocol)
+		public GameRoomSessionBuilder protocol(Protocol protocol)
 		{
 			this.protocol = protocol;
 			return this;
@@ -95,26 +95,26 @@ public abstract class GameRoomSession extends Session implements IGameRoom
 	}
 	
 	@Override
-	public IPlayerSession createPlayerSession()
+	public PlayerSession createPlayerSession()
 	{
-		IPlayerSession playerSession = getSessionInstance();
+		PlayerSession playerSession = getSessionInstance();
 		return playerSession;
 	}
 	
 	@Override
-	public abstract void onLogin(IPlayerSession playerSession);
+	public abstract void onLogin(PlayerSession playerSession);
 	
 	@Override
-	public synchronized boolean connectSession(IPlayerSession playerSession)
+	public synchronized boolean connectSession(PlayerSession playerSession)
 	{
 		if (!isShuttingDown)
 		{
-			playerSession.setStatus(ISession.Status.CONNECTING);
+			playerSession.setStatus(Session.Status.CONNECTING);
 			sessions.add(playerSession);
 			LOG.trace("Protocol to be applied is: {}",protocol.getClass().getName());
 			protocol.applyProtocol(playerSession);
 			createAndAddEventHandlers(playerSession);
-			playerSession.setStatus(ISession.Status.CONNECTED);
+			playerSession.setStatus(Session.Status.CONNECTED);
 			afterSessionConnect(playerSession);
 			return true;
 			// TODO send event to all other sessions?
@@ -128,19 +128,19 @@ public abstract class GameRoomSession extends Session implements IGameRoom
 	}
 
 	@Override
-	public void afterSessionConnect(IPlayerSession playerSession)
+	public void afterSessionConnect(PlayerSession playerSession)
 	{
 			
 	}
 	
-	public synchronized boolean disconnectSession(IPlayerSession playerSession)
+	public synchronized boolean disconnectSession(PlayerSession playerSession)
 	{
 		final boolean removeHandlers = this.eventDispatcher.removeHandlersForSession(playerSession);
 		return (removeHandlers && sessions.remove(playerSession));
 	}
 
 	@Override
-	public void sendBroadcast(INetworkEvent networkEvent)
+	public void sendBroadcast(NetworkEvent networkEvent)
 	{
 		onEvent(networkEvent);
 	}
@@ -149,26 +149,26 @@ public abstract class GameRoomSession extends Session implements IGameRoom
 	public synchronized void close()
 	{
 		isShuttingDown = true;
-		for(IPlayerSession session: sessions)
+		for(PlayerSession session: sessions)
 		{
 			session.close();
 		}
 	}
 	
-	public IPlayerSession getSessionInstance()
+	public PlayerSession getSessionInstance()
 	{
-		IPlayerSession playerSession = Sessions.newPlayerSession(this);
+		PlayerSession playerSession = Sessions.newPlayerSession(this);
 		return playerSession;
 	}
 	
 	@Override
-	public Set<IPlayerSession> getSessions()
+	public Set<PlayerSession> getSessions()
 	{
 		return sessions;
 	}
 
 	@Override
-	public void setSessions(Set<IPlayerSession> sessions)
+	public void setSessions(Set<PlayerSession> sessions)
 	{
 		this.sessions = sessions;
 	}
@@ -186,37 +186,37 @@ public abstract class GameRoomSession extends Session implements IGameRoom
 	}
 
 	@Override
-	public IGame getParentGame()
+	public Game getParentGame()
 	{
 		return parentGame;
 	}
 
 	@Override
-	public void setParentGame(IGame parentGame)
+	public void setParentGame(Game parentGame)
 	{
 		this.parentGame = parentGame;
 	}
 
 	@Override
-	public void setStateManager(IGameStateManagerService stateManager)
+	public void setStateManager(GameStateManagerService stateManager)
 	{
 		this.stateManager = stateManager;
 	}
 	
 	@Override
-	public IGameStateManagerService getStateManager()
+	public GameStateManagerService getStateManager()
 	{
 		return stateManager;
 	}
 
 	@Override
-	public IProtocol getProtocol()
+	public Protocol getProtocol()
 	{
 		return protocol;
 	}
 
 	@Override
-	public void setProtocol(IProtocol protocol)
+	public void setProtocol(Protocol protocol)
 	{
 		this.protocol = protocol;
 	}
@@ -239,10 +239,10 @@ public abstract class GameRoomSession extends Session implements IGameRoom
 	 * @param playerSession
 	 *            The session for which the event handlers are created.
 	 */
-	protected void createAndAddEventHandlers(IPlayerSession playerSession)
+	protected void createAndAddEventHandlers(PlayerSession playerSession)
 	{
 		// Create a network event listener for the player session.
-		IEventHandler networkEventHandler = new NetworkEventListener(playerSession);
+		EventHandler networkEventHandler = new NetworkEventListener(playerSession);
 		// Add the handler to the game room's EventDispatcher so that it will
 		// pass game room network events to player session session.
 		this.eventDispatcher.addHandler(networkEventHandler);

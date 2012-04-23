@@ -2,9 +2,9 @@ package org.menacheri;
 
 import java.net.UnknownHostException;
 
-import org.menacheri.jetclient.app.ISession;
+import org.menacheri.jetclient.app.Session;
 import org.menacheri.jetclient.app.impl.SessionFactory;
-import org.menacheri.jetclient.event.IEvent;
+import org.menacheri.jetclient.event.Event;
 import org.menacheri.jetclient.event.impl.AbstractSessionEventHandler;
 import org.menacheri.jetclient.util.LoginHelper;
 import org.menacheri.jetclient.util.LoginHelper.LoginBuilder;
@@ -34,12 +34,12 @@ public class TestClass
 				.jetserverUdpHostName("255.255.255.255").udpPort(18090);
 		LoginHelper loginHelper = builder.build();
 		SessionFactory sessionFactory = new SessionFactory(loginHelper);
-		ISession session = sessionFactory.createAndConnectSession();
+		Session session = sessionFactory.createAndConnectSession();
 		AbstractSessionEventHandler handler = new AbstractSessionEventHandler(
 				session)
 		{
 			@Override
-			public void onDataIn(IEvent event)
+			public void onDataIn(Event event)
 			{
 				System.out.println("Received event: " + event);
 			}

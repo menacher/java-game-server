@@ -9,10 +9,10 @@ import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.handler.codec.string.StringDecoder;
 import org.jboss.netty.handler.codec.string.StringEncoder;
-import org.menacheri.jetserver.app.IPlayerSession;
-import org.menacheri.jetserver.app.ISession;
+import org.menacheri.jetserver.app.PlayerSession;
+import org.menacheri.jetserver.app.Session;
 import org.menacheri.jetserver.communication.NettyTCPMessageSender;
-import org.menacheri.jetserver.convert.ITransform;
+import org.menacheri.jetserver.convert.Transform;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +39,7 @@ public class NettyUtils
 	}
 	
 	public static ChannelPipeline getPipeLineOfConnection(
-			IPlayerSession playerSession)
+			PlayerSession playerSession)
 	{
 		Channel channel = (Channel)playerSession.getConnectParameter(NETTY_CHANNEL);
 		if(null != channel)
@@ -52,7 +52,7 @@ public class NettyUtils
 		}
 	}
 	
-	public static Channel getChannelOfSession(ISession session)
+	public static Channel getChannelOfSession(Session session)
 	{
 		return (Channel)session.getConnectParameter(NETTY_CHANNEL);
 	}
@@ -228,7 +228,7 @@ public class NettyUtils
 		return buffer;
 	}
 	
-	public static <T,V> V readObject(ChannelBuffer buffer, ITransform<ChannelBuffer, V> decoder)
+	public static <T,V> V readObject(ChannelBuffer buffer, Transform<ChannelBuffer, V> decoder)
 	{
 		int length = 0;
 		if(null != buffer && buffer.readableBytes() > 2){
@@ -247,7 +247,7 @@ public class NettyUtils
 	}
 	
 	public static <V> ChannelBuffer writeObject(
-			ITransform<V, ChannelBuffer> converter, V object) {
+			Transform<V, ChannelBuffer> converter, V object) {
 		ChannelBuffer buffer = null;
 		try {
 			ChannelBuffer objectBuffer = converter.convert(object);

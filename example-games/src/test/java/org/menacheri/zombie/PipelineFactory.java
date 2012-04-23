@@ -12,7 +12,7 @@ import org.jboss.netty.handler.codec.frame.LengthFieldBasedFrameDecoder;
 import org.jboss.netty.handler.codec.frame.LengthFieldPrepender;
 import org.jboss.netty.handler.codec.oneone.OneToOneDecoder;
 import org.menacheri.jetserver.event.Events;
-import org.menacheri.jetserver.event.IEvent;
+import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.handlers.netty.EventDecoder;
 
 
@@ -50,7 +50,7 @@ public class PipelineFactory implements ChannelPipelineFactory
 		protected Object decode(ChannelHandlerContext ctx, Channel channel,
 				Object msg) throws Exception
 		{
-			IEvent event = (IEvent)msg;
+			Event event = (Event)msg;
 			if(Events.START == event.getType())
 			{
 				int started = counter.incrementAndGet();

@@ -3,13 +3,13 @@ package org.menacheri.zombie.game;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.menacheri.jetserver.app.IGame;
-import org.menacheri.jetserver.app.IGameRoom;
-import org.menacheri.jetserver.app.impl.Game;
+import org.menacheri.jetserver.app.Game;
+import org.menacheri.jetserver.app.GameRoom;
+import org.menacheri.jetserver.app.impl.SimpleGame;
 import org.menacheri.jetserver.app.impl.GameRoomSession.GameRoomSessionBuilder;
-import org.menacheri.jetserver.protocols.IProtocol;
-import org.menacheri.jetserver.service.ILookupService;
-import org.menacheri.jetserver.service.impl.LookupService;
+import org.menacheri.jetserver.protocols.Protocol;
+import org.menacheri.jetserver.service.LookupService;
+import org.menacheri.jetserver.service.impl.SimpleLookupService;
 import org.menacheri.zombie.domain.Defender;
 import org.menacheri.zombie.domain.World;
 import org.menacheri.zombie.domain.Zombie;
@@ -35,18 +35,18 @@ public class ZombieSpringConfig
 {
 	@Autowired
 	@Qualifier("messageBufferProtocol")
-	private IProtocol messageBufferProtocol;
+	private Protocol messageBufferProtocol;
 	
 //	@Autowired
 //	private ILookupService lookupService;
 	
-	public @Bean IGame zombieGame()
+	public @Bean Game zombieGame()
 	{
-		Game game = new Game(1,"Zombie");
+		Game game = new SimpleGame(1,"Zombie");
 		return game;
 	}
 	
-	public @Bean IGameRoom zombieRoom1()
+	public @Bean GameRoom zombieRoom1()
 	{
 		GameRoomSessionBuilder sessionBuilder = new GameRoomSessionBuilder();
 		sessionBuilder.parentGame(zombieGame()).gameRoomName("Zombie_ROOM_1").protocol(messageBufferProtocol);
@@ -80,11 +80,11 @@ public class ZombieSpringConfig
 	}
 	
 	
-	public @Bean(name="lookupService") ILookupService lookupService()
+	public @Bean(name="lookupService") LookupService lookupService()
 	{
-		Map<String,IGameRoom> refKeyGameRoomMap = new HashMap<String, IGameRoom>();
+		Map<String,GameRoom> refKeyGameRoomMap = new HashMap<String, GameRoom>();
 		refKeyGameRoomMap.put("Zombie_ROOM_1_REF_KEY_1", zombieRoom1());
-		LookupService service = new LookupService(refKeyGameRoomMap);
+		LookupService service = new SimpleLookupService(refKeyGameRoomMap);
 		return service;
 	}
 }

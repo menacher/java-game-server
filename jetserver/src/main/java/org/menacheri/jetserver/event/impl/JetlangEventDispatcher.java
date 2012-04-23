@@ -14,25 +14,25 @@ import org.jetlang.core.Callback;
 import org.jetlang.core.Disposable;
 import org.jetlang.core.Filter;
 import org.jetlang.fibers.Fiber;
-import org.menacheri.jetserver.app.ISession;
+import org.menacheri.jetserver.app.Session;
 import org.menacheri.jetserver.concurrent.Fibers;
 import org.menacheri.jetserver.event.Events;
-import org.menacheri.jetserver.event.IEvent;
-import org.menacheri.jetserver.event.IEventDispatcher;
-import org.menacheri.jetserver.event.IEventHandler;
-import org.menacheri.jetserver.event.ISessionEventHandler;
+import org.menacheri.jetserver.event.Event;
+import org.menacheri.jetserver.event.EventDispatcher;
+import org.menacheri.jetserver.event.EventHandler;
+import org.menacheri.jetserver.event.SessionEventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JetlangEventDispatcher implements IEventDispatcher
+public class JetlangEventDispatcher implements EventDispatcher
 {
 	private static final Logger LOG = LoggerFactory
 			.getLogger(JetlangEventDispatcher.class);
 
 	// TODO make it as a setter/constructor parameters
-	private Map<Integer, List<IEventHandler>> handlersByEventType;
-	private List<IEventHandler> anyHandler;
-	private MemoryChannel<IEvent> eventQueue;
+	private Map<Integer, List<EventHandler>> handlersByEventType;
+	private List<EventHandler> anyHandler;
+	private MemoryChannel<Event> eventQueue;
 	private Fiber fiber;
 	private volatile boolean isCloseCalled = false;
 	/**
@@ -40,7 +40,7 @@ public class JetlangEventDispatcher implements IEventDispatcher
 	 * objects. This way, when a handler is removed, the dispose method can be
 	 * called on the {@link Disposable}.
 	 */
-	private Map<IEventHandler, Disposable> disposableHandlerMap;
+	private Map<EventHandler, Disposable> disposableHandlerMap;
 
 	public JetlangEventDispatcher()
 	{
@@ -48,8 +48,8 @@ public class JetlangEventDispatcher implements IEventDispatcher
 	}
 
 	public JetlangEventDispatcher(
-			Map<Integer, List<IEventHandler>> listenersByEventType,
-			List<IEventHandler> anyHandler, MemoryChannel<IEvent> eventQueue,
+			Map<Integer, List<EventHandler>> listenersByEventType,
+			List<EventHandler> anyHandler, MemoryChannel<Event> eventQueue,
 			Fiber fiber)
 	{
 		super();
@@ -62,21 +62,21 @@ public class JetlangEventDispatcher implements IEventDispatcher
 	public void initialize()
 	{
 		// TODO make the 5 configurable.
-		handlersByEventType = new HashMap<Integer, List<IEventHandler>>(4);
-		anyHandler = new CopyOnWriteArrayList<IEventHandler>();
-		eventQueue = new MemoryChannel<IEvent>();
+		handlersByEventType = new HashMap<Integer, List<EventHandler>>(4);
+		anyHandler = new CopyOnWriteArrayList<EventHandler>();
+		eventQueue = new MemoryChannel<Event>();
 		fiber = Fibers.pooledFiber();
-		disposableHandlerMap = new HashMap<IEventHandler, Disposable>();
+		disposableHandlerMap = new HashMap<EventHandler, Disposable>();
 	}
 
 	@Override
-	public void fireEvent(final IEvent event)
+	public void fireEvent(final Event event)
 	{
 		eventQueue.publish(event);
 	}
 
 	@Override
-	public void addHandler(final IEventHandler eventHandler)
+	public void addHandler(final EventHandler eventHandler)
 	{
 		final int eventType = eventHandler.getEventType();
 		if (Events.ANY == eventType)
@@ -86,28 +86,28 @@ public class JetlangEventDispatcher implements IEventDispatcher
 		else
 		{
 			synchronized(this){
-				List<IEventHandler> listeners = this.handlersByEventType.get(eventType);
+				List<EventHandler> listeners = this.handlersByEventType.get(eventType);
 				if (listeners == null)
 				{
-					listeners = new CopyOnWriteArrayList<IEventHandler>();
+					listeners = new CopyOnWriteArrayList<EventHandler>();
 					this.handlersByEventType.put(eventType, listeners);
 				}
 		
 				listeners.add(eventHandler);
 		
-				Callback<List<IEvent>> eventCallback = createEventCallbackForHandler(eventHandler);
+				Callback<List<Event>> eventCallback = createEventCallbackForHandler(eventHandler);
 		
 				// Add the appropriate filter before processing the event.
-				Filter<IEvent> eventFilter = new Filter<IEvent>()
+				Filter<Event> eventFilter = new Filter<Event>()
 				{
 					@Override
-					public boolean passes(IEvent msg)
+					public boolean passes(Event msg)
 					{
 						return (eventHandler.getEventType() == msg.getType());
 					}
 				};
 				// Create a subscription based on the filter also.
-				BatchSubscriber<IEvent> batchEventSubscriber = new BatchSubscriber<IEvent>(
+				BatchSubscriber<Event> batchEventSubscriber = new BatchSubscriber<Event>(
 						fiber, eventCallback, eventFilter, 0, TimeUnit.MILLISECONDS);
 				Disposable disposable = eventQueue.subscribe(batchEventSubscriber);
 				disposableHandlerMap.put(eventHandler, disposable);
@@ -122,7 +122,7 @@ public class JetlangEventDispatcher implements IEventDispatcher
 	 * 
 	 * @param eventHandler
 	 */
-	protected void addANYHandler(final IEventHandler eventHandler)
+	protected void addANYHandler(final EventHandler eventHandler)
 	{
 		final int eventType = eventHandler.getEventType();
 		if (eventType != Events.ANY)
@@ -132,22 +132,22 @@ public class JetlangEventDispatcher implements IEventDispatcher
 			throw new IllegalArgumentException(
 					"The incoming handler is not of type ANY");
 		}
-		Callback<List<IEvent>> eventCallback = createEventCallbackForHandler(eventHandler);
-		BatchSubscriber<IEvent> batchEventSubscriber = new BatchSubscriber<IEvent>(
+		Callback<List<Event>> eventCallback = createEventCallbackForHandler(eventHandler);
+		BatchSubscriber<Event> batchEventSubscriber = new BatchSubscriber<Event>(
 				fiber, eventCallback, 0, TimeUnit.MILLISECONDS);
 		Disposable disposable = eventQueue.subscribe(batchEventSubscriber);
 		disposableHandlerMap.put(eventHandler, disposable);
 	}
 
-	protected Callback<List<IEvent>> createEventCallbackForHandler(
-			final IEventHandler eventHandler)
+	protected Callback<List<Event>> createEventCallbackForHandler(
+			final EventHandler eventHandler)
 	{
-		Callback<List<IEvent>> eventCallback = new Callback<List<IEvent>>()
+		Callback<List<Event>> eventCallback = new Callback<List<Event>>()
 		{
 			@Override
-			public void onMessage(List<IEvent> messages)
+			public void onMessage(List<Event> messages)
 			{
-				for (IEvent event : messages)
+				for (Event event : messages)
 				{
 					eventHandler.onEvent(event);
 				}
@@ -157,7 +157,7 @@ public class JetlangEventDispatcher implements IEventDispatcher
 	}
 
 	@Override
-	public synchronized List<IEventHandler> getHandlers(int eventType)
+	public synchronized List<EventHandler> getHandlers(int eventType)
 	{
 		if (Events.ANY == eventType)
 		{
@@ -167,7 +167,7 @@ public class JetlangEventDispatcher implements IEventDispatcher
 	}
 
 	@Override
-	public void removeHandler(IEventHandler eventHandler)
+	public void removeHandler(EventHandler eventHandler)
 	{
 		int eventType = eventHandler.getEventType();
 		if (Events.ANY == eventType)
@@ -177,7 +177,7 @@ public class JetlangEventDispatcher implements IEventDispatcher
 		else
 		{
 			synchronized(this){
-				List<IEventHandler> listeners = this.handlersByEventType
+				List<EventHandler> listeners = this.handlersByEventType
 						.get(eventType);
 				if (null != listeners)
 				{
@@ -193,7 +193,7 @@ public class JetlangEventDispatcher implements IEventDispatcher
 		removeDisposableForHandler(eventHandler);
 	}
 
-	private synchronized void removeDisposableForHandler(IEventHandler eventHandler)
+	private synchronized void removeDisposableForHandler(EventHandler eventHandler)
 	{
 		Disposable disposable = disposableHandlerMap.get(eventHandler);
 		if (null != disposable)
@@ -205,7 +205,7 @@ public class JetlangEventDispatcher implements IEventDispatcher
 	@Override
 	public synchronized void removeHandlersForEvent(int eventType)
 	{
-		List<IEventHandler> handlers = null;
+		List<EventHandler> handlers = null;
 		if (Events.ANY == eventType)
 		{
 			handlers = anyHandler;
@@ -216,7 +216,7 @@ public class JetlangEventDispatcher implements IEventDispatcher
 		}
 		if (null != handlers)
 		{
-			for (IEventHandler eventHandler : handlers)
+			for (EventHandler eventHandler : handlers)
 			{
 				removeDisposableForHandler(eventHandler);
 			}
@@ -225,40 +225,40 @@ public class JetlangEventDispatcher implements IEventDispatcher
 		handlersByEventType.put(eventType, null);
 	}
 
-	public synchronized boolean removeHandlersForSession(ISession session)
+	public synchronized boolean removeHandlersForSession(Session session)
 	{
 		LOG.trace("Entered removeHandlersForSession for session {}", session);
-		List<IEventHandler> removeList = null;
+		List<EventHandler> removeList = null;
 		
-		Collection<List<IEventHandler>> eventHandlersList = new ArrayList<List<IEventHandler>>(
+		Collection<List<EventHandler>> eventHandlersList = new ArrayList<List<EventHandler>>(
 				handlersByEventType.values());
 		eventHandlersList.add(anyHandler);
 		
-		for (List<IEventHandler> handlerList : eventHandlersList)
+		for (List<EventHandler> handlerList : eventHandlersList)
 		{
 			removeList = getHandlersToRemoveForSession(handlerList,session);
 		}
 		
 		LOG.trace("Going to remove {} handlers for session: {}",
 				removeList.size(), session);
-		for (IEventHandler handler : removeList)
+		for (EventHandler handler : removeList)
 		{
 			removeHandler(handler);
 		}
 		return (removeList.size() > 0);
 	}
 
-	protected List<IEventHandler> getHandlersToRemoveForSession(
-			List<IEventHandler> handlerList, ISession session)
+	protected List<EventHandler> getHandlersToRemoveForSession(
+			List<EventHandler> handlerList, Session session)
 	{
-		List<IEventHandler> removeList = new ArrayList<IEventHandler>();
+		List<EventHandler> removeList = new ArrayList<EventHandler>();
 		if (null != handlerList)
 		{
-			for (IEventHandler handler : handlerList)
+			for (EventHandler handler : handlerList)
 			{
-				if (handler instanceof ISessionEventHandler)
+				if (handler instanceof SessionEventHandler)
 				{
-					ISessionEventHandler sessionHandler = (ISessionEventHandler) handler;
+					SessionEventHandler sessionHandler = (SessionEventHandler) handler;
 					if (sessionHandler.getSession().equals(session))
 					{
 						removeList.add(handler);
@@ -290,23 +290,23 @@ public class JetlangEventDispatcher implements IEventDispatcher
 		}
 	}
 
-	public Map<Integer, List<IEventHandler>> getListenersByEventType()
+	public Map<Integer, List<EventHandler>> getListenersByEventType()
 	{
 		return handlersByEventType;
 	}
 
 	public void setListenersByEventType(
-			Map<Integer, List<IEventHandler>> listenersByEventType)
+			Map<Integer, List<EventHandler>> listenersByEventType)
 	{
 		this.handlersByEventType = listenersByEventType;
 	}
 
-	public MemoryChannel<IEvent> getEventQueue()
+	public MemoryChannel<Event> getEventQueue()
 	{
 		return eventQueue;
 	}
 
-	public void setEventQueue(MemoryChannel<IEvent> eventQueue)
+	public void setEventQueue(MemoryChannel<Event> eventQueue)
 	{
 		this.eventQueue = eventQueue;
 	}
@@ -321,13 +321,13 @@ public class JetlangEventDispatcher implements IEventDispatcher
 		this.fiber = fiber;
 	}
 
-	public Map<IEventHandler, Disposable> getDisposableHandlerMap()
+	public Map<EventHandler, Disposable> getDisposableHandlerMap()
 	{
 		return disposableHandlerMap;
 	}
 
 	public void setDisposableHandlerMap(
-			Map<IEventHandler, Disposable> disposableHandlerMap)
+			Map<EventHandler, Disposable> disposableHandlerMap)
 	{
 		this.disposableHandlerMap = disposableHandlerMap;
 	}

@@ -2,10 +2,10 @@ package org.menacheri.jetserver.communication;
 
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFutureListener;
-import org.menacheri.jetserver.communication.IDeliveryGuaranty.DeliveryGuaranty;
-import org.menacheri.jetserver.communication.IMessageSender.IReliable;
+import org.menacheri.jetserver.communication.DeliveryGuaranty.DeliveryGuarantyOptions;
+import org.menacheri.jetserver.communication.MessageSender.IReliable;
 import org.menacheri.jetserver.event.Events;
-import org.menacheri.jetserver.event.IEvent;
+import org.menacheri.jetserver.event.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 public class NettyTCPMessageSender implements IReliable
 {
 	private final Channel channel;
-	private static final IDeliveryGuaranty DELIVERY_GUARANTY = DeliveryGuaranty.RELIABLE;
+	private static final DeliveryGuaranty DELIVERY_GUARANTY = DeliveryGuarantyOptions.RELIABLE;
 	private static final Logger LOG = LoggerFactory
 			.getLogger(NettyTCPMessageSender.class);
 
@@ -36,7 +36,7 @@ public class NettyTCPMessageSender implements IReliable
 	}
 
 	@Override
-	public IDeliveryGuaranty getDeliveryGuaranty()
+	public DeliveryGuaranty getDeliveryGuaranty()
 	{
 		return DELIVERY_GUARANTY;
 	}
@@ -56,7 +56,7 @@ public class NettyTCPMessageSender implements IReliable
 	{
 		LOG.info("Going to close tcp connection in class: {}", this
 				.getClass().getName());
-		IEvent event = Events.event(null, Events.DISCONNECT);
+		Event event = Events.event(null, Events.DISCONNECT);
 		if (channel.isConnected())
 		{
 			channel.write(event).addListener(ChannelFutureListener.CLOSE);

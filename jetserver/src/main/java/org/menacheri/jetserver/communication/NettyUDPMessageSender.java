@@ -3,13 +3,13 @@ package org.menacheri.jetserver.communication;
 import java.net.SocketAddress;
 
 import org.jboss.netty.channel.socket.DatagramChannel;
-import org.menacheri.jetserver.app.ISession;
-import org.menacheri.jetserver.communication.IDeliveryGuaranty.DeliveryGuaranty;
-import org.menacheri.jetserver.communication.IMessageSender.IFast;
+import org.menacheri.jetserver.app.Session;
+import org.menacheri.jetserver.communication.DeliveryGuaranty.DeliveryGuarantyOptions;
+import org.menacheri.jetserver.communication.MessageSender.IFast;
 import org.menacheri.jetserver.event.Events;
-import org.menacheri.jetserver.event.impl.NetworkEvent;
+import org.menacheri.jetserver.event.impl.DefaultNetworkEvent;
 import org.menacheri.jetserver.handlers.netty.UDPUpstreamHandler;
-import org.menacheri.jetserver.service.ISessionRegistryService;
+import org.menacheri.jetserver.service.SessionRegistryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,8 +17,8 @@ import org.slf4j.LoggerFactory;
  * This class is used to send messages to a remote UDP client or server. An
  * instance of this class will be created by the {@link UDPUpstreamHandler} when
  * a {@link Events#CONNECT} event is received from client. The created instance
- * of this class is then sent as payload of a {@link NetworkEvent} to the
- * {@link ISession}.
+ * of this class is then sent as payload of a {@link DefaultNetworkEvent} to the
+ * {@link Session}.
  * 
  * 
  * @author Abraham Menacherry
@@ -30,13 +30,13 @@ public class NettyUDPMessageSender implements IFast
 			.getLogger(NettyUDPMessageSender.class);
 	private final SocketAddress remoteAddress;
 	private final DatagramChannel channel;
-	private final ISessionRegistryService sessionRegistryService;
+	private final SessionRegistryService sessionRegistryService;
 
-	private static final IDeliveryGuaranty DELIVERY_GUARANTY = DeliveryGuaranty.FAST;
+	private static final DeliveryGuaranty DELIVERY_GUARANTY = DeliveryGuarantyOptions.FAST;
 
 	public NettyUDPMessageSender(SocketAddress remoteAddress,
 			DatagramChannel channel,
-			ISessionRegistryService sessionRegistryService)
+			SessionRegistryService sessionRegistryService)
 	{
 		this.remoteAddress = remoteAddress;
 		this.channel = channel;
@@ -50,7 +50,7 @@ public class NettyUDPMessageSender implements IFast
 	}
 
 	@Override
-	public IDeliveryGuaranty getDeliveryGuaranty()
+	public DeliveryGuaranty getDeliveryGuaranty()
 	{
 		return DELIVERY_GUARANTY;
 	}
@@ -58,7 +58,7 @@ public class NettyUDPMessageSender implements IFast
 	@Override
 	public void close()
 	{
-		ISession session = sessionRegistryService.getSession(remoteAddress);
+		Session session = sessionRegistryService.getSession(remoteAddress);
 		if (sessionRegistryService.removeSession(remoteAddress))
 		{
 			LOG.info("Successfully removed session: {}", session);
@@ -97,7 +97,7 @@ public class NettyUDPMessageSender implements IFast
 		return sender;
 	}
 
-	public ISessionRegistryService getSessionRegistryService()
+	public SessionRegistryService getSessionRegistryService()
 	{
 		return sessionRegistryService;
 	}

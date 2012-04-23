@@ -3,12 +3,12 @@ package org.menacheri.jetserver.event;
 /**
  * Abstract event handler is a helper class which must be overriden by classes
  * which need to implement the IEventHandler interface. The
- * {@link #onEvent(IEvent)} method needs to be implemented by such classes.
+ * {@link #onEvent(Event)} method needs to be implemented by such classes.
  * 
  * @author Abraham Menacherry
  * 
  */
-public abstract class AbstractEventHandler implements IEventHandler
+public abstract class AbstractEventHandler implements EventHandler
 {
 	private final int EVENT_TYPE;
 	

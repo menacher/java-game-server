@@ -4,10 +4,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import org.menacheri.jetclient.app.ISession;
+import org.menacheri.jetclient.app.Session;
 import org.menacheri.jetclient.app.impl.SessionFactory;
 import org.menacheri.jetclient.communication.NettyMessageBuffer;
-import org.menacheri.jetclient.event.IEvent;
+import org.menacheri.jetclient.event.Event;
 import org.menacheri.jetclient.event.impl.AbstractSessionEventHandler;
 import org.menacheri.jetclient.util.LoginHelper;
 import org.menacheri.jetclient.util.LoginHelper.LoginBuilder;
@@ -25,7 +25,7 @@ public class ZombieJetclient
 		SessionFactory sessionFactory = new SessionFactory(loginHelper);
 		ScheduledExecutorService taskExecutor = Executors.newSingleThreadScheduledExecutor();
 		for(int i = 1; i<=50; i++){
-			ISession session = sessionFactory.createAndConnectSession();
+			Session session = sessionFactory.createAndConnectSession();
 			addDefaultHandlerToSession(session);
 			GamePlay task = null;
 			if((i % 2) == 0){
@@ -38,13 +38,13 @@ public class ZombieJetclient
 		}
 	}
 	
-	private static void addDefaultHandlerToSession(ISession session)
+	private static void addDefaultHandlerToSession(Session session)
 	{
 		// we are only interested in data in, so override only that method.
 		AbstractSessionEventHandler handler = new AbstractSessionEventHandler(session)
 		{
 			@Override
-			public void onDataIn(IEvent event)
+			public void onDataIn(Event event)
 			{
 				NettyMessageBuffer buffer = (NettyMessageBuffer)event.getSource();
 				System.out.println("Remaining Human Population: " + buffer.readInt());

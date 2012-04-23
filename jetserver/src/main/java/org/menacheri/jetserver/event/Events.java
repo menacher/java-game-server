@@ -1,15 +1,15 @@
 package org.menacheri.jetserver.event;
 
-import org.menacheri.jetserver.app.ISession;
-import org.menacheri.jetserver.communication.IDeliveryGuaranty;
-import org.menacheri.jetserver.communication.IMessageSender;
-import org.menacheri.jetserver.communication.IDeliveryGuaranty.DeliveryGuaranty;
-import org.menacheri.jetserver.event.impl.AbstractSessionEventHandler;
+import org.menacheri.jetserver.app.Session;
+import org.menacheri.jetserver.communication.DeliveryGuaranty;
+import org.menacheri.jetserver.communication.MessageSender;
+import org.menacheri.jetserver.communication.DeliveryGuaranty.DeliveryGuarantyOptions;
+import org.menacheri.jetserver.event.impl.DefaultSessionEventHandler;
 import org.menacheri.jetserver.event.impl.ChangeAttributeEvent;
 import org.menacheri.jetserver.event.impl.ConnectEvent;
-import org.menacheri.jetserver.event.impl.Event;
-import org.menacheri.jetserver.event.impl.EventContext;
-import org.menacheri.jetserver.event.impl.NetworkEvent;
+import org.menacheri.jetserver.event.impl.DefaultEvent;
+import org.menacheri.jetserver.event.impl.DefaultEventContext;
+import org.menacheri.jetserver.event.impl.DefaultNetworkEvent;
 
 
 public class Events
@@ -17,7 +17,7 @@ public class Events
 	/**
 	 * Events should <b>NEVER</b> have this type. But event handlers can choose
 	 * to have this type to signify that they will handle any type of incoming
-	 * event. For e.g. {@link AbstractSessionEventHandler}
+	 * event. For e.g. {@link DefaultSessionEventHandler}
 	 */
 	public final static byte ANY = 0x00;
 	// Lifecycle events.
@@ -67,24 +67,24 @@ public class Events
 	public static final byte DISCONNECT = 0x22;
 	public static final byte EXCEPTION = 0x24;
 	
-	public static IEvent event(Object source, int eventType)
+	public static Event event(Object source, int eventType)
 	{
-		return event(source,eventType,(ISession)null);
+		return event(source,eventType,(Session)null);
 	}
 	
-	public static IEvent event(Object source, int eventType,ISession session)
+	public static Event event(Object source, int eventType,Session session)
 	{
-		IEventContext context = null;
+		EventContext context = null;
 		if(null != session)
 		{
-			context = new EventContext();
+			context = new DefaultEventContext();
 		}
 		return event(source,eventType,context);
 	}
 	
-	public static IEvent event(Object source, int eventType, IEventContext context)
+	public static Event event(Object source, int eventType, EventContext context)
 	{
-		Event event = new Event();
+		DefaultEvent event = new DefaultEvent();
 		event.setSource(source);
 		event.setType(eventType);
 		event.setEventContext(context);
@@ -94,23 +94,23 @@ public class Events
 	
 	/**
 	 * Creates a network event with the source set to the object passed in as
-	 * parameter and the {@link IDeliveryGuaranty} set to
-	 * {@link DeliveryGuaranty#RELIABLE}. This method delegates to
-	 * {@link #networkEvent(Object, IDeliveryGuaranty)}.
+	 * parameter and the {@link DeliveryGuaranty} set to
+	 * {@link DeliveryGuarantyOptions#RELIABLE}. This method delegates to
+	 * {@link #networkEvent(Object, DeliveryGuaranty)}.
 	 * 
 	 * @param source
 	 *            The payload of the event. This is the actual data that gets
 	 *            transmitted to remote machine.
-	 * @return An instance of {@link INetworkEvent}
+	 * @return An instance of {@link NetworkEvent}
 	 */
-	public static INetworkEvent networkEvent(Object source)
+	public static NetworkEvent networkEvent(Object source)
 	{
-		return networkEvent(source,IDeliveryGuaranty.DeliveryGuaranty.RELIABLE);
+		return networkEvent(source,DeliveryGuaranty.DeliveryGuarantyOptions.RELIABLE);
 	}
 	
 	/**
 	 * Creates a network event with the source set to the object passed in as
-	 * parameter and the {@link IDeliveryGuaranty} set to the incoming
+	 * parameter and the {@link DeliveryGuaranty} set to the incoming
 	 * parameter.
 	 * 
 	 * @param source
@@ -119,29 +119,29 @@ public class Events
 	 * @param deliveryGuaranty
 	 *            This decides which transport TCP or UDP to be used to send the
 	 *            message to remote machine.
-	 * @return An instance of {@link INetworkEvent}
+	 * @return An instance of {@link NetworkEvent}
 	 */
-	public static INetworkEvent networkEvent(Object source, IDeliveryGuaranty deliveryGuaranty)
+	public static NetworkEvent networkEvent(Object source, DeliveryGuaranty deliveryGuaranty)
 	{
-		IEvent event = event(source,Events.NETWORK_MESSAGE);
-		INetworkEvent networkEvent = new NetworkEvent(event);
+		Event event = event(source,Events.NETWORK_MESSAGE);
+		NetworkEvent networkEvent = new DefaultNetworkEvent(event);
 		networkEvent.setDeliveryGuaranty(deliveryGuaranty);
 		return networkEvent;
 	}
 	
-	public static IEvent connectEvent(IMessageSender messageSender){
-		IEvent event = new ConnectEvent();
+	public static Event connectEvent(MessageSender messageSender){
+		Event event = new ConnectEvent();
 		event.setSource(messageSender);
 		event.setTimeStamp(System.currentTimeMillis());
 		return event;
 	}
 	
-	public static IEvent dataInEvent(Object source)
+	public static Event dataInEvent(Object source)
 	{
 		return event(source,Events.SESSION_MESSAGE);
 	}
 	
-	public static IEvent changeAttributeEvent(String key, Object value)
+	public static Event changeAttributeEvent(String key, Object value)
 	{
 		ChangeAttributeEvent changeAttributeEvent = new ChangeAttributeEvent();
 		changeAttributeEvent.setType(CHANGE_ATTRIBUTE);

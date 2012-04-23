@@ -9,18 +9,18 @@ import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.socket.DatagramChannel;
 import org.menacheri.jetclient.NettyTCPClient;
 import org.menacheri.jetclient.NettyUDPClient;
-import org.menacheri.jetclient.app.IPlayer;
-import org.menacheri.jetclient.app.IPlayerSession;
-import org.menacheri.jetclient.app.ISession;
-import org.menacheri.jetclient.app.impl.Session.SessionBuilder;
-import org.menacheri.jetclient.communication.IMessageBuffer;
-import org.menacheri.jetclient.communication.IMessageSender.IFast;
-import org.menacheri.jetclient.communication.IMessageSender.IReliable;
+import org.menacheri.jetclient.app.Player;
+import org.menacheri.jetclient.app.PlayerSession;
+import org.menacheri.jetclient.app.Session;
+import org.menacheri.jetclient.app.impl.DefaultSession.SessionBuilder;
+import org.menacheri.jetclient.communication.MessageBuffer;
+import org.menacheri.jetclient.communication.MessageSender.IFast;
+import org.menacheri.jetclient.communication.MessageSender.IReliable;
 import org.menacheri.jetclient.communication.NettyTCPMessageSender;
 import org.menacheri.jetclient.communication.NettyUDPMessageSender;
 import org.menacheri.jetclient.event.Events;
-import org.menacheri.jetclient.event.IEvent;
-import org.menacheri.jetclient.event.IEventHandler;
+import org.menacheri.jetclient.event.Event;
+import org.menacheri.jetclient.event.EventHandler;
 import org.menacheri.jetclient.handlers.netty.TCPPipelineFactory;
 import org.menacheri.jetclient.handlers.netty.UDPPipelineFactory;
 import org.menacheri.jetclient.util.LoginHelper;
@@ -73,16 +73,16 @@ public class SessionFactory
 	}
 
 	/**
-	 * Creates a {@link ISession} and connects it to the remote jetserver.
+	 * Creates a {@link Session} and connects it to the remote jetserver.
 	 * 
 	 * @return The session instance created.
 	 * @throws InterruptedException
 	 * @throws Exception
 	 */
-	public ISession createAndConnectSession() throws InterruptedException,
+	public Session createAndConnectSession() throws InterruptedException,
 			Exception
 	{
-		ISession session = createSession();
+		Session session = createSession();
 		connectSession(session);
 		return session;
 	}
@@ -91,7 +91,7 @@ public class SessionFactory
 	 * @return Returns the session instance created using a
 	 *         {@link SessionBuilder}.
 	 */
-	public ISession createSession()
+	public Session createSession()
 	{
 		SessionBuilder sessionBuilder = new SessionBuilder().id(sessionId
 				.incrementAndGet());
@@ -108,7 +108,7 @@ public class SessionFactory
 	 * @throws InterruptedException
 	 * @throws Exception
 	 */
-	public void connectSession(final ISession session)
+	public void connectSession(final Session session)
 			throws InterruptedException, Exception
 	{
 		InetSocketAddress localAddress = null;
@@ -119,10 +119,10 @@ public class SessionFactory
 			localAddress = udpClient.getLocalAddress(datagramChannel);
 			// Add a start event handler to the session which will send the udp
 			// connect on server START signal.
-			IEventHandler startEventHandler = new IEventHandler()
+			EventHandler startEventHandler = new EventHandler()
 			{
 				@Override
-				public void onEvent(IEvent event)
+				public void onEvent(Event event)
 				{
 					try
 					{
@@ -152,9 +152,9 @@ public class SessionFactory
 
 		// Connect session using tcp to remote jetserver
 		TCPPipelineFactory tcpFactory = new TCPPipelineFactory(session);
-		IMessageBuffer<ChannelBuffer> buffer = loginHelper
+		MessageBuffer<ChannelBuffer> buffer = loginHelper
 				.getLoginBuffer(localAddress);
-		IEvent loginEvent = Events.event(buffer, Events.LOG_IN);
+		Event loginEvent = Events.event(buffer, Events.LOG_IN);
 		// This will in turn invoke the startEventHandler when server sends
 		// Events.START event.
 		Channel channel = tcpClient.connect(tcpFactory, loginEvent);
@@ -162,10 +162,10 @@ public class SessionFactory
 		session.setTcpMessageSender(tcpMessageSender);
 	}
 
-	public IPlayerSession createPlayerSession(IPlayer player)
+	public PlayerSession createPlayerSession(Player player)
 	{
 		SessionBuilder sessionBuilder = new SessionBuilder();
-		PlayerSession playerSession = new PlayerSession(sessionBuilder, player);
+		DefaultPlayerSession playerSession = new DefaultPlayerSession(sessionBuilder, player);
 		return playerSession;
 	}
 

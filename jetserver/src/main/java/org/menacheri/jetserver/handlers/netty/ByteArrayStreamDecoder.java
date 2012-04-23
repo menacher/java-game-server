@@ -8,7 +8,7 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelHandler.Sharable;
 import org.jboss.netty.handler.codec.oneone.OneToOneDecoder;
 import org.menacheri.jetserver.event.Events;
-import org.menacheri.jetserver.event.IEvent;
+import org.menacheri.jetserver.event.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,7 +25,7 @@ public class ByteArrayStreamDecoder extends OneToOneDecoder{
 			LOG.error("Incoming message is null");
 			return msg;
 		}
-		IEvent event = (IEvent)msg;
+		Event event = (Event)msg;
 		if(event.getType() == Events.SESSION_MESSAGE)
 		{
 			ChannelBuffer buffer = (ChannelBuffer)event.getSource();

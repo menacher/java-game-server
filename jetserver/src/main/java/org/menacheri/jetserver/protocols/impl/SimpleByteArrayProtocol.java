@@ -3,7 +3,7 @@ package org.menacheri.jetserver.protocols.impl;
 import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.handler.codec.frame.LengthFieldPrepender;
-import org.menacheri.jetserver.app.IPlayerSession;
+import org.menacheri.jetserver.app.PlayerSession;
 import org.menacheri.jetserver.handlers.netty.ByteArrayDecoder;
 import org.menacheri.jetserver.handlers.netty.ByteArrayToChannelBufferEncoder;
 import org.menacheri.jetserver.protocols.AbstractNettyProtocol;
@@ -51,7 +51,7 @@ public class SimpleByteArrayProtocol extends AbstractNettyProtocol
 	}
 	
 	@Override
-	public void applyProtocol(IPlayerSession playerSession)
+	public void applyProtocol(PlayerSession playerSession)
 	{
 		ChannelPipeline pipeline = NettyUtils
 				.getPipeLineOfConnection(playerSession);

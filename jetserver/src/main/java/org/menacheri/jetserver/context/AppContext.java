@@ -1,6 +1,6 @@
 package org.menacheri.jetserver.context;
 
-import org.menacheri.jetserver.app.IGameStartListener;
+import org.menacheri.jetserver.app.GameStartListener;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -102,7 +102,7 @@ public class AppContext implements ApplicationContextAware
 	/**
 	 * Called from the main method once the application is initialized. This
 	 * method is advised by aspectj which will in turn call the start method on
-	 * the {@link IGameStartListener} instance.
+	 * the {@link GameStartListener} instance.
 	 */
 	public void initialized()
 	{

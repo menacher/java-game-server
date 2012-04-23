@@ -19,9 +19,9 @@ import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.socket.DatagramChannel;
 import org.jboss.netty.channel.socket.DatagramChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
-import org.menacheri.jetclient.app.ISession;
+import org.menacheri.jetclient.app.Session;
 import org.menacheri.jetclient.event.Events;
-import org.menacheri.jetclient.event.IEvent;
+import org.menacheri.jetclient.event.Event;
 import org.menacheri.jetclient.handlers.netty.UDPUpstreamHandler;
 
 /**
@@ -64,7 +64,7 @@ public class NettyUDPClient
 	 * {@link UDPUpstreamHandler} will resolve which session to pass the event,
 	 * using this map.
 	 */
-	public static final Map<InetSocketAddress, ISession> CLIENTS = new HashMap<InetSocketAddress, ISession>();
+	public static final Map<InetSocketAddress, Session> CLIENTS = new HashMap<InetSocketAddress, Session>();
 
 	/**
 	 * Creates an instance of a Netty UDP client which can then be used to
@@ -203,7 +203,7 @@ public class NettyUDPClient
 	 *         it.
 	 * @throws UnknownHostException
 	 */
-	public ChannelFuture connect(ISession session,
+	public ChannelFuture connect(Session session,
 			DatagramChannel datagramChannel) throws UnknownHostException,
 			InterruptedException
 	{
@@ -233,7 +233,7 @@ public class NettyUDPClient
 	 *         it.
 	 * @throws UnknownHostException
 	 */
-	public ChannelFuture connect(ISession session,
+	public ChannelFuture connect(Session session,
 			DatagramChannel datagramChannel, InetSocketAddress serverAddress,
 			int timeout, TimeUnit unit) throws UnknownHostException,
 			InterruptedException
@@ -250,7 +250,7 @@ public class NettyUDPClient
 					+ " Passed to connect method is not bound");
 		}
 
-		IEvent event = Events.event(null, Events.CONNECT);
+		Event event = Events.event(null, Events.CONNECT);
 		ChannelFuture future = datagramChannel.write(event, serverAddress);
 		future.addListener(new ChannelFutureListener()
 		{

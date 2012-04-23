@@ -5,9 +5,9 @@ import org.jboss.netty.channel.ChannelPipelineFactory;
 import org.jboss.netty.channel.Channels;
 import org.jboss.netty.handler.codec.frame.LengthFieldBasedFrameDecoder;
 import org.jboss.netty.handler.codec.frame.LengthFieldPrepender;
-import org.menacheri.jetclient.app.ISession;
-import org.menacheri.jetclient.communication.IMessageBuffer;
-import org.menacheri.jetclient.event.IEvent;
+import org.menacheri.jetclient.app.Session;
+import org.menacheri.jetclient.communication.MessageBuffer;
+import org.menacheri.jetclient.event.Event;
 
 /**
  * This pipeline factory can be considered the default 'protocol' for client
@@ -27,23 +27,23 @@ public class TCPPipelineFactory implements ChannelPipelineFactory
 	private static final LengthFieldPrepender LENGTH_FIELD_PREPENDER = new LengthFieldPrepender(
 			2);
 	/**
-	 * Decodes incoming messages from remote jetserver to {@link IMessageBuffer}
-	 * type, puts this as the payload for an {@link IEvent} and passes this
-	 * {@link IEvent} instance to the next decoder/handler in the chain.
+	 * Decodes incoming messages from remote jetserver to {@link MessageBuffer}
+	 * type, puts this as the payload for an {@link Event} and passes this
+	 * {@link Event} instance to the next decoder/handler in the chain.
 	 */
 	private static final MessageBufferEventDecoder EVENT_DECODER = new MessageBufferEventDecoder();
 	/**
-	 * Decodes incoming messages from remote jetserver to {@link IMessageBuffer}
-	 * type, puts this as the payload for an {@link IEvent} and passes this
-	 * {@link IEvent} instance to the next decoder/handler in the chain.
+	 * Decodes incoming messages from remote jetserver to {@link MessageBuffer}
+	 * type, puts this as the payload for an {@link Event} and passes this
+	 * {@link Event} instance to the next decoder/handler in the chain.
 	 */
 	private static final MessageBufferEventEncoder EVENT_ENCODER = new MessageBufferEventEncoder();
 	/**
-	 * Used to transmit the message to {@link ISession}.
+	 * Used to transmit the message to {@link Session}.
 	 */
 	private final DefaultToClientHandler defaultToClientHandler;
 
-	public TCPPipelineFactory(ISession session)
+	public TCPPipelineFactory(Session session)
 	{
 		this.defaultToClientHandler = new DefaultToClientHandler(session);
 	}

@@ -6,7 +6,7 @@ import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ChannelHandler.Sharable;
 import org.jboss.netty.handler.codec.oneone.OneToOneEncoder;
-import org.menacheri.jetserver.event.IEvent;
+import org.menacheri.jetserver.event.Event;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +36,7 @@ public class EventEncoder extends OneToOneEncoder
 			LOG.error("Received null message in EventDecoder");
 			return msg;
 		}
-		IEvent event = (IEvent) msg;
+		Event event = (Event) msg;
 		ChannelBuffer opCode = ChannelBuffers.buffer(1);
 		opCode.writeByte(event.getType());
 		ChannelBuffer buffer = null;

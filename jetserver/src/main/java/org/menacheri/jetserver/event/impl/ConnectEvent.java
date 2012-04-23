@@ -1,28 +1,28 @@
 package org.menacheri.jetserver.event.impl;
 
-import org.menacheri.jetserver.app.ISession;
-import org.menacheri.jetserver.communication.IMessageSender;
+import org.menacheri.jetserver.app.Session;
+import org.menacheri.jetserver.communication.MessageSender;
 import org.menacheri.jetserver.event.Events;
-import org.menacheri.jetserver.event.IEvent;
+import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.handlers.netty.LoginHandler;
 import org.menacheri.jetserver.handlers.netty.UDPUpstreamHandler;
 
 /**
  * This is a specific Event class with type {@link Events#CONNECT}. This class
  * is used by {@link LoginHandler} and {@link UDPUpstreamHandler} to create the
- * respective {@link IMessageSender} (upd, or tcp), set it as the source of this
- * event and then forward it to the {@link ISession}. <b>Note</b> Trying to
- * reset the event type of this class using {@link IEvent#setType(int)} will
+ * respective {@link MessageSender} (upd, or tcp), set it as the source of this
+ * event and then forward it to the {@link Session}. <b>Note</b> Trying to
+ * reset the event type of this class using {@link Event#setType(int)} will
  * result in an {@link UnsupportedOperationException}.
  * 
  * @author Abraham Menacherry
  * 
  */
-public class ConnectEvent extends Event
+public class ConnectEvent extends DefaultEvent
 {
 	private static final long serialVersionUID = 1L;
 	private static final byte TYPE = Events.CONNECT;
-	private IMessageSender messageSender;
+	private MessageSender messageSender;
 
 	@Override
 	public int getType()
@@ -38,7 +38,7 @@ public class ConnectEvent extends Event
 	}
 
 	@Override
-	public IMessageSender getSource()
+	public MessageSender getSource()
 	{
 		return messageSender;
 	}
@@ -46,6 +46,6 @@ public class ConnectEvent extends Event
 	@Override
 	public void setSource(Object source)
 	{
-		this.messageSender = (IMessageSender) source;
+		this.messageSender = (MessageSender) source;
 	}
 }

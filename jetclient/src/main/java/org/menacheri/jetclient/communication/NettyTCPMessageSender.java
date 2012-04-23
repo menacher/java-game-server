@@ -2,9 +2,9 @@ package org.menacheri.jetclient.communication;
 
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFutureListener;
-import org.menacheri.jetclient.communication.IMessageSender.IReliable;
+import org.menacheri.jetclient.communication.MessageSender.IReliable;
 import org.menacheri.jetclient.event.Events;
-import org.menacheri.jetclient.event.IEvent;
+import org.menacheri.jetclient.event.Event;
 
 /**
  * A class that transmits messages reliably to remote machines/vm's. Internally
@@ -16,7 +16,7 @@ import org.menacheri.jetclient.event.IEvent;
 public class NettyTCPMessageSender implements IReliable
 {
 	private final Channel channel;
-	private static final IDeliveryGuaranty DELIVERY_GUARANTY = IDeliveryGuaranty.DeliveryGuaranty.RELIABLE;
+	private static final DeliveryGuaranty DELIVERY_GUARANTY = DeliveryGuaranty.DeliveryGuarantyOptions.RELIABLE;
 
 	public NettyTCPMessageSender(Channel channel)
 	{
@@ -31,7 +31,7 @@ public class NettyTCPMessageSender implements IReliable
 	}
 
 	@Override
-	public IDeliveryGuaranty getDeliveryGuaranty()
+	public DeliveryGuaranty getDeliveryGuaranty()
 	{
 		return DELIVERY_GUARANTY;
 	}
@@ -52,7 +52,7 @@ public class NettyTCPMessageSender implements IReliable
 	 * 
 	 * @param closeEvent
 	 */
-	public void close(IEvent closeEvent)
+	public void close(Event closeEvent)
 	{
 		closeAfterFlushingPendingWrites(channel, closeEvent);
 	}
@@ -64,7 +64,7 @@ public class NettyTCPMessageSender implements IReliable
 	 * @param channel
 	 * @param event
 	 */
-	public void closeAfterFlushingPendingWrites(Channel channel, IEvent event)
+	public void closeAfterFlushingPendingWrites(Channel channel, Event event)
 	{
 		if (channel.isConnected())
 		{

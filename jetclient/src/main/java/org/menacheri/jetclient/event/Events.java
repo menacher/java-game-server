@@ -1,11 +1,11 @@
 package org.menacheri.jetclient.event;
 
-import org.menacheri.jetclient.communication.IDeliveryGuaranty;
-import org.menacheri.jetclient.communication.IDeliveryGuaranty.DeliveryGuaranty;
+import org.menacheri.jetclient.communication.DeliveryGuaranty;
+import org.menacheri.jetclient.communication.DeliveryGuaranty.DeliveryGuarantyOptions;
 import org.menacheri.jetclient.event.impl.AbstractSessionEventHandler;
 import org.menacheri.jetclient.event.impl.ChangeAttributeEvent;
-import org.menacheri.jetclient.event.impl.Event;
-import org.menacheri.jetclient.event.impl.NetworkEvent;
+import org.menacheri.jetclient.event.impl.DefaultEvent;
+import org.menacheri.jetclient.event.impl.DefaultNetworkEvent;
 /**
  * Defines the event constants. Server and client communicate to each other
  * using these constants. However, since Netty can be used to support any binary
@@ -73,23 +73,23 @@ public class Events
 
 	/**
 	 * Creates a network event with the source set to the object passed in as
-	 * parameter and the {@link IDeliveryGuaranty} set to
-	 * {@link DeliveryGuaranty#RELIABLE}. This method delegates to
-	 * {@link #networkEvent(Object, IDeliveryGuaranty)}.
+	 * parameter and the {@link DeliveryGuaranty} set to
+	 * {@link DeliveryGuarantyOptions#RELIABLE}. This method delegates to
+	 * {@link #networkEvent(Object, DeliveryGuaranty)}.
 	 * 
 	 * @param source
 	 *            The payload of the event. This is the actual data that gets
 	 *            transmitted to remote machine.
-	 * @return An instance of {@link INetworkEvent}
+	 * @return An instance of {@link NetworkEvent}
 	 */
-	public static INetworkEvent networkEvent(Object source)
+	public static NetworkEvent networkEvent(Object source)
 	{
-		return networkEvent(source, DeliveryGuaranty.RELIABLE);
+		return networkEvent(source, DeliveryGuarantyOptions.RELIABLE);
 	}
 	
 	/**
 	 * Creates a network event with the source set to the object passed in as
-	 * parameter and the {@link IDeliveryGuaranty} set to the incoming
+	 * parameter and the {@link DeliveryGuaranty} set to the incoming
 	 * parameter.
 	 * 
 	 * @param source
@@ -98,26 +98,26 @@ public class Events
 	 * @param deliveryGuaranty
 	 *            This decides which transport TCP or UDP to be used to send the
 	 *            message to remote machine.
-	 * @return An instance of {@link INetworkEvent}
+	 * @return An instance of {@link NetworkEvent}
 	 */
-	public static INetworkEvent networkEvent(Object source, IDeliveryGuaranty deliveryGuaranty)
+	public static NetworkEvent networkEvent(Object source, DeliveryGuaranty deliveryGuaranty)
 	{
-		IEvent event = event(source,Events.NETWORK_MESSAGE);
-		INetworkEvent networkEvent = new NetworkEvent(event);
+		Event event = event(source,Events.NETWORK_MESSAGE);
+		NetworkEvent networkEvent = new DefaultNetworkEvent(event);
 		networkEvent.setDeliveryGuaranty(deliveryGuaranty);
 		return networkEvent;
 	}
 	
-	public static IEvent event(Object source, int eventType)
+	public static Event event(Object source, int eventType)
 	{
-		Event event = new Event();
+		DefaultEvent event = new DefaultEvent();
 		event.setSource(source);
 		event.setType(eventType);
 		event.setTimeStamp(System.currentTimeMillis());
 		return event;
 	}
 
-	public static IEvent changeAttributeEvent(String key, Object value)
+	public static Event changeAttributeEvent(String key, Object value)
 	{
 		ChangeAttributeEvent changeAttributeEvent = new ChangeAttributeEvent();
 		changeAttributeEvent.setType(CHANGE_ATTRIBUTE);

@@ -1,15 +1,15 @@
 package org.menacheri.zombie.game;
 
-import org.menacheri.jetserver.app.IGameCommandInterpreter;
-import org.menacheri.jetserver.app.ISession;
+import org.menacheri.jetserver.app.GameCommandInterpreter;
+import org.menacheri.jetserver.app.Session;
 import org.menacheri.jetserver.app.impl.InvalidCommandException;
-import org.menacheri.jetserver.communication.IDeliveryGuaranty;
-import org.menacheri.jetserver.communication.IMessageBuffer;
+import org.menacheri.jetserver.communication.DeliveryGuaranty.DeliveryGuarantyOptions;
+import org.menacheri.jetserver.communication.MessageBuffer;
 import org.menacheri.jetserver.communication.NettyMessageBuffer;
+import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.event.Events;
-import org.menacheri.jetserver.event.IEvent;
-import org.menacheri.jetserver.event.INetworkEvent;
-import org.menacheri.jetserver.event.impl.AbstractSessionEventHandler;
+import org.menacheri.jetserver.event.NetworkEvent;
+import org.menacheri.jetserver.event.impl.DefaultSessionEventHandler;
 import org.menacheri.zombie.domain.Defender;
 import org.menacheri.zombie.domain.IAM;
 import org.menacheri.zombie.domain.Zombie;
@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
 
 //public class SessionHandler extends AsyncSessionListener implements IGameCommandInterpreter
 @SuppressWarnings("rawtypes")
-public class SessionHandler extends AbstractSessionEventHandler implements IGameCommandInterpreter
+public class SessionHandler extends DefaultSessionEventHandler implements GameCommandInterpreter
 {
 	private static final Logger LOG = LoggerFactory.getLogger(SessionHandler.class);
 	volatile int cmdCount;
@@ -29,7 +29,7 @@ public class SessionHandler extends AbstractSessionEventHandler implements IGame
 	private Zombie zombie;
 	private IAM iam;
 	
-	public SessionHandler(ISession session,Defender defender, Zombie zombie, IAM iam)
+	public SessionHandler(Session session,Defender defender, Zombie zombie, IAM iam)
 	{
 		super(session);
 		this.defender = defender;
@@ -37,7 +37,7 @@ public class SessionHandler extends AbstractSessionEventHandler implements IGame
 		this.iam = iam;
 	}
 	
-	public void onDataIn(IEvent event)
+	public void onDataIn(Event event)
 	{
 		try 
 		{
@@ -56,7 +56,7 @@ public class SessionHandler extends AbstractSessionEventHandler implements IGame
 	{
 		cmdCount++;
 		//IGameEvent event = (IGameEvent) command;
-		IMessageBuffer buf = (IMessageBuffer) command;
+		MessageBuffer buf = (MessageBuffer) command;
 		int type = buf.readInt();
 		int operation = buf.readInt();
 		IAM iam = IAM.getWho(type);
@@ -99,9 +99,9 @@ public class SessionHandler extends AbstractSessionEventHandler implements IGame
 			NettyMessageBuffer buffer = new NettyMessageBuffer();
 			System.out.println("Command No: " + cmdCount);
 			buffer.writeInt(cmdCount);
-//			IEvent tcpEvent = Events.dataOutTcpEvent(buffer);
+//			Event tcpEvent = Events.dataOutTcpEvent(buffer);
 //			getSession().onEvent(tcpEvent);
-			INetworkEvent udpEvent = Events.networkEvent(buffer, IDeliveryGuaranty.DeliveryGuaranty.FAST);
+			NetworkEvent udpEvent = Events.networkEvent(buffer, DeliveryGuarantyOptions.FAST);
 			getSession().onEvent(udpEvent);
 		}
 	}

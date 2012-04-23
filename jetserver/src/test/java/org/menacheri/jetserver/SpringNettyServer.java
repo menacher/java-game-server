@@ -1,7 +1,7 @@
 package org.menacheri.jetserver;
 
 import org.apache.log4j.PropertyConfigurator;
-import org.menacheri.jetserver.server.IServerManager;
+import org.menacheri.jetserver.server.ServerManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -27,7 +27,7 @@ public class SpringNettyServer
 		context.registerShutdownHook();
 		
 		// Start tcp and flash servers
-		IServerManager manager = (IServerManager)context.getBean("serverManager");
+		ServerManager manager = (ServerManager)context.getBean("serverManager");
 		try
 		{
 			manager.startServers(8090,843,8081);
