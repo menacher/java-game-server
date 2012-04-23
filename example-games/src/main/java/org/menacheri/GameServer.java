@@ -3,10 +3,10 @@ package org.menacheri;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.PropertyConfigurator;
-import org.menacheri.app.IGameRoom;
-import org.menacheri.app.ITask;
-import org.menacheri.server.IServerManager;
-import org.menacheri.service.ITaskManagerService;
+import org.menacheri.jetserver.app.IGameRoom;
+import org.menacheri.jetserver.app.ITask;
+import org.menacheri.jetserver.server.IServerManager;
+import org.menacheri.jetserver.service.ITaskManagerService;
 import org.menacheri.zombie.domain.World;
 import org.menacheri.zombie.domain.WorldMonitor;
 import org.menacheri.zombie.game.ZombieRoom;

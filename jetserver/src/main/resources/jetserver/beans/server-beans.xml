@@ -14,19 +14,19 @@
 		location="jetserver/props/jetserver.properties" />
 		
 	<!-- The Spring application context -->
-	<bean id="appContext" class="org.menacheri.context.AppContext"></bean>
+	<bean id="appContext" class="org.menacheri.jetserver.context.AppContext"></bean>
 	
 	<!-- Configure the three servers. By default tcp runs at 8090 and flash at 843 -->
-	<bean id="serverManager" class="org.menacheri.server.netty.ServerManagerImpl"></bean>
+	<bean id="serverManager" class="org.menacheri.jetserver.server.netty.ServerManagerImpl"></bean>
 	
-	<bean id="tcpServer" class="org.menacheri.server.netty.NettyTCPServer"
+	<bean id="tcpServer" class= "org.menacheri.jetserver.server.netty.NettyTCPServer"
 		init-method="createServerBootstrap" destroy-method="stopServer">
 		<property name="pipelineFactory" ref="loginPipelineFactory"></property>
 		<property name="gameAdminService" ref="gameAdminService"></property>
 		<property name="portNumber" value="${tcp.port}"></property>
 	</bean>
 
-	<bean id="udpServer" class="org.menacheri.server.netty.NettyUDPServer"
+	<bean id="udpServer" class="org.menacheri.jetserver.server.netty.NettyUDPServer"
 		init-method="createServerBootstrap" destroy-method="stopServer">
 		<property name="pipelineFactory" ref="updChannelPipelineFactory"></property>
 		<property name="gameAdminService" ref="gameAdminService"></property>
@@ -35,7 +35,7 @@
 	</bean>
 
 	<!-- Configure the Flash policy server. By default it runs at 843 -->
-	<bean id="flashPolicyServer" class="org.menacheri.server.netty.FlashPolicyServer"
+	<bean id="flashPolicyServer" class="org.menacheri.jetserver.server.netty.FlashPolicyServer"
 		init-method="createServerBootstrap" destroy-method="stopServer">
 		<property name="pipelineFactory" ref="flashPolicyServerPipelineFactory"></property>
 		<property name="gameAdminService" ref="gameAdminService"></property>
@@ -43,13 +43,12 @@
 	</bean>
 
 	<!-- All the pipeline factory beans are now defined -->
-	<bean id="flashPolicyServerPipelineFactory"
-		class="org.menacheri.server.netty.FlashPolicyServerPipelineFactory">
+	<bean id="flashPolicyServerPipelineFactory" class="org.menacheri.jetserver.server.netty.FlashPolicyServerPipelineFactory">
 		<lookup-method name="getFlashPolicyServerHandler" bean="flashPolicyServerHandler"/>
 		<property name="timer" ref="hashedWheelTimer"></property>
 	</bean>
 		
-	<bean id="loginPipelineFactory" class="org.menacheri.server.netty.LoginPipelineFactory">
+	<bean id="loginPipelineFactory" class="org.menacheri.jetserver.server.netty.LoginPipelineFactory">
 		<property name="frameSize" value="1024"></property>
 		<property name="timer" ref="hashedWheelTimer"></property>
 		<property name="idleCheckHandler" ref="idleCheckHandler"></property>
@@ -58,14 +57,14 @@
 		<property name="lengthFieldPrepender" ref="lengthFieldPrepender"></property>
 	</bean>
 	
-	<bean id="updChannelPipelineFactory" class="org.menacheri.server.netty.UDPChannelPipelineFactory" 
+	<bean id="updChannelPipelineFactory" class="org.menacheri.jetserver.server.netty.UDPChannelPipelineFactory" 
 	init-method="init">
 		<property name="messageBufferEventDecoder" ref="messageBufferEventDecoder"></property>
 		<property name="messageBufferEventEncoder" ref="messageBufferEventEncoder"></property>
 		<property name="upstream" ref="udpUpstreamHandler"></property>
 	</bean>
 	
-	<bean id="loginHandler" class ="org.menacheri.handlers.netty.LoginHandler">
+	<bean id="loginHandler" class="org.menacheri.jetserver.handlers.netty.LoginHandler">
 		<property name="lookupService" ref="lookupService"></property>
 		<property name="sessionRegistryService" ref="sessionRegistryService"></property>
 	</bean>

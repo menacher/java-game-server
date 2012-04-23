@@ -9,13 +9,13 @@
 	<context:annotation-config />
 	
 	<!-- Communication protocols that are available by default -->
-	<bean id="simpleByteArrayProtocol" class="org.menacheri.protocols.impl.SimpleByteArrayProtocol">
+	<bean id="simpleByteArrayProtocol" class="org.menacheri.jetserver.protocols.impl.SimpleByteArrayProtocol">
 		<property name="byteArrayToChannelBufferEncoder" ref="byteArrayToChannelBufferEncoder"/>
 		<property name="lengthFieldPrepender" ref="lengthFieldPrepender"></property>
 		<property name="byteArrayDecoder" ref="byteArrayDecoder"></property>
 	</bean>
 	
-	<bean id="amf3Protocol"  class="org.menacheri.protocols.impl.AMF3Protocol">
+	<bean id="amf3Protocol"  class="org.menacheri.jetserver.protocols.impl.AMF3Protocol">
 		<property name="lengthFieldPrepender" ref="lengthFieldPrepender"></property>
 		<property name="eventDecoder" ref="eventDecoder"></property>
 		<property name="eventEncoder" ref="eventEncoder"></property>
@@ -23,7 +23,7 @@
 		<property name="eventSourceToAMF3Encoder" ref="eventSourceToAMF3Encoder"></property>
 	</bean>
 	
-	<bean id="amf3StringProtocol" class="org.menacheri.protocols.impl.AMF3StringProtocol">
+	<bean id="amf3StringProtocol" class="org.menacheri.jetserver.protocols.impl.AMF3StringProtocol">
 		<property name="maxFrameSize" value="4096"></property>
 		<property name="nulEncoder" ref="nulEncoder"></property>
 		<property name="base64Decoder" ref="base64Decoder"></property>
@@ -32,20 +32,20 @@
 		<property name="javaObjectToAMF3Encoder" ref="javaToAMF3Encoder"></property>
 	</bean>
 	
-	<bean id="stringProtocol" class="org.menacheri.protocols.impl.StringProtocol">
+	<bean id="stringProtocol" class="org.menacheri.jetserver.protocols.impl.StringProtocol">
 		<property name="frameSize" value="4096"></property>
 		<property name="nulEncoder" ref="nulEncoder"></property>
 		<property name="stringDecoder" ref="stringDecoder"></property>
 		<property name="stringEncoder" ref="stringEncoder"></property>
 	</bean>
 	
-	<bean id="channelBufferProtocol" class="org.menacheri.protocols.impl.ChannelBufferProtocol">
+	<bean id="channelBufferProtocol" class="org.menacheri.jetserver.protocols.impl.ChannelBufferProtocol">
 		<property name="eventDecoder" ref="eventDecoder"></property>
 		<property name="lengthFieldPrepender" ref="lengthFieldPrepender"></property>
 		<property name="eventEncoder" ref="eventEncoder"></property>
 	</bean>
 	
-	<bean id="messageBufferProtocol" class="org.menacheri.protocols.impl.MessageBufferProtocol">
+	<bean id="messageBufferProtocol" class="org.menacheri.jetserver.protocols.impl.MessageBufferProtocol">
 		<property name="lengthFieldPrepender" ref="lengthFieldPrepender"></property>
 		<property name="messageBufferEventDecoder" ref="messageBufferEventDecoder"></property>
 		<property name="messageBufferEventEncoder" ref="messageBufferEventEncoder"></property>

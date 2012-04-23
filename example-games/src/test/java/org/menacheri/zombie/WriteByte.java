@@ -7,7 +7,7 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.socket.DatagramChannel;
-import org.menacheri.event.Events;
+import org.menacheri.jetserver.event.Events;
 import org.menacheri.zombie.domain.IAM;
 import org.menacheri.zombie.domain.ZombieCommands;
 

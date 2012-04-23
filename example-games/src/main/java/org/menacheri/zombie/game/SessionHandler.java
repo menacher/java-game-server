@@ -1,15 +1,15 @@
 package org.menacheri.zombie.game;
 
-import org.menacheri.app.IGameCommandInterpreter;
-import org.menacheri.app.ISession;
-import org.menacheri.app.impl.InvalidCommandException;
-import org.menacheri.communication.IDeliveryGuaranty;
-import org.menacheri.communication.IMessageBuffer;
-import org.menacheri.communication.NettyMessageBuffer;
-import org.menacheri.event.Events;
-import org.menacheri.event.IEvent;
-import org.menacheri.event.INetworkEvent;
-import org.menacheri.event.impl.AbstractSessionEventHandler;
+import org.menacheri.jetserver.app.IGameCommandInterpreter;
+import org.menacheri.jetserver.app.ISession;
+import org.menacheri.jetserver.app.impl.InvalidCommandException;
+import org.menacheri.jetserver.communication.IDeliveryGuaranty;
+import org.menacheri.jetserver.communication.IMessageBuffer;
+import org.menacheri.jetserver.communication.NettyMessageBuffer;
+import org.menacheri.jetserver.event.Events;
+import org.menacheri.jetserver.event.IEvent;
+import org.menacheri.jetserver.event.INetworkEvent;
+import org.menacheri.jetserver.event.impl.AbstractSessionEventHandler;
 import org.menacheri.zombie.domain.Defender;
 import org.menacheri.zombie.domain.IAM;
 import org.menacheri.zombie.domain.Zombie;

@@ -1,11 +1,11 @@
 package org.menacheri.zombie.domain;
 
-import org.menacheri.app.IGameRoom;
-import org.menacheri.app.ITask;
-import org.menacheri.communication.IDeliveryGuaranty;
-import org.menacheri.communication.NettyMessageBuffer;
-import org.menacheri.event.Events;
-import org.menacheri.event.INetworkEvent;
+import org.menacheri.jetserver.app.IGameRoom;
+import org.menacheri.jetserver.app.ITask;
+import org.menacheri.jetserver.communication.IDeliveryGuaranty;
+import org.menacheri.jetserver.communication.NettyMessageBuffer;
+import org.menacheri.jetserver.event.Events;
+import org.menacheri.jetserver.event.INetworkEvent;
 import org.menacheri.zombie.game.Messages;
 
 public class WorldMonitor implements ITask

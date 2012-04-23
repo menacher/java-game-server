@@ -1,7 +1,7 @@
 package org.menacheri.zombie.game;
 
-import org.menacheri.app.IPlayerSession;
-import org.menacheri.app.impl.GameRoomSession;
+import org.menacheri.jetserver.app.IPlayerSession;
+import org.menacheri.jetserver.app.impl.GameRoomSession;
 import org.menacheri.zombie.domain.Defender;
 import org.menacheri.zombie.domain.IAM;
 import org.menacheri.zombie.domain.World;

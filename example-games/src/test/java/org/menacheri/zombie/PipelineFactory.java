@@ -11,9 +11,9 @@ import org.jboss.netty.channel.Channels;
 import org.jboss.netty.handler.codec.frame.LengthFieldBasedFrameDecoder;
 import org.jboss.netty.handler.codec.frame.LengthFieldPrepender;
 import org.jboss.netty.handler.codec.oneone.OneToOneDecoder;
-import org.menacheri.event.Events;
-import org.menacheri.event.IEvent;
-import org.menacheri.handlers.netty.EventDecoder;
+import org.menacheri.jetserver.event.Events;
+import org.menacheri.jetserver.event.IEvent;
+import org.menacheri.jetserver.handlers.netty.EventDecoder;
 
 
 public class PipelineFactory implements ChannelPipelineFactory

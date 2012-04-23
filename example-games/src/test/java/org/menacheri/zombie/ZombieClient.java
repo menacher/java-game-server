@@ -16,8 +16,8 @@ import org.jboss.netty.channel.ChannelFactory;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
 import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
-import org.menacheri.event.Events;
-import org.menacheri.util.NettyUtils;
+import org.menacheri.jetserver.event.Events;
+import org.menacheri.jetserver.util.NettyUtils;
 
 
 public class ZombieClient

@@ -7,8 +7,8 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.channel.ExceptionEvent;
 import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
-import org.menacheri.event.Events;
-import org.menacheri.event.IEvent;
+import org.menacheri.jetserver.event.Events;
+import org.menacheri.jetserver.event.IEvent;
 import org.menacheri.zombie.domain.ZombieCommands;
 
 

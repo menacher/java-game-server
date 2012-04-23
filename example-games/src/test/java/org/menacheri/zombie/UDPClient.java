@@ -16,9 +16,9 @@ import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.channel.socket.DatagramChannel;
 import org.jboss.netty.channel.socket.DatagramChannelFactory;
 import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
-import org.menacheri.event.Events;
-import org.menacheri.handlers.netty.EventDecoder;
-import org.menacheri.util.NettyUtils;
+import org.menacheri.jetserver.event.Events;
+import org.menacheri.jetserver.handlers.netty.EventDecoder;
+import org.menacheri.jetserver.util.NettyUtils;
 import org.menacheri.zombie.domain.IAM;
 
 
