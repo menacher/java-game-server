@@ -5,7 +5,7 @@ import java.net.SocketAddress;
 import org.jboss.netty.channel.socket.DatagramChannel;
 import org.menacheri.jetserver.app.Session;
 import org.menacheri.jetserver.communication.DeliveryGuaranty.DeliveryGuarantyOptions;
-import org.menacheri.jetserver.communication.MessageSender.IFast;
+import org.menacheri.jetserver.communication.MessageSender.Fast;
 import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.impl.DefaultNetworkEvent;
 import org.menacheri.jetserver.handlers.netty.UDPUpstreamHandler;
@@ -24,7 +24,7 @@ import org.slf4j.LoggerFactory;
  * @author Abraham Menacherry
  * 
  */
-public class NettyUDPMessageSender implements IFast
+public class NettyUDPMessageSender implements Fast
 {
 	private static final Logger LOG = LoggerFactory
 			.getLogger(NettyUDPMessageSender.class);

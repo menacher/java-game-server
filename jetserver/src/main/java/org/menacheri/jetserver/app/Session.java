@@ -3,8 +3,8 @@ package org.menacheri.jetserver.app;
 import java.util.List;
 
 import org.menacheri.jetserver.communication.MessageSender;
-import org.menacheri.jetserver.communication.MessageSender.IFast;
-import org.menacheri.jetserver.communication.MessageSender.IReliable;
+import org.menacheri.jetserver.communication.MessageSender.Fast;
+import org.menacheri.jetserver.communication.MessageSender.Reliable;
 import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.event.EventDispatcher;
@@ -108,11 +108,11 @@ public interface Session
 	
 	void close();
 
-	public abstract void setUdpSender(IFast udpSender);
+	public abstract void setUdpSender(Fast udpSender);
 
-	public abstract IFast getUdpSender();
+	public abstract Fast getUdpSender();
 
-	public abstract void setTcpSender(IReliable tcpSender);
+	public abstract void setTcpSender(Reliable tcpSender);
 
-	public abstract IReliable getTcpSender();
+	public abstract Reliable getTcpSender();
 }

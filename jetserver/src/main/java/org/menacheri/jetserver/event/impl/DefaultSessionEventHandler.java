@@ -4,8 +4,8 @@ import org.menacheri.jetserver.app.PlayerSession;
 import org.menacheri.jetserver.app.Session;
 import org.menacheri.jetserver.communication.DeliveryGuaranty;
 import org.menacheri.jetserver.communication.DeliveryGuaranty.DeliveryGuarantyOptions;
-import org.menacheri.jetserver.communication.MessageSender.IFast;
-import org.menacheri.jetserver.communication.MessageSender.IReliable;
+import org.menacheri.jetserver.communication.MessageSender.Fast;
+import org.menacheri.jetserver.communication.MessageSender.Reliable;
 import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.event.NetworkEvent;
@@ -111,7 +111,7 @@ public class DefaultSessionEventHandler implements SessionEventHandler
 	{
 		DeliveryGuaranty guaranty = event.getDeliveryGuaranty();
 		if(guaranty.getGuaranty() == DeliveryGuarantyOptions.FAST.getGuaranty()){
-			IFast udpSender = getSession().getUdpSender();
+			Fast udpSender = getSession().getUdpSender();
 			if(null != udpSender)
 			{
 				udpSender.sendMessage(event);
@@ -139,9 +139,9 @@ public class DefaultSessionEventHandler implements SessionEventHandler
 	{
 		Object source = event.getSource();
 		Session session = getSession();
-		if (source instanceof IReliable)
+		if (source instanceof Reliable)
 		{
-			session.setTcpSender((IReliable) source);
+			session.setTcpSender((Reliable) source);
 			// Now send the start event to session
 			session.onEvent(Events.event(null, Events.START));
 		}
@@ -154,7 +154,7 @@ public class DefaultSessionEventHandler implements SessionEventHandler
 			else
 			{
 				session.setUDPEnabled(true);
-				session.setUdpSender((IFast) source);
+				session.setUdpSender((Fast) source);
 			}
 		}
 	}

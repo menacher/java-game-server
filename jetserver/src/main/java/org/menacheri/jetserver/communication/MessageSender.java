@@ -44,7 +44,7 @@ public interface MessageSender
 	 * @author Abraham Menacherry
 	 * 
 	 */
-	public interface IReliable extends MessageSender{}
+	public interface Reliable extends MessageSender{}
 	
 	/**
 	 * An interface whose implementations would transmit messages fast but
@@ -54,6 +54,6 @@ public interface MessageSender
 	 * @author Abraham Menacherry
 	 * 
 	 */
-	public interface IFast extends MessageSender{}
+	public interface Fast extends MessageSender{}
 
 }
