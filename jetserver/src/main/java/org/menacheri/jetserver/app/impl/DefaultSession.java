@@ -6,8 +6,8 @@ import java.util.Map;
 
 import org.jboss.netty.channel.Channel;
 import org.menacheri.jetserver.app.Session;
-import org.menacheri.jetserver.communication.MessageSender.IFast;
-import org.menacheri.jetserver.communication.MessageSender.IReliable;
+import org.menacheri.jetserver.communication.MessageSender.Fast;
+import org.menacheri.jetserver.communication.MessageSender.Reliable;
 import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.event.EventDispatcher;
@@ -59,9 +59,9 @@ public class DefaultSession implements Session
 	
 	protected final Map<String, Object> connectParameters;
 
-	protected IReliable tcpSender = null;
+	protected Reliable tcpSender = null;
 	
-	protected IFast udpSender = null;
+	protected Fast udpSender = null;
 	
 	protected DefaultSession(SessionBuilder sessionBuilder)
 	{
@@ -419,25 +419,25 @@ public class DefaultSession implements Session
 	}
 
 	@Override
-	public IReliable getTcpSender()
+	public Reliable getTcpSender()
 	{
 		return tcpSender;
 	}
 
 	@Override
-	public void setTcpSender(IReliable tcpSender)
+	public void setTcpSender(Reliable tcpSender)
 	{
 		this.tcpSender = tcpSender;
 	}
 
 	@Override
-	public IFast getUdpSender()
+	public Fast getUdpSender()
 	{
 		return udpSender;
 	}
 
 	@Override
-	public void setUdpSender(IFast udpSender)
+	public void setUdpSender(Fast udpSender)
 	{
 		this.udpSender = udpSender;
 	}
