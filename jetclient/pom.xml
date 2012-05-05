@@ -7,7 +7,7 @@
 	<version>0.1</version>
 	<name>jetclient</name>
 	<url>https://github.com/menacher/java-game-server/tree/master/jetclient</url>
-	<description>This is a client library for jetserver https://github.com/menacher/java-game-server/tree/master/jet/server. Java clients can use this program to connect and interact with jetserver.</description>
+	<description>This is a client library for jetserver https://github.com/menacher/java-game-server/tree/master/jetserver. Java clients can use this program to connect and interact with jetserver.</description>
 	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
