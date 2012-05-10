@@ -3,7 +3,6 @@ package org.menacheri.jetserver.app;
 import java.util.Set;
 
 import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.group.DefaultChannelGroup;
 import org.menacheri.jetserver.app.impl.DefaultPlayer;
 import org.menacheri.jetserver.event.NetworkEvent;
 import org.menacheri.jetserver.protocols.Protocol;
@@ -57,10 +56,7 @@ public interface GameRoom
 	public void afterSessionConnect(PlayerSession playerSession);
 
 	/**
-	 * Remove a session from the existing list of user sessions. If the
-	 * implementation is netty {@link DefaultChannelGroup} then it would
-	 * automatically take care of session removal in case a session is closed.
-	 * In other scenarios, we may require to manually remove it from the set.
+	 * Remove a session from the existing list of user sessions.
 	 * 
 	 * @param session
 	 *            The session to be removed from the set.
@@ -69,10 +65,7 @@ public interface GameRoom
 	public abstract boolean disconnectSession(PlayerSession session);
 
 	/**
-	 * Returns a list of sessions that is held by the game room. Warning: If the
-	 * default game room implementation is used, it iterates through the native
-	 * sessions i.e Netty Channels each time to create this set, hence an
-	 * expensive operation.
+	 * Returns a list of sessions that is held by the game room.
 	 * 
 	 * @return Returns the set of user sessions associated with game room.
 	 */
@@ -122,7 +115,7 @@ public interface GameRoom
 	 * Method used to set the state manager for a game room. Each game room will
 	 * have its own instance of the state manager. If using spring, then the
 	 * state manager bean needs to be of type "prototype" instead of singleton.
-	 * Meaning that the state is not share across multiple rooms.
+	 * Meaning that the state is not shared across multiple rooms.
 	 * 
 	 * @param stateManager
 	 */
