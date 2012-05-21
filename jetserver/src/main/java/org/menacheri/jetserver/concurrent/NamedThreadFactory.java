@@ -5,8 +5,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class NamedThreadFactory implements ThreadFactory
 {
-	private AtomicInteger counter = new AtomicInteger(0); 
-    private String        name; 
+	private static AtomicInteger counter = new AtomicInteger(1); 
+    private String        name = "Lane"; 
     private boolean       daemon; 
     private int           priority; 
 
