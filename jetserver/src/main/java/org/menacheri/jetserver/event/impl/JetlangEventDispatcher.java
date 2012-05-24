@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.jetlang.channels.BatchSubscriber;
@@ -15,11 +16,11 @@ import org.jetlang.core.Disposable;
 import org.jetlang.core.Filter;
 import org.jetlang.fibers.Fiber;
 import org.menacheri.jetserver.app.Session;
-import org.menacheri.jetserver.concurrent.Fibers;
-import org.menacheri.jetserver.event.Events;
+import org.menacheri.jetserver.concurrent.Lane;
 import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.event.EventDispatcher;
 import org.menacheri.jetserver.event.EventHandler;
+import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.SessionEventHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,9 +33,11 @@ public class JetlangEventDispatcher implements EventDispatcher
 	// TODO make it as a setter/constructor parameters
 	private Map<Integer, List<EventHandler>> handlersByEventType;
 	private List<EventHandler> anyHandler;
-	private MemoryChannel<Event> eventQueue;
-	private Fiber fiber;
+	private final MemoryChannel<Event> eventQueue;
+	private final Fiber fiber;
 	private volatile boolean isCloseCalled = false;
+	private final Lane<String, ExecutorService> dispatcherLane;
+	
 	/**
 	 * This Map holds event handlers and their corresponding {@link Disposable}
 	 * objects. This way, when a handler is removed, the dispose method can be
@@ -42,21 +45,24 @@ public class JetlangEventDispatcher implements EventDispatcher
 	 */
 	private Map<EventHandler, Disposable> disposableHandlerMap;
 
-	public JetlangEventDispatcher()
+	public JetlangEventDispatcher(MemoryChannel<Event> eventQueue, Fiber fiber, Lane<String, ExecutorService> lane)
 	{
-
+		this.eventQueue = eventQueue;
+		this.fiber = fiber;
+		this.dispatcherLane = lane;
 	}
 
 	public JetlangEventDispatcher(
 			Map<Integer, List<EventHandler>> listenersByEventType,
 			List<EventHandler> anyHandler, MemoryChannel<Event> eventQueue,
-			Fiber fiber)
+			Fiber fiber, Lane<String, ExecutorService> lane)
 	{
 		super();
 		this.handlersByEventType = listenersByEventType;
 		this.anyHandler = anyHandler;
 		this.eventQueue = eventQueue;
 		this.fiber = fiber;
+		this.dispatcherLane = lane;
 	}
 
 	public void initialize()
@@ -64,15 +70,20 @@ public class JetlangEventDispatcher implements EventDispatcher
 		// TODO make the 5 configurable.
 		handlersByEventType = new HashMap<Integer, List<EventHandler>>(4);
 		anyHandler = new CopyOnWriteArrayList<EventHandler>();
-		eventQueue = new MemoryChannel<Event>();
-		fiber = Fibers.pooledFiber();
 		disposableHandlerMap = new HashMap<EventHandler, Disposable>();
 	}
 
 	@Override
 	public void fireEvent(final Event event)
 	{
-		eventQueue.publish(event);
+		if (null != dispatcherLane && dispatcherLane.isOnSameLane(Thread.currentThread().getName()))
+		{
+			dispatchEventOnSameLane(event);
+		}
+		else
+		{
+			eventQueue.publish(event);
+		}
 	}
 
 	@Override
@@ -132,6 +143,7 @@ public class JetlangEventDispatcher implements EventDispatcher
 			throw new IllegalArgumentException(
 					"The incoming handler is not of type ANY");
 		}
+		anyHandler.add(eventHandler);
 		Callback<List<Event>> eventCallback = createEventCallbackForHandler(eventHandler);
 		BatchSubscriber<Event> batchEventSubscriber = new BatchSubscriber<Event>(
 				fiber, eventCallback, 0, TimeUnit.MILLISECONDS);
@@ -154,6 +166,28 @@ public class JetlangEventDispatcher implements EventDispatcher
 			}
 		};
 		return eventCallback;
+	}
+	
+	protected void dispatchEventOnSameLane(Event event)
+	{
+		for (EventHandler handler : anyHandler)
+		{
+			handler.onEvent(event);
+		}
+
+		// retrieval is not thread safe, but since we are not setting it to
+		// null
+		// anywhere it should be fine.
+		List<EventHandler> handlers = handlersByEventType.get(event
+				.getType());
+		// Iteration is thread safe since we use copy on write.
+		if (null != handlers)
+		{
+			for (EventHandler handler : handlers)
+			{
+				handler.onEvent(event);
+			}
+		}
 	}
 
 	@Override
@@ -306,19 +340,9 @@ public class JetlangEventDispatcher implements EventDispatcher
 		return eventQueue;
 	}
 
-	public void setEventQueue(MemoryChannel<Event> eventQueue)
-	{
-		this.eventQueue = eventQueue;
-	}
-
 	public Fiber getFiber()
 	{
 		return fiber;
-	}
-
-	public void setFiber(Fiber fiber)
-	{
-		this.fiber = fiber;
 	}
 
 	public Map<EventHandler, Disposable> getDisposableHandlerMap()
