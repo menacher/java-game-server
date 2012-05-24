@@ -9,6 +9,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.menacheri.jetserver.app.GameRoom;
 
+/**
+ * A session choosing a Lane can be done based on a strategy. The enumeration
+ * already has 2 default implementations. Users can implement their own
+ * sophisticated ones based on usecase.
+ * 
+ * @author Abraham Menacherry
+ * 
+ * @param <LANE_ID_TYPE>
+ * @param <UNDERLYING_LANE>
+ * @param <GROUP>
+ */
 public interface LaneStrategy<LANE_ID_TYPE, UNDERLYING_LANE, GROUP>
 {
 	Lane<LANE_ID_TYPE, UNDERLYING_LANE> chooseLane(GROUP group);
@@ -44,8 +55,6 @@ public interface LaneStrategy<LANE_ID_TYPE, UNDERLYING_LANE, GROUP>
 		 * that if there are some GameRooms with huge number of sessions and
 		 * some with few, possibility of uneven load on multiple CPU cores is
 		 * possible.
-		 * 
-		 * @author Abraham Menacherry
 		 * 
 		 */
 		GROUP_BY_ROOM
