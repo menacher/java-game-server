@@ -1,8 +1,8 @@
 package org.menacheri.jetserver.concurrent;
 
-public interface Lane<I,T>
+public interface Lane<ID_TYPE,UNDERLYING_LANE>
 {
-	boolean isOnSameLane(I currentLane);
-	I getId();
-	T getUnderlyingLane();
+	boolean isOnSameLane(ID_TYPE currentLane);
+	ID_TYPE getId();
+	UNDERLYING_LANE getUnderlyingLane();
 }
