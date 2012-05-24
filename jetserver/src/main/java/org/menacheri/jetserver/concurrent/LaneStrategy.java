@@ -1,32 +1,33 @@
 package org.menacheri.jetserver.concurrent;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.menacheri.jetserver.app.GameRoom;
 
-public interface LaneStrategy
+public interface LaneStrategy<LANE_ID_TYPE, UNDERLYING_LANE, GROUP>
 {
-	<I, T, O> Lane<I, T> chooseLane(O group);
+	Lane<LANE_ID_TYPE, UNDERLYING_LANE> chooseLane(GROUP group);
 
-	public enum LaneStrategies implements LaneStrategy
+	public enum LaneStrategies implements
+			LaneStrategy<String, ExecutorService, GameRoom>
 	{
 
 		ROUND_ROBIN
 		{
 			final AtomicInteger currentLane = new AtomicInteger(0);
-
-			@SuppressWarnings("unchecked")
+			final int laneSize = lanes.size();
+			
 			@Override
-			public Lane<String, ExecutorService> chooseLane(Object group)
+			public Lane<String, ExecutorService> chooseLane(GameRoom group)
 			{
 				synchronized (currentLane)
 				{
-					if (currentLane.get() == lanes.size())
+					if (currentLane.get() == laneSize)
 					{
 						currentLane.set(0);
 					}
@@ -34,36 +35,89 @@ public interface LaneStrategy
 				return lanes.get(currentLane.getAndIncrement());
 			}
 		},
-		GAME_ROOM
+		/**
+		 * This Strategy groups sessions by GameRoom on a lane. Each time a
+		 * session is added, it will check for the session's game room and
+		 * return back the lane on which the GameRoom is operating. This way all
+		 * sessions will be running on the same thread and inter-session
+		 * messaging will be fast synchronous message calls. The disadvantage is
+		 * that if there are some GameRooms with huge number of sessions and
+		 * some with few, possibility of uneven load on multiple CPU cores is
+		 * possible.
+		 * 
+		 * @author Abraham Menacherry
+		 * 
+		 */
+		GROUP_BY_ROOM
 		{
-			@SuppressWarnings("rawtypes")
-			Map laneRoomMap = new HashMap();
+			private final ConcurrentMap<GameRoom, Lane<String, ExecutorService>> roomLaneMap = new ConcurrentHashMap<GameRoom, Lane<String, ExecutorService>>();
+			private final ConcurrentMap<Lane<String, ExecutorService>, AtomicInteger> laneSessionCounter = new ConcurrentHashMap<Lane<String, ExecutorService>, AtomicInteger>();
 
-			@SuppressWarnings({ "hiding", "unchecked" })
 			@Override
-			public <String, ExecutorService, GameRoom> Lane<String, ExecutorService> chooseLane(
-					GameRoom group)
+			public Lane<String, ExecutorService> chooseLane(GameRoom room)
 			{
-				synchronized (laneRoomMap)
+				Lane<String, ExecutorService> lane = roomLaneMap.get(room);
+				if (null == lane)
 				{
-					if (laneRoomMap.isEmpty())
+					synchronized (laneSessionCounter)
 					{
-						for (@SuppressWarnings("rawtypes")
-						Lane lane : lanes)
+						if (laneSessionCounter.isEmpty())
 						{
-							List<GameRoom> roomList = new ArrayList<GameRoom>();
-							laneRoomMap.put(lane, roomList);
+							for (Lane<String, ExecutorService> theLane : lanes)
+							{
+								laneSessionCounter.put(theLane,
+										new AtomicInteger(0));
+							}
 						}
+						Set<Lane<String, ExecutorService>> laneSet = laneSessionCounter
+								.keySet();
+						int min = 0;
+						for (Lane<String, ExecutorService> theLane : laneSet)
+						{
+							AtomicInteger counter = laneSessionCounter
+									.get(theLane);
+							int numOfSessions = counter.get();
+							// if numOfSessions is 0, then this lane/thread/core
+							// is not tagged to a gameroom and it can be used.
+							if (numOfSessions == 0)
+							{
+								lane = theLane;
+								break;
+							}
+							else
+							{
+								// reset min for first time.
+								if (min == 0)
+								{
+									min = numOfSessions;
+									lane = theLane;
+								}
+								// If numOfSessions is less than min then
+								// replace min with that value, also set the
+								// lane.
+								if (numOfSessions < min)
+								{
+									min = numOfSessions;
+									lane = theLane;
+								}
+							}
+						}
+						
+						roomLaneMap.put(room, lane);
 					}
 				}
-
-				return null;
+				// A new session has chosen the lane, hence the session counter
+				// needs to be incremented.
+				laneSessionCounter.get(lane).incrementAndGet();
+				// TODO how to reduce count on session close?
+				return lane;
 			}
-
+			
 		};
 
 		final List<Lane<String, ExecutorService>> lanes = Lanes.LANES
 				.getJetLanes();
 	}
-
+	
+	
 }
