@@ -1,14 +1,19 @@
 package org.menacheri.jetserver.app.impl;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
 
 import org.menacheri.jetserver.app.Game;
 import org.menacheri.jetserver.app.GameRoom;
 import org.menacheri.jetserver.app.PlayerSession;
 import org.menacheri.jetserver.app.Session;
+import org.menacheri.jetserver.concurrent.LaneStrategy;
+import org.menacheri.jetserver.concurrent.LaneStrategy.LaneStrategies;
 import org.menacheri.jetserver.event.EventHandler;
 import org.menacheri.jetserver.event.NetworkEvent;
+import org.menacheri.jetserver.event.impl.EventDispatchers;
 import org.menacheri.jetserver.event.impl.NetworkEventListener;
 import org.menacheri.jetserver.protocols.Protocol;
 import org.menacheri.jetserver.service.GameStateManagerService;
@@ -51,22 +56,41 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
 		this.parentGame = gameRoomSessionBuilder.parentGame;
 		this.gameRoomName = gameRoomSessionBuilder.gameRoomName;
 		this.protocol = gameRoomSessionBuilder.protocol;
+		if(null == gameRoomSessionBuilder.eventDispatcher)
+		{
+			this.eventDispatcher = EventDispatchers.newJetlangEventDispatcher(
+					this, gameRoomSessionBuilder.laneStrategy);
+		}
 	}
 	
 	public static class GameRoomSessionBuilder extends SessionBuilder
 	{
-		private Set<PlayerSession> sessions;
-		private Game parentGame;
-		private String gameRoomName;
-		private Protocol protocol;
+		protected Set<PlayerSession> sessions;
+		protected Game parentGame;
+		protected String gameRoomName;
+		protected Protocol protocol;
+		protected LaneStrategy<String, ExecutorService, GameRoom> laneStrategy;
 		
 		@Override
 		protected void validateAndSetValues()
 		{
-			super.validateAndSetValues();// Mandatory call
-			if(null == sessions){
+			if (null == id)
+			{
+				id = String.valueOf(SESSION_ID.incrementAndGet());
+			}
+			if(null == sessionAttributes)
+			{
+				sessionAttributes = new HashMap<String, Object>();
+			}
+			if (null == sessions)
+			{
 				sessions = new HashSet<PlayerSession>();
 			}
+			if (null == laneStrategy)
+			{
+				laneStrategy = LaneStrategies.GROUP_BY_ROOM;
+			}
+			creationTime = System.currentTimeMillis();
 		}
 		
 		public GameRoomSessionBuilder sessions(Set<PlayerSession> sessions)
@@ -90,6 +114,13 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
 		public GameRoomSessionBuilder protocol(Protocol protocol)
 		{
 			this.protocol = protocol;
+			return this;
+		}
+		
+		public GameRoomSessionBuilder laneStrategy(
+				LaneStrategy<String, ExecutorService, GameRoom> laneStrategy)
+		{
+			this.laneStrategy = laneStrategy;
 			return this;
 		}
 	}
