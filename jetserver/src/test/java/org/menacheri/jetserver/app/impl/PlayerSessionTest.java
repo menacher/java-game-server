@@ -31,7 +31,7 @@ public class PlayerSessionTest
 	private static final AtomicLong COUNTER = new AtomicLong(0l);
 	private static final int NUM_OF_GAME_ROOMS = 1000;
 	private static final int SESSIONS_PER_GAME_ROOM = 50;
-	private static final int EVENTS_PER_SESSION = 1;
+	private static final int EVENTS_PER_SESSION = 10;
 	private static final int LATCH_COUNT = ((NUM_OF_GAME_ROOMS * SESSIONS_PER_GAME_ROOM) * (EVENTS_PER_SESSION * SESSIONS_PER_GAME_ROOM))
 			+ (EVENTS_PER_SESSION * SESSIONS_PER_GAME_ROOM * NUM_OF_GAME_ROOMS);
 	private static final CountDownLatch LATCH = new CountDownLatch(LATCH_COUNT);
