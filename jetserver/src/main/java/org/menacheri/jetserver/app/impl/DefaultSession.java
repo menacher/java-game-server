@@ -30,11 +30,11 @@ public class DefaultSession implements Session
 	/**
 	 * session id
 	 */
-	protected final String id;
+	protected final Object id;
 	/**
 	 * event dispatcher
 	 */
-	protected final EventDispatcher eventDispatcher;
+	protected EventDispatcher eventDispatcher;
 
 	/**
 	 * session parameters
@@ -93,16 +93,16 @@ public class DefaultSession implements Session
 		/**
 		 * Used to set a unique id on the incoming sessions to this room.
 		 */
-		private static final AtomicInteger SESSION_ID = new AtomicInteger(0);
-		private String id = null;
-		private EventDispatcher eventDispatcher = null;
-		private Map<String, Object> sessionAttributes = null;
-		private long creationTime = 0l;
-		private long lastReadWriteTime = 0l;
-		private Status status = Status.NOT_CONNECTED;
-		private boolean isWriteable = true;
-		private volatile boolean isShuttingDown = false;
-		private boolean isUDPEnabled = false;// By default UDP is not enabled.
+		protected static final AtomicInteger SESSION_ID = new AtomicInteger(0);
+		protected Object id = null;
+		protected EventDispatcher eventDispatcher = null;
+		protected Map<String, Object> sessionAttributes = null;
+		protected long creationTime = 0l;
+		protected long lastReadWriteTime = 0l;
+		protected Status status = Status.NOT_CONNECTED;
+		protected boolean isWriteable = true;
+		protected volatile boolean isShuttingDown = false;
+		protected boolean isUDPEnabled = false;// By default UDP is not enabled.
 		
 		public Session build()
 		{
@@ -123,7 +123,7 @@ public class DefaultSession implements Session
 			}
 			if (null == eventDispatcher)
 			{
-				eventDispatcher = EventDispatchers.newJetlangEventDispatcher();
+				eventDispatcher = EventDispatchers.newJetlangEventDispatcher(null,null);
 			}
 			if(null == sessionAttributes)
 			{
@@ -132,7 +132,7 @@ public class DefaultSession implements Session
 			creationTime = System.currentTimeMillis();
 		}
 		
-		public String getId()
+		public Object getId()
 		{
 			return id;
 		}
