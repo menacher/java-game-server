@@ -31,29 +31,6 @@ public interface Session
 
 	void removeAttribute(String key);
 
-	/**
-     * Set connect parameter
-     *
-     * @param key
-     * @param object
-     */
-    public void setConnectParameter( String key, Object object );
-
-    /**
-     * Remove connect parameter
-     *
-     * @param key
-     */
-    public void removeConnectParameter( String key );
-    
-    /**
-     * Get connect parameter
-     *
-     * @param key
-     * @return connect parameter
-     */
-    public Object getConnectParameter( String key );
-    
 	void onEvent(Event event);
 
 	EventDispatcher getEventDispatcher();

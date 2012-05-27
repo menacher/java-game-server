@@ -16,14 +16,14 @@ import org.menacheri.jetserver.app.GameRoom;
 import org.menacheri.jetserver.app.Player;
 import org.menacheri.jetserver.app.PlayerSession;
 import org.menacheri.jetserver.communication.NettyTCPMessageSender;
-import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.Event;
+import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.server.netty.AbstractNettyServer;
 import org.menacheri.jetserver.service.LookupService;
 import org.menacheri.jetserver.service.SessionRegistryService;
-import org.menacheri.jetserver.util.SimpleCredentials;
 import org.menacheri.jetserver.util.Credentials;
 import org.menacheri.jetserver.util.NettyUtils;
+import org.menacheri.jetserver.util.SimpleCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -119,8 +119,6 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 		if(null != gameRoom)
 		{
 			PlayerSession playerSession = gameRoom.createPlayerSession();
-			playerSession.setConnectParameter(NettyUtils.NETTY_CHANNEL,
-					channel); // TODO is this required?
 			gameRoom.onLogin(playerSession);
 			LOG.trace("Sending GAME_ROOM_JOIN_SUCCESS to channel {}", channel.getId());
 			ChannelFuture future = channel.write(NettyUtils.createBufferForOpcode(Events.GAME_ROOM_JOIN_SUCCESS));
@@ -151,10 +149,13 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 					LOG.trace("Going to clear pipeline");
 					// Clear the existing pipeline
 					NettyUtils.clearPipeline(channel.getPipeline());
+					// Set the tcp channel on the session. 
+					NettyTCPMessageSender sender = new NettyTCPMessageSender(channel);
+					playerSession.setTcpSender(sender);
 					// Connect the pipeline to the game room.
 					gameRoom.connectSession(playerSession);
-					// Send the connect event to session so that it can create its message sender
-					playerSession.onEvent(Events.connectEvent(new NettyTCPMessageSender(channel)));
+					// Send the connect event so that it will in turn send the START event.
+					playerSession.onEvent(Events.connectEvent(sender));
 				}
 				else
 				{
