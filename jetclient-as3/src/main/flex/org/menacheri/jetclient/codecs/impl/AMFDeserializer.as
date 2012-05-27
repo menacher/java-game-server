@@ -22,6 +22,10 @@
 		{
 			var bytes:ByteArray = input as ByteArray;
 			var eventType:int = bytes.readByte();
+			if (eventType == Events.NETWORK_MESSAGE) 
+			{
+				eventType = Events.SESSION_MESSAGE;
+			}
 			return Events.event(eventType, bytes.readObject());
 		}
 		

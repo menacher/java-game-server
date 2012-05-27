@@ -10,7 +10,6 @@ import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.handler.codec.string.StringDecoder;
 import org.jboss.netty.handler.codec.string.StringEncoder;
 import org.menacheri.jetserver.app.PlayerSession;
-import org.menacheri.jetserver.app.Session;
 import org.menacheri.jetserver.communication.NettyTCPMessageSender;
 import org.menacheri.jetserver.convert.Transform;
 import org.slf4j.Logger;
@@ -41,20 +40,7 @@ public class NettyUtils
 	public static ChannelPipeline getPipeLineOfConnection(
 			PlayerSession playerSession)
 	{
-		Channel channel = (Channel)playerSession.getConnectParameter(NETTY_CHANNEL);
-		if(null != channel)
-		{
-			return channel.getPipeline();
-		}
-		else
-		{
-			return null;
-		}
-	}
-	
-	public static Channel getChannelOfSession(Session session)
-	{
-		return (Channel)session.getConnectParameter(NETTY_CHANNEL);
+		return getPipeLineOfConnection((NettyTCPMessageSender)playerSession.getTcpSender());
 	}
 	
 	/**

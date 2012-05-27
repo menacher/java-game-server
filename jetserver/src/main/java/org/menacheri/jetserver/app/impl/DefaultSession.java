@@ -3,15 +3,15 @@ package org.menacheri.jetserver.app.impl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jboss.netty.channel.Channel;
 import org.menacheri.jetserver.app.Session;
 import org.menacheri.jetserver.communication.MessageSender.Fast;
 import org.menacheri.jetserver.communication.MessageSender.Reliable;
-import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.event.EventDispatcher;
 import org.menacheri.jetserver.event.EventHandler;
+import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.impl.EventDispatchers;
 
 
@@ -30,11 +30,11 @@ public class DefaultSession implements Session
 	/**
 	 * session id
 	 */
-	protected final String id;
+	protected final Object id;
 	/**
 	 * event dispatcher
 	 */
-	protected final EventDispatcher eventDispatcher;
+	protected EventDispatcher eventDispatcher;
 
 	/**
 	 * session parameters
@@ -57,8 +57,6 @@ public class DefaultSession implements Session
 	
 	protected boolean isUDPEnabled;
 	
-	protected final Map<String, Object> connectParameters;
-
 	protected Reliable tcpSender = null;
 	
 	protected Fast udpSender = null;
@@ -78,7 +76,6 @@ public class DefaultSession implements Session
 		this.isWriteable = sessionBuilder.isWriteable;
 		this.isShuttingDown = sessionBuilder.isShuttingDown;
 		this.isUDPEnabled = sessionBuilder.isUDPEnabled;
-		this.connectParameters = sessionBuilder.connectParameters;
 	}
 	
 	/**
@@ -93,16 +90,19 @@ public class DefaultSession implements Session
 	 */
 	public static class SessionBuilder
 	{
-		private String id = null;
-		private EventDispatcher eventDispatcher = null;
-		private Map<String, Object> sessionAttributes = null;
-		private long creationTime = 0l;
-		private long lastReadWriteTime = 0l;
-		private Status status = Status.NOT_CONNECTED;
-		private boolean isWriteable = true;
-		private volatile boolean isShuttingDown = false;
-		private boolean isUDPEnabled = false;// By default UDP is not enabled.
-		private Map<String, Object> connectParameters = null;
+		/**
+		 * Used to set a unique id on the incoming sessions to this room.
+		 */
+		protected static final AtomicInteger SESSION_ID = new AtomicInteger(0);
+		protected Object id = null;
+		protected EventDispatcher eventDispatcher = null;
+		protected Map<String, Object> sessionAttributes = null;
+		protected long creationTime = 0l;
+		protected long lastReadWriteTime = 0l;
+		protected Status status = Status.NOT_CONNECTED;
+		protected boolean isWriteable = true;
+		protected volatile boolean isShuttingDown = false;
+		protected boolean isUDPEnabled = false;// By default UDP is not enabled.
 		
 		public Session build()
 		{
@@ -117,22 +117,22 @@ public class DefaultSession implements Session
 		 * super.validateAndSetValues(), otherwise you could get runtime NPE's.
 		 */
 		protected void validateAndSetValues(){
+			if (null == id)
+			{
+				id = String.valueOf(SESSION_ID.incrementAndGet());
+			}
 			if (null == eventDispatcher)
 			{
-				eventDispatcher = EventDispatchers.newJetlangEventDispatcher();
+				eventDispatcher = EventDispatchers.newJetlangEventDispatcher(null,null);
 			}
 			if(null == sessionAttributes)
 			{
 				sessionAttributes = new HashMap<String, Object>();
 			}
-			if(null == connectParameters)
-			{
-				connectParameters = new HashMap<String, Object>();
-			}
 			creationTime = System.currentTimeMillis();
 		}
 		
-		public String getId()
+		public Object getId()
 		{
 			return id;
 		}
@@ -179,11 +179,6 @@ public class DefaultSession implements Session
 		public SessionBuilder isUDPEnabled(boolean isUDPEnabled)
 		{
 			this.isUDPEnabled = isUDPEnabled;
-			return this;
-		}
-		public SessionBuilder connectParameters(Map<String, Object> connectParameters)
-		{
-			this.connectParameters = connectParameters;
 			return this;
 		}
 		
@@ -253,41 +248,6 @@ public class DefaultSession implements Session
 		sessionAttributes.put(key, value);
 		Event event = Events.changeAttributeEvent(key, value);
 		eventDispatcher.fireEvent(event);
-	}
-
-	/**
-	 * Get connect parameter
-	 * 
-	 * @param key
-	 *            Find out a connect parameter for the this key.
-	 * @return connect parameter
-	 */
-	public Object getConnectParameter(String key) {
-		return this.connectParameters.get(key);
-	}
-
-	/**
-	 * Set connect parameter
-	 * 
-	 * @param key
-	 *            The key to be set. It should be a string.
-	 * @param object
-	 *            . The connection object to be set. If using a Netty
-	 *            implementation, it would be {@link Channel}
-	 */
-	public void setConnectParameter(String key, Object object) {
-		this.connectParameters.put(key, object);
-	}
-
-	/**
-	 * Remove connect parameter
-	 * 
-	 * @param key
-	 *            The connect parameter to be removed based on the key.
-	 */
-	public void removeConnectParameter(String key)
-	{
-		this.connectParameters.remove(key);
 	}
 
 	@Override
@@ -381,11 +341,6 @@ public class DefaultSession implements Session
 	public Map<String, Object> getSessionAttributes()
 	{
 		return sessionAttributes;
-	}
-
-	public Map<String, Object> getConnectParameters()
-	{
-		return connectParameters;
 	}
 
 	@Override

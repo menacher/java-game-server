@@ -4,9 +4,10 @@ import org.jetlang.channels.MemoryChannel;
 import org.menacheri.jetserver.app.GameRoom;
 import org.menacheri.jetserver.app.Player;
 import org.menacheri.jetserver.app.PlayerSession;
+import org.menacheri.jetserver.concurrent.LaneStrategy.LaneStrategies;
 import org.menacheri.jetserver.event.EventDispatcher;
+import org.menacheri.jetserver.event.impl.EventDispatchers;
 import org.menacheri.jetserver.protocols.Protocol;
-
 
 /**
  * This implementation of the {@link PlayerSession} interface is used to both
@@ -19,7 +20,8 @@ import org.menacheri.jetserver.protocols.Protocol;
  * @author Abraham Menacherry
  * 
  */
-public class DefaultPlayerSession extends DefaultSession implements PlayerSession
+public class DefaultPlayerSession extends DefaultSession implements
+		PlayerSession
 {
 
 	/**
@@ -45,23 +47,24 @@ public class DefaultPlayerSession extends DefaultSession implements PlayerSessio
 		this.parentGameRoom = playerSessionBuilder.parentGameRoom;
 		this.protocol = playerSessionBuilder.protocol;
 	}
-	
+
 	public static class PlayerSessionBuilder extends SessionBuilder
 	{
-		private Player player = null;
-		private GameRoom parentGameRoom;
-		private Protocol protocol;
+		protected Player player = null;
+		protected GameRoom parentGameRoom;
+		protected Protocol protocol;
 
 		public PlayerSession build()
 		{
 			return new DefaultPlayerSession(this);
 		}
-		
+
 		public PlayerSessionBuilder player(Player player)
 		{
 			this.player = player;
 			return this;
 		}
+
 		public PlayerSessionBuilder parentGameRoom(GameRoom parentGameRoom)
 		{
 			if (null == parentGameRoom)
@@ -72,13 +75,25 @@ public class DefaultPlayerSession extends DefaultSession implements PlayerSessio
 			this.parentGameRoom = parentGameRoom;
 			return this;
 		}
+
+		@Override
+		protected void validateAndSetValues()
+		{
+			if (null == eventDispatcher)
+			{
+				eventDispatcher = EventDispatchers.newJetlangEventDispatcher(
+						parentGameRoom, LaneStrategies.GROUP_BY_ROOM);
+			}
+			super.validateAndSetValues();
+		}
+
 		public PlayerSessionBuilder protocol(Protocol protocol)
 		{
 			this.protocol = protocol;
 			return this;
 		}
 	}
-	
+
 	@Override
 	public Player getPlayer()
 	{
@@ -110,7 +125,7 @@ public class DefaultPlayerSession extends DefaultSession implements PlayerSessio
 	@Override
 	public void close()
 	{
-		if(!isShuttingDown)
+		if (!isShuttingDown)
 		{
 			super.close();
 			parentGameRoom.disconnectSession(this);
@@ -118,9 +133,10 @@ public class DefaultPlayerSession extends DefaultSession implements PlayerSessio
 	}
 
 	@Override
-	public String toString() {
-		return "PlayerSession [id=" + id + "player=" + player + ", parentGameRoom="
-				+ parentGameRoom + ", protocol=" + protocol  
-				+ ", isShuttingDown=" + isShuttingDown + "]";
+	public String toString()
+	{
+		return "PlayerSession [id=" + id + "player=" + player
+				+ ", parentGameRoom=" + parentGameRoom + ", protocol="
+				+ protocol + ", isShuttingDown=" + isShuttingDown + "]";
 	}
 }

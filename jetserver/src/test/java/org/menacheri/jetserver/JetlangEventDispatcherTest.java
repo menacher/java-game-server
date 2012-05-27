@@ -20,7 +20,7 @@ public class JetlangEventDispatcherTest
 			throws InterruptedException
 	{
 		EventDispatcher dispatcher = EventDispatchers
-				.newJetlangEventDispatcher();
+				.newJetlangEventDispatcher(null,null);
 		final CountDownLatch latch = new CountDownLatch(1);
 		dispatcher.addHandler(new EventHandler()
 		{
@@ -47,7 +47,7 @@ public class JetlangEventDispatcherTest
 	public void eventReceiptOnANYTypeEventHandler() throws InterruptedException
 	{
 		EventDispatcher dispatcher = EventDispatchers
-				.newJetlangEventDispatcher();
+				.newJetlangEventDispatcher(null,null);
 		final CountDownLatch latch = new CountDownLatch(5);
 		dispatcher.addHandler(new EventHandler()
 		{
@@ -84,7 +84,7 @@ public class JetlangEventDispatcherTest
 			throws InterruptedException
 	{
 		EventDispatcher dispatcher = EventDispatchers
-				.newJetlangEventDispatcher();
+				.newJetlangEventDispatcher(null,null);
 		final CountDownLatch latch = new CountDownLatch(1);
 		dispatcher.addHandler(new EventHandler()
 		{
@@ -111,7 +111,7 @@ public class JetlangEventDispatcherTest
 	public void eventPublishingPerformance() throws InterruptedException
 	{
 		EventDispatcher dispatcher = EventDispatchers
-				.newJetlangEventDispatcher();
+				.newJetlangEventDispatcher(null,null);
 		int countOfEvents = 5000000;
 		final CountDownLatch latch = new CountDownLatch(countOfEvents);
 		dispatcher.addHandler(new EventHandler()
