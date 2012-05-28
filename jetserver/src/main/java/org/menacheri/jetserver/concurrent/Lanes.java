@@ -1,17 +1,16 @@
 package org.menacheri.jetserver.concurrent;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadFactory;
 
 public enum Lanes
 {
 	LANES;
-	final String serverCores = System.getProperty("jet.cores");
+	final String serverCores = System.getProperty("jet.lanes");
 	final int numOfCores;
-	final List<Lane<String, ExecutorService>> jetLanes;
+	final Lane<String, ExecutorService>[] jetLanes;
 
+	@SuppressWarnings("unchecked")
 	Lanes()
 	{
 		int cores = 1;
@@ -27,17 +26,17 @@ public enum Lanes
 			}
 		}
 		numOfCores = cores;
-		jetLanes = new ArrayList<Lane<String, ExecutorService>>();
-		ThreadFactory threadFactory = new NamedThreadFactory("Lane");
-		for (int i = 0; i <= cores; i++)
+		jetLanes = new Lane[cores];
+		ThreadFactory threadFactory = new NamedThreadFactory("Lane",true);
+		for (int i = 1; i <= cores; i++)
 		{
-			DefaultLane defaultLane = new DefaultLane("Lane[" + (i + 1) + "]",
+			DefaultLane defaultLane = new DefaultLane("Lane[" + i + "]",
 					ManagedExecutor.newSingleThreadExecutor(threadFactory));
-			jetLanes.add(defaultLane);
+			jetLanes[i - 1] = defaultLane;
 		}
 	}
 
-	public List<Lane<String, ExecutorService>> getJetLanes()
+	public Lane<String, ExecutorService>[] getJetLanes()
 	{
 		return jetLanes;
 	}

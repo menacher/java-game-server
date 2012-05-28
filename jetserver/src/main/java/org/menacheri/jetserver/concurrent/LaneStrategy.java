@@ -1,6 +1,5 @@
 package org.menacheri.jetserver.concurrent;
 
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -12,7 +11,7 @@ import org.menacheri.jetserver.app.GameRoom;
 /**
  * A session choosing a Lane can be done based on a strategy. The enumeration
  * already has 2 default implementations. Users can implement their own
- * sophisticated ones based on usecase.
+ * sophisticated ones based on use case.
  * 
  * @author Abraham Menacherry
  * 
@@ -31,13 +30,13 @@ public interface LaneStrategy<LANE_ID_TYPE, UNDERLYING_LANE, GROUP>
 		ROUND_ROBIN
 		{
 			final AtomicInteger currentLane = new AtomicInteger(0);
-			final int laneSize = lanes.size();
+			final int laneSize = lanes.length;
 			
 			@Override
 			public Lane<String, ExecutorService> chooseLane(GameRoom group)
 			{
 				currentLane.compareAndSet(laneSize, 0);
-				return lanes.get(currentLane.getAndIncrement());
+				return lanes[currentLane.getAndIncrement()];
 			}
 		},
 		/**
@@ -118,7 +117,7 @@ public interface LaneStrategy<LANE_ID_TYPE, UNDERLYING_LANE, GROUP>
 			
 		};
 
-		final List<Lane<String, ExecutorService>> lanes = Lanes.LANES
+		final Lane<String, ExecutorService>[] lanes = Lanes.LANES
 				.getJetLanes();
 	}
 	
