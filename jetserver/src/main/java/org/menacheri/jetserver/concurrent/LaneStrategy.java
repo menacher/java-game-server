@@ -36,13 +36,7 @@ public interface LaneStrategy<LANE_ID_TYPE, UNDERLYING_LANE, GROUP>
 			@Override
 			public Lane<String, ExecutorService> chooseLane(GameRoom group)
 			{
-				synchronized (currentLane)
-				{
-					if (currentLane.get() == laneSize)
-					{
-						currentLane.set(0);
-					}
-				}
+				currentLane.compareAndSet(laneSize, 0);
 				return lanes.get(currentLane.getAndIncrement());
 			}
 		},
