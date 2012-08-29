@@ -1,6 +1,9 @@
 package org.menacheri.jetserver.protocols;
 
+import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.handler.codec.frame.LengthFieldBasedFrameDecoder;
+import org.menacheri.jetserver.app.PlayerSession;
+import org.menacheri.jetserver.util.NettyUtils;
 
 /**
  * This abstract class defines common methods across all protocols. Individual
@@ -34,4 +37,16 @@ public abstract class AbstractNettyProtocol implements Protocol
 		return protocolName;
 	}
 
+	@Override
+	public void applyPortocol(PlayerSession playerSession,
+			boolean clearExistingProtocolHandlers) 
+	{
+		if(clearExistingProtocolHandlers)
+		{
+			ChannelPipeline pipeline = NettyUtils
+					.getPipeLineOfConnection(playerSession);
+			NettyUtils.clearPipeline(pipeline);
+		}
+		applyProtocol(playerSession);
+	}
 }

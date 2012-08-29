@@ -40,4 +40,16 @@ public interface Protocol
 	 *            set.
 	 */
 	public void applyProtocol(PlayerSession playerSession);
+	
+	/**
+	 * This method delegates to the {@link #applyProtocol(PlayerSession)} method
+	 * after clearing the pipeline based on the input flag.
+	 * 
+	 * @param playerSession
+	 * @param clearExistingProtocolHandlers
+	 *            Clears the pipeline of existing protocol handlers if set to
+	 *            true.
+	 */
+	public void applyPortocol(PlayerSession playerSession,
+			boolean clearExistingProtocolHandlers);
 }

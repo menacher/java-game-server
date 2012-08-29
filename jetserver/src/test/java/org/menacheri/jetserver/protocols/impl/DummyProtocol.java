@@ -16,4 +16,10 @@ public class DummyProtocol implements Protocol
 	{
 
 	}
+
+	@Override
+	public void applyPortocol(PlayerSession playerSession,
+			boolean clearExistingProtocolHandlers) {
+		
+	}
 }
