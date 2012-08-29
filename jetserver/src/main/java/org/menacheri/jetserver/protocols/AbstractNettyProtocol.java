@@ -38,7 +38,7 @@ public abstract class AbstractNettyProtocol implements Protocol
 	}
 
 	@Override
-	public void applyPortocol(PlayerSession playerSession,
+	public void applyProtocol(PlayerSession playerSession,
 			boolean clearExistingProtocolHandlers) 
 	{
 		if(clearExistingProtocolHandlers)

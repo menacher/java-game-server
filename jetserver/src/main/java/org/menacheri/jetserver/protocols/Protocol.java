@@ -50,6 +50,6 @@ public interface Protocol
 	 *            Clears the pipeline of existing protocol handlers if set to
 	 *            true.
 	 */
-	public void applyPortocol(PlayerSession playerSession,
+	public void applyProtocol(PlayerSession playerSession,
 			boolean clearExistingProtocolHandlers);
 }
