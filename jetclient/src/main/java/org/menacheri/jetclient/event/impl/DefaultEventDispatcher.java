@@ -146,6 +146,19 @@ public class DefaultEventDispatcher implements EventDispatcher
 	}
 
 	@Override
+	public synchronized void clear()
+	{
+		if(null != handlersByEventType)
+		{
+			handlersByEventType.clear();
+		}
+		if(null != genericHandlers)
+		{
+			genericHandlers.clear();
+		}
+	}
+	
+	@Override
 	public void fireEvent(Event event)
 	{
 		boolean isShuttingDown = false;

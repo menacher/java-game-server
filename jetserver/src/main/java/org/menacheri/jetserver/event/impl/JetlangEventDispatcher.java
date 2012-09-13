@@ -282,6 +282,20 @@ public class JetlangEventDispatcher implements EventDispatcher
 		return (removeList.size() > 0);
 	}
 
+	@Override
+	public synchronized void clear()
+	{
+		LOG.trace("Going to clear handlers on dispatcher {}", this);
+		if(null != handlersByEventType)
+		{
+			handlersByEventType.clear();
+		}
+		if(null != anyHandler)
+		{
+			anyHandler.clear();
+		}
+	}
+	
 	protected List<EventHandler> getHandlersToRemoveForSession(
 			List<EventHandler> handlerList, Session session)
 	{

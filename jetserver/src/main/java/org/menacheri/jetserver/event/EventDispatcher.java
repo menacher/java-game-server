@@ -53,6 +53,14 @@ public interface EventDispatcher
 	 * @return Returns true if all handlers were successfully removed.
 	 */
 	boolean removeHandlersForSession(Session session);
+	
+	/**
+	 * Clears all handles associated with this dispatcher and returns the number
+	 * of handlers cleared.
+	 * 
+	 * @return
+	 */
+	void clear();
     
     /**
      * Fires event in asynchronous mode
