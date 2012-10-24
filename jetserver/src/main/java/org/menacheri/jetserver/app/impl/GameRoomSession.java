@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 
 import org.menacheri.jetserver.app.Game;
 import org.menacheri.jetserver.app.GameRoom;
+import org.menacheri.jetserver.app.Player;
 import org.menacheri.jetserver.app.PlayerSession;
 import org.menacheri.jetserver.app.Session;
 import org.menacheri.jetserver.concurrent.LaneStrategy;
@@ -126,9 +127,9 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
 	}
 	
 	@Override
-	public PlayerSession createPlayerSession()
+	public PlayerSession createPlayerSession(Player player)
 	{
-		PlayerSession playerSession = getSessionInstance();
+		PlayerSession playerSession = getSessionInstance(player);
 		return playerSession;
 	}
 	
@@ -143,9 +144,8 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
 			playerSession.setStatus(Session.Status.CONNECTING);
 			sessions.add(playerSession);
 			LOG.trace("Protocol to be applied is: {}",protocol.getClass().getName());
-			protocol.applyProtocol(playerSession,true);
+			protocol.applyProtocol(playerSession);
 			createAndAddEventHandlers(playerSession);
-			playerSession.setGameRoom(this);
 			playerSession.setStatus(Session.Status.CONNECTED);
 			afterSessionConnect(playerSession);
 			return true;
@@ -187,9 +187,9 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
 		}
 	}
 	
-	public PlayerSession getSessionInstance()
+	public PlayerSession getSessionInstance(Player player)
 	{
-		PlayerSession playerSession = Sessions.newPlayerSession(this);
+		PlayerSession playerSession = Sessions.newPlayerSession(this,player);
 		return playerSession;
 	}
 	

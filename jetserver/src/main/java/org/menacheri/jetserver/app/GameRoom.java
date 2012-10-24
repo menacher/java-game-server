@@ -30,7 +30,7 @@ public interface GameRoom
 	 * 
 	 * @return The game specific implementation of the player session.
 	 */
-	public PlayerSession createPlayerSession();
+	public PlayerSession createPlayerSession(Player player);
 	
 	/**
 	 * Method called after the session is created. Can be used to add

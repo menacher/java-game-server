@@ -118,7 +118,7 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 		GameRoom gameRoom = lookupService.gameRoomLookup(refKey);
 		if(null != gameRoom)
 		{
-			PlayerSession playerSession = gameRoom.createPlayerSession();
+			PlayerSession playerSession = gameRoom.createPlayerSession(player);
 			gameRoom.onLogin(playerSession);
 			LOG.trace("Sending GAME_ROOM_JOIN_SUCCESS to channel {}", channel.getId());
 			ChannelFuture future = channel.write(NettyUtils.createBufferForOpcode(Events.GAME_ROOM_JOIN_SUCCESS));

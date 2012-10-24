@@ -1,6 +1,7 @@
 package org.menacheri.jetserver.app.impl;
 
 import org.menacheri.jetserver.app.GameRoom;
+import org.menacheri.jetserver.app.Player;
 import org.menacheri.jetserver.app.PlayerSession;
 import org.menacheri.jetserver.app.Session;
 import org.menacheri.jetserver.app.impl.DefaultPlayerSession.PlayerSessionBuilder;
@@ -23,10 +24,10 @@ public class Sessions
 		return new SessionBuilder().build();
 	}
 	
-	public static PlayerSession newPlayerSession(GameRoom gameRoom)
+	public static PlayerSession newPlayerSession(GameRoom gameRoom, Player player)
 	{
 		// TODO the player has to be set here after doing lookup.
-		return new PlayerSessionBuilder().parentGameRoom(gameRoom).build();
+		return new PlayerSessionBuilder().parentGameRoom(gameRoom).player(player).build();
 	}
 
 }

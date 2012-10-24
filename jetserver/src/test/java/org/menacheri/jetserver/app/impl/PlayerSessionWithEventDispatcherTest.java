@@ -61,7 +61,7 @@ public class PlayerSessionWithEventDispatcherTest
 		{
 			for (int j = 1; j <= SESSIONS_PER_GAME_ROOM; j++)
 			{
-				PlayerSession playerSession = gameRoom.createPlayerSession();
+				PlayerSession playerSession = gameRoom.createPlayerSession(null);
 				gameRoom.connectSession(playerSession);
 				playerSession.addHandler(new SessionHandler(playerSession));
 				sessionList.add(playerSession);
