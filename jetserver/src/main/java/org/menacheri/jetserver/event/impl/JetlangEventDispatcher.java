@@ -216,11 +216,6 @@ public class JetlangEventDispatcher implements EventDispatcher
 				if (null != listeners)
 				{
 					listeners.remove(eventHandler);
-					// Remove the reference if there are no listeners left.
-					if (listeners.size() == 0)
-					{
-						handlersByEventType.put(eventType, null);
-					}
 				}
 			}
 		}
@@ -233,6 +228,7 @@ public class JetlangEventDispatcher implements EventDispatcher
 		if (null != disposable)
 		{
 			disposable.dispose();
+			disposableHandlerMap.remove(eventHandler);
 		}
 	}
 
@@ -262,7 +258,7 @@ public class JetlangEventDispatcher implements EventDispatcher
 	public synchronized boolean removeHandlersForSession(Session session)
 	{
 		LOG.trace("Entered removeHandlersForSession for session {}", session);
-		List<EventHandler> removeList = null;
+		List<EventHandler> removeList = new ArrayList<EventHandler>();
 		
 		Collection<List<EventHandler>> eventHandlersList = new ArrayList<List<EventHandler>>(
 				handlersByEventType.values());
@@ -270,7 +266,7 @@ public class JetlangEventDispatcher implements EventDispatcher
 		
 		for (List<EventHandler> handlerList : eventHandlersList)
 		{
-			removeList = getHandlersToRemoveForSession(handlerList,session);
+			removeList.addAll(getHandlersToRemoveForSession(handlerList,session));
 		}
 		
 		LOG.trace("Going to remove {} handlers for session: {}",
@@ -294,6 +290,13 @@ public class JetlangEventDispatcher implements EventDispatcher
 		{
 			anyHandler.clear();
 		}
+		// Iterate through the list of disposables and dispose each one.
+		Collection<Disposable> disposables = disposableHandlerMap.values();
+		for (Disposable disposable : disposables)
+		{
+			disposable.dispose();
+		}
+		disposables.clear();
 	}
 	
 	protected List<EventHandler> getHandlersToRemoveForSession(
