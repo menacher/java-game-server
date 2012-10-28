@@ -32,9 +32,12 @@ public class NettyUtils
 	public static ChannelPipeline getPipeLineOfConnection(
 			NettyTCPMessageSender messageSender)
 	{
-		Channel channel = messageSender.getChannel();
-		ChannelPipeline pipeline = channel.getPipeline();
-		return pipeline;
+		if(null != messageSender){
+	        Channel channel = messageSender.getChannel();
+	        ChannelPipeline pipeline = channel.getPipeline();
+	        return pipeline;
+	    }
+	    return null;
 	}
 	
 	public static ChannelPipeline getPipeLineOfConnection(
@@ -50,6 +53,9 @@ public class NettyUtils
 	 */
 	public static void clearPipeline(ChannelPipeline pipeline)
 	{
+		if(null == pipeline){
+			return;
+		}
 		try
 		{
 			int counter = 0;
