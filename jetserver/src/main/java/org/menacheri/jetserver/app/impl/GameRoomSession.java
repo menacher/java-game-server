@@ -168,6 +168,7 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
 	public synchronized boolean disconnectSession(PlayerSession playerSession)
 	{
 		final boolean removeHandlers = this.eventDispatcher.removeHandlersForSession(playerSession);
+		playerSession.getEventDispatcher().clear(); // remove network handlers of the session.
 		return (removeHandlers && sessions.remove(playerSession));
 	}
 
