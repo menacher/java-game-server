@@ -362,7 +362,7 @@ public class DefaultSession implements Session
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		DefaultPlayerSession other = (DefaultPlayerSession) obj;
+		DefaultSession other = (DefaultSession) obj;
 		if (id == null)
 		{
 			if (other.id != null)
