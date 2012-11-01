@@ -145,7 +145,7 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
 			sessions.add(playerSession);
 			playerSession.setGameRoom(this);
 			LOG.trace("Protocol to be applied is: {}",protocol.getClass().getName());
-			protocol.applyProtocol(playerSession);
+			protocol.applyProtocol(playerSession,true);
 			createAndAddEventHandlers(playerSession);
 			playerSession.setStatus(Session.Status.CONNECTED);
 			afterSessionConnect(playerSession);

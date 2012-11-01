@@ -73,7 +73,6 @@ public class AMF3Protocol extends AbstractNettyProtocol
 		ChannelPipeline pipeline = NettyUtils
 				.getPipeLineOfConnection(playerSession);
 
-		NettyUtils.clearPipeline(pipeline);
 		// Upstream handlers or encoders (i.e towards server) are added to
 		// pipeline now.
 		pipeline.addLast("lengthDecoder", createLengthBasedFrameDecoder());
