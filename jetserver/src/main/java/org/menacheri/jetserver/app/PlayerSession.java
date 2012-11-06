@@ -1,5 +1,6 @@
 package org.menacheri.jetserver.app;
 
+import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.protocols.Protocol;
 
 
@@ -54,4 +55,13 @@ public interface PlayerSession extends Session
 	 *            The {@link Protocol} to set.
 	 */
 	public void setProtocol(Protocol protocol);
+	
+	/**
+	 * The event to be send to the {@link GameRoom} to which the PlayerSession
+	 * belongs. Behavior is unspecified if message is sent when a room change is
+	 * taking place.
+	 * 
+	 * @param event The event to send to the {@link GameRoom}
+	 */
+	public void sendToGameRoom(Event event);
 }

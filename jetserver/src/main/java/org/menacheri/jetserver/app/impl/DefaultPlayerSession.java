@@ -5,6 +5,7 @@ import org.menacheri.jetserver.app.GameRoom;
 import org.menacheri.jetserver.app.Player;
 import org.menacheri.jetserver.app.PlayerSession;
 import org.menacheri.jetserver.concurrent.LaneStrategy.LaneStrategies;
+import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.event.EventDispatcher;
 import org.menacheri.jetserver.event.impl.EventDispatchers;
 import org.menacheri.jetserver.protocols.Protocol;
@@ -132,6 +133,11 @@ public class DefaultPlayerSession extends DefaultSession implements
 		}
 	}
 
+	@Override
+	public void sendToGameRoom(Event event) {
+		parentGameRoom.send(event);
+	}
+	
 	@Override
 	public String toString()
 	{

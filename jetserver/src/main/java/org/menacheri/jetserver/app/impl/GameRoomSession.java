@@ -12,6 +12,7 @@ import org.menacheri.jetserver.app.PlayerSession;
 import org.menacheri.jetserver.app.Session;
 import org.menacheri.jetserver.concurrent.LaneStrategy;
 import org.menacheri.jetserver.concurrent.LaneStrategy.LaneStrategies;
+import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.event.EventHandler;
 import org.menacheri.jetserver.event.NetworkEvent;
 import org.menacheri.jetserver.event.impl.EventDispatchers;
@@ -173,6 +174,11 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
 		return (removeHandlers && sessions.remove(playerSession));
 	}
 
+	@Override
+	public void send(Event event) {
+		onEvent(event);
+	}
+	
 	@Override
 	public void sendBroadcast(NetworkEvent networkEvent)
 	{

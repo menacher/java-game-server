@@ -4,6 +4,7 @@ import java.util.Set;
 
 import org.jboss.netty.channel.Channel;
 import org.menacheri.jetserver.app.impl.DefaultPlayer;
+import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.event.NetworkEvent;
 import org.menacheri.jetserver.protocols.Protocol;
 import org.menacheri.jetserver.service.GameStateManagerService;
@@ -148,6 +149,19 @@ public interface GameRoom
 	 */
 	public abstract void setSessions(Set<PlayerSession> sessions);
 
+	/**
+	 * Used to send an event to the GameRoom. The room can listen on this method
+	 * for incoming events, do necessary business or game logic, transformations
+	 * etc and then send it across to other {@link PlayerSession}s if required.
+	 * Implementations are generally expected to be async, so default
+	 * implementation would be to just patch incoming event to the
+	 * {@link Session#onEvent(org.menacheri.jetserver.event.Event)} of the
+	 * GameRoom's session where the actual business logic can be applied.
+	 * 
+	 * @param event The event to send to room
+	 */
+	public abstract void send(Event event);
+	
 	/**
 	 * Method used to send a broadcast message to all sessions in the group. It
 	 * is the easiest way to update the state of all connected {@link DefaultPlayer} s
