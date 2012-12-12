@@ -1,6 +1,9 @@
 package org.menacheri.jetserver.util;
 
+import static org.jboss.netty.buffer.ChannelBuffers.copiedBuffer;
+
 import java.net.InetSocketAddress;
+import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.NoSuchElementException;
 
@@ -8,8 +11,6 @@ import org.jboss.netty.buffer.ChannelBuffer;
 import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.handler.codec.string.StringDecoder;
-import org.jboss.netty.handler.codec.string.StringEncoder;
 import org.jboss.netty.util.CharsetUtil;
 import org.menacheri.jetserver.app.PlayerSession;
 import org.menacheri.jetserver.communication.NettyTCPMessageSender;
@@ -26,14 +27,6 @@ import org.slf4j.LoggerFactory;
 public class NettyUtils
 {
 	private static final Logger LOG = LoggerFactory.getLogger(NettyUtils.class);
-	/**
-	 * Default UTF-8 compliant decoder.
-	 */
-	private static final StringDecoderWrapper STRING_DECODER = new StringDecoderWrapper();
-	/**
-	 * Default UTF-8 compliant encoder.
-	 */
-	private static final StringEncoderWrapper STRING_ENCODER = new StringEncoderWrapper();
 	
 	public static final String NETTY_CHANNEL = "NETTY_CHANNEL";
 	
@@ -216,22 +209,21 @@ public class NettyUtils
 	public static String readString(ChannelBuffer buffer, int length,
 			Charset charSet)
 	{
-		ChannelBuffer stringBuffer = buffer.readSlice(length);
 		String str = null;
+		if (null == charSet)
+		{
+			charSet = CharsetUtil.UTF_8;
+		}
 		try
 		{
-			if(null == charSet || CharsetUtil.UTF_8.equals(charSet))
-			{
-				str = STRING_DECODER.decode(stringBuffer);
-			}
-			else
-			{
-				str = new StringDecoderWrapper(charSet).decode(stringBuffer);
-			}
+			ChannelBuffer stringBuffer = buffer.readSlice(length);
+			str = stringBuffer.toString(charSet);
 		}
 		catch (Exception e)
 		{
-			LOG.error("Error occurred while trying to read string from buffer: {}",e);
+			LOG.error(
+					"Error occurred while trying to read string from buffer: {}",
+					e);
 		}
 		return str;
 	}
@@ -310,33 +302,32 @@ public class NettyUtils
 	 * 
 	 * @param msg
 	 *            The string to be written.
-	 * @param charSet
+	 * @param charset
 	 *            The Charset say 'UTF-8' in which the encoding needs to be
 	 *            done.
 	 * @return
 	 */
-	public static ChannelBuffer writeString(String msg, Charset charSet) 
+	public static ChannelBuffer writeString(String msg, Charset charset)
 	{
 		ChannelBuffer buffer = null;
 		try
 		{
 			ChannelBuffer stringBuffer = null;
-			if(null == charSet || CharsetUtil.UTF_8.equals(charSet))
+			if (null == charset)
 			{
-				stringBuffer = STRING_ENCODER.encode(msg);
+				charset = CharsetUtil.UTF_8;
 			}
-			else
-			{
-				stringBuffer = new StringEncoderWrapper(charSet).encode(msg);
-			}
+			stringBuffer = copiedBuffer(ByteOrder.BIG_ENDIAN, (String) msg,
+					charset);
 			int length = stringBuffer.readableBytes();
 			ChannelBuffer lengthBuffer = ChannelBuffers.buffer(2);
 			lengthBuffer.writeShort(length);
-			buffer = ChannelBuffers.wrappedBuffer(lengthBuffer,stringBuffer);
+			buffer = ChannelBuffers.wrappedBuffer(lengthBuffer, stringBuffer);
 		}
 		catch (Exception e)
 		{
-			LOG.error("Error occurred while trying to write string to buffer: {}",e);
+			LOG.error("Error occurred while trying to write string buffer: {}",
+					e);
 		}
 		return buffer;
 	}
@@ -419,42 +410,5 @@ public class NettyUtils
 		ChannelBuffer socketAddressBuffer = ChannelBuffers.wrappedBuffer(hostName,portNum);
 		return socketAddressBuffer;
 	}
-	
-	public static class StringDecoderWrapper extends StringDecoder
-	{
-		public StringDecoderWrapper(Charset charSet)
-		{
-			super(charSet);
-		}
-		
-		public StringDecoderWrapper()
-		{
-		}
-		
-		public String decode(ChannelBuffer buffer) throws Exception
-		{
-			String message = (String) super.decode(null, null, buffer);
-			return message;
-		}
-	}
-	
-	public static class StringEncoderWrapper extends StringEncoder
-	{
-		public StringEncoderWrapper(Charset charSet)
-		{
-			super(charSet);
-		}
-		
-		public StringEncoderWrapper()
-		{
-		}
-		
-		protected ChannelBuffer encode(Object msg) throws Exception
-		{
-			ChannelBuffer strBuffer = (ChannelBuffer)super.encode(null, null, msg);
-			return strBuffer;
-		}
-	}
-	
 	
 }
