@@ -1,6 +1,9 @@
 package org.menacheri.jetclient.util;
 
+import static org.jboss.netty.buffer.ChannelBuffers.copiedBuffer;
+
 import java.net.InetSocketAddress;
+import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.NoSuchElementException;
 
@@ -10,8 +13,6 @@ import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.handler.codec.serialization.ClassResolvers;
 import org.jboss.netty.handler.codec.serialization.ObjectDecoder;
 import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
-import org.jboss.netty.handler.codec.string.StringDecoder;
-import org.jboss.netty.handler.codec.string.StringEncoder;
 import org.jboss.netty.util.CharsetUtil;
 import org.menacheri.convert.Transform;
 
@@ -23,8 +24,6 @@ import org.menacheri.convert.Transform;
  */
 public class NettyUtils
 {
-	private static final StringDecoderWrapper STRING_DECODER = new StringDecoderWrapper();
-	private static final StringEncoderWrapper STRING_ENCODER = new StringEncoderWrapper();
 	private static final ObjectDecoderWrapper OBJECT_DECODER = new ObjectDecoderWrapper();
 
 	public static final String NETTY_CHANNEL = "NETTY_CHANNEL";
@@ -79,19 +78,19 @@ public class NettyUtils
 	 *            strlength-strbytes combination.
 	 * @param numOfStrings
 	 *            The number of strings to be read. Should not be negative or 0
-	 * @param charSet
+	 * @param charset
 	 *            The Charset say 'UTF-8' in which the decoding needs to be
 	 *            done.
 	 * 
 	 * @return the strings read from the buffer as an array.
 	 */
 	public static String[] readStrings(ChannelBuffer buffer, int numOfStrings,
-			Charset charSet)
+			Charset charset)
 	{
 		String[] strings = new String[numOfStrings]; 
 		for(int i=0;i<numOfStrings;i++)
 		{
-			String theStr = readString(buffer,charSet);
+			String theStr = readString(buffer,charset);
 			if(null == theStr) break;
 			strings[i] = theStr;
 		}
@@ -122,19 +121,19 @@ public class NettyUtils
 	 * @param buffer
 	 *            The Netty buffer containing at least one unsigned short
 	 *            followed by a string of similar length.
-	 * @param charSet
+	 * @param charset
 	 *            The Charset say 'UTF-8' in which the decoding needs to be
 	 *            done.
 	 * @return Returns the String or throws {@link IndexOutOfBoundsException} if
 	 *         the length is greater than expected.
 	 */
-	public static String readString(ChannelBuffer buffer, Charset charSet)
+	public static String readString(ChannelBuffer buffer, Charset charset)
 	{
 		String readString = null;
 		if (null != buffer && buffer.readableBytes() > 2)
 		{
 			int length = buffer.readUnsignedShort();
-			readString = readString(buffer, length, charSet);
+			readString = readString(buffer, length, charset);
 		}
 		return readString;
 	}
@@ -157,32 +156,29 @@ public class NettyUtils
 	/**
 	 * Read a string from a channel buffer with the specified length. It resets
 	 * the reader index of the buffer to the end of the string. Defaults to
-	 * UTF-8 encoding in case charSet passed in is null
+	 * UTF-8 encoding in case charset passed in is null
 	 * 
 	 * @param buffer
 	 *            The Netty buffer containing the String.
 	 * @param length
 	 *            The number of bytes in the String.
-	 * @param charSet
+	 * @param charset
 	 *            The Charset say 'UTF-8' in which the decoding needs to be
 	 *            done.
 	 * @return Returns the read string.
 	 */
 	public static String readString(ChannelBuffer buffer, int length,
-			Charset charSet)
+			Charset charset)
 	{
-		ChannelBuffer stringBuffer = buffer.readSlice(length);
 		String str = null;
+		if (null == charset)
+		{
+			charset = CharsetUtil.UTF_8;
+		}
 		try
 		{
-			if (null == charSet || CharsetUtil.UTF_8.equals(charSet))
-			{
-				str = STRING_DECODER.decode(stringBuffer);
-			}
-			else
-			{
-				str = new StringDecoderWrapper(charSet).decode(stringBuffer);
-			}
+			ChannelBuffer stringBuffer = buffer.readSlice(length);
+			str = stringBuffer.toString(charset);
 		}
 		catch (Exception e)
 		{
@@ -214,7 +210,7 @@ public class NettyUtils
 	 * of Hello><Hello as appropriate charset binary><Length of world><World as
 	 * UTF-8 binary>
 	 * 
-	 * @param charSet
+	 * @param charset
 	 *            The Charset say 'UTF-8' in which the encoding needs to be
 	 *            done.
 	 * @param msgs
@@ -222,14 +218,14 @@ public class NettyUtils
 	 * @return {@link ChannelBuffer} with format
 	 *         length-stringbinary-length-stringbinary
 	 */
-	public static ChannelBuffer writeStrings(Charset charSet, String... msgs)
+	public static ChannelBuffer writeStrings(Charset charset, String... msgs)
 	{
 		ChannelBuffer buffer = null;
 		for (String msg : msgs)
 		{
 			if (null == buffer)
 			{
-				buffer = writeString(msg, charSet);
+				buffer = writeString(msg, charset);
 			}
 			else
 			{
@@ -259,34 +255,31 @@ public class NettyUtils
 	/**
 	 * Creates a channel buffer of which the first 2 bytes contain the length of
 	 * the string in bytes and the remaining is the actual string in binary with
-	 * specified format. Defaults to UTF-8 encoding in case charSet passed in is
+	 * specified format. Defaults to UTF-8 encoding in case charset passed in is
 	 * null
 	 * 
 	 * @param msg
 	 *            The string to be written.
-	 * @param charSet
+	 * @param charset
 	 *            The Charset say 'UTF-8' in which the encoding needs to be
 	 *            done.
 	 * @return
 	 */
-	public static ChannelBuffer writeString(String msg, Charset charSet) 
+	public static ChannelBuffer writeString(String msg, Charset charset) 
 	{
 		ChannelBuffer buffer = null;
 		try
 		{
 			ChannelBuffer stringBuffer = null;
-			if(null == charSet || CharsetUtil.UTF_8.equals(charSet))
+			if (null == charset)
 			{
-				stringBuffer = STRING_ENCODER.encode(msg);
+				charset = CharsetUtil.UTF_8;
 			}
-			else
-			{
-				stringBuffer = new StringEncoderWrapper(charSet).encode(msg);
-			}
+			stringBuffer = copiedBuffer(ByteOrder.BIG_ENDIAN, msg, charset);
 			int length = stringBuffer.readableBytes();
 			ChannelBuffer lengthBuffer = ChannelBuffers.buffer(2);
 			lengthBuffer.writeShort(length);
-			buffer = ChannelBuffers.wrappedBuffer(lengthBuffer,stringBuffer);
+			buffer = ChannelBuffers.wrappedBuffer(lengthBuffer, stringBuffer);
 		}
 		catch (Exception e)
 		{
@@ -457,42 +450,6 @@ public class NettyUtils
 		ChannelBuffer socketAddressBuffer = ChannelBuffers.wrappedBuffer(
 				hostName, portNum);
 		return socketAddressBuffer;
-	}
-
-	public static class StringDecoderWrapper extends StringDecoder
-	{
-		public StringDecoderWrapper(Charset charSet)
-		{
-			super(charSet);
-		}
-		
-		public StringDecoderWrapper()
-		{
-		}
-		
-		public String decode(ChannelBuffer buffer) throws Exception
-		{
-			String message = (String) super.decode(null, null, buffer);
-			return message;
-		}
-	}
-	
-	public static class StringEncoderWrapper extends StringEncoder
-	{
-		public StringEncoderWrapper(Charset charSet)
-		{
-			super(charSet);
-		}
-		
-		public StringEncoderWrapper()
-		{
-		}
-		
-		protected ChannelBuffer encode(Object msg) throws Exception
-		{
-			ChannelBuffer strBuffer = (ChannelBuffer)super.encode(null, null, msg);
-			return strBuffer;
-		}
 	}
 
 	public static class ObjectDecoderWrapper extends ObjectDecoder
