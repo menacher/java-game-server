@@ -18,6 +18,11 @@ import org.menacheri.jetclient.event.impl.DefaultNetworkEvent;
 public class Events
 {
 	/**
+	 * The protocol version. This will be sent along with the login message so
+	 * that appropriate login handlers can be set in the pipeline.
+	 */
+	public static final byte PROTOCOL_VERSION = 0X01;
+	/**
 	 * Events should <b>NEVER</b> have this type. But event handlers can choose
 	 * to have this type to signify that they will handle any type of incoming
 	 * event. For e.g. {@link AbstractSessionEventHandler}

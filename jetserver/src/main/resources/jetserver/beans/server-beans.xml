@@ -5,7 +5,8 @@
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 	
-	<import resource="service-beans.xml"></import>
+	<import resource="server-protocols.xml"></import>
+	
 	<context:annotation-config />
 	
 	<!-- Configure all properties files here, wildcards like *.properties are 
@@ -21,7 +22,7 @@
 	
 	<bean id="tcpServer" class= "org.menacheri.jetserver.server.netty.NettyTCPServer"
 		init-method="createServerBootstrap" destroy-method="stopServer">
-		<property name="pipelineFactory" ref="loginPipelineFactory"></property>
+		<property name="pipelineFactory" ref="protocolMultiplexerPipelineFactory"></property>
 		<property name="gameAdminService" ref="gameAdminService"></property>
 		<property name="portNumber" value="${tcp.port}"></property>
 	</bean>
@@ -64,9 +65,11 @@
 		<property name="upstream" ref="udpUpstreamHandler"></property>
 	</bean>
 	
-	<bean id="loginHandler" class="org.menacheri.jetserver.handlers.netty.LoginHandler">
-		<property name="lookupService" ref="lookupService"></property>
-		<property name="sessionRegistryService" ref="sessionRegistryService"></property>
+	<bean id="protocolMultiplexerPipelineFactory" class="org.menacheri.jetserver.server.netty.ProtocolMultiplexerPipelineFactory">
+		<property name="bytesForProtocolCheck" value="5"></property>
+		<property name="loginProtocol" ref="compositeLoginProtocol"></property>
+		<property name="timer" ref="hashedWheelTimer"></property>
+		<property name="idleCheckHandler" ref="idleCheckHandler"></property>
 	</bean>
 	
 	<bean id="hashedWheelTimer" class="org.jboss.netty.util.HashedWheelTimer"></bean>

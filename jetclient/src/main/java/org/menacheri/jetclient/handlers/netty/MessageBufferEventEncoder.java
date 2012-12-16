@@ -8,6 +8,7 @@ import org.jboss.netty.channel.ChannelHandlerContext;
 import org.jboss.netty.handler.codec.oneone.OneToOneEncoder;
 import org.menacheri.jetclient.communication.MessageBuffer;
 import org.menacheri.jetclient.event.Event;
+import org.menacheri.jetclient.event.Events;
 
 /**
  * Converts an incoming {@link Event} which in turn has a
@@ -33,6 +34,14 @@ public class MessageBufferEventEncoder extends OneToOneEncoder
 		Event event = (Event) msg;
 		ChannelBuffer opCode = ChannelBuffers.buffer(1);
 		opCode.writeByte(event.getType());
+		if (Events.LOG_IN == event.getType())
+		{
+			// write protocol version also
+			ChannelBuffer protocolVersion = ChannelBuffers.buffer(1);
+			protocolVersion.writeByte(Events.PROTOCOL_VERSION);
+			opCode = ChannelBuffers.wrappedBuffer(opCode, protocolVersion);
+		}
+		
 		ChannelBuffer buffer = null;
 		if (null != event.getSource())
 		{

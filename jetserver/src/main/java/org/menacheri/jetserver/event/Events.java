@@ -14,6 +14,7 @@ import org.menacheri.jetserver.event.impl.DefaultNetworkEvent;
 
 public class Events
 {
+	public static final byte PROTCOL_VERSION=0x01;
 	/**
 	 * Events should <b>NEVER</b> have this type. But event handlers can choose
 	 * to have this type to signify that they will handle any type of incoming

@@ -81,11 +81,13 @@ public class ZombieClient
 	public static ChannelBuffer getLoginBuffer(String refKey, ChannelBuffer udpAddress)
 	{
 		ChannelBuffer opCode = ChannelBuffers.buffer(1);
+		ChannelBuffer protocol = ChannelBuffers.buffer(1);
 		opCode.writeByte(Events.LOG_IN);
+		protocol.writeByte(Events.PROTCOL_VERSION);
 		String username = "user";
 		String password = "pass";
 		// write username,password and ref key.
-		ChannelBuffer buffer = ChannelBuffers.wrappedBuffer(opCode,
+		ChannelBuffer buffer = ChannelBuffers.wrappedBuffer(opCode,protocol,
 				NettyUtils.writeStrings(username,password,refKey),udpAddress);
 		return buffer;
 	}

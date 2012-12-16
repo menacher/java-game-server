@@ -2,10 +2,12 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
 	<import resource="netty-handlers.xml"></import>
+	
 	<context:annotation-config />
 	
 	<!-- Communication protocols that are available by default -->
@@ -49,6 +51,25 @@
 		<property name="lengthFieldPrepender" ref="lengthFieldPrepender"></property>
 		<property name="messageBufferEventDecoder" ref="messageBufferEventDecoder"></property>
 		<property name="messageBufferEventEncoder" ref="messageBufferEventEncoder"></property>
+	</bean>
+
+	<!-- Login Protocols these decide what handlers are in the pipeline during 
+		login of a client to jetserver -->
+	<bean id="httpLoginProtocol" class="org.menacheri.jetserver.handlers.netty.LoginProtocol.HTTPProtocol" scope="prototype"></bean>
+	<bean id="defaultJetLoginProtocol" class="org.menacheri.jetserver.handlers.netty.LoginProtocol.DefaultJetProtocol" scope="prototype">
+		<property name="eventDecoder" ref="eventDecoder"></property>
+		<property name="loginHandler" ref="loginHandler"></property>
+		<property name="lengthFieldPrepender" ref="lengthFieldPrepender"></property>
+	</bean>
+	
+	
+	<bean id="compositeLoginProtocol" class="org.menacheri.jetserver.handlers.netty.LoginProtocol.CompositeProtocol" scope="prototype">
+		<property name="protocols">
+			<list>
+				<ref bean="defaultJetLoginProtocol"/>
+				<ref bean="httpLoginProtocol"/>
+			</list>
+		</property>
 	</bean>
 	
 </beans>
