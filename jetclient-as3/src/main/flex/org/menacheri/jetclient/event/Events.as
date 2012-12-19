@@ -9,6 +9,8 @@ package org.menacheri.jetclient.event
 	 */
 	public class Events
 	{
+		// protocl version
+		public static const JET_PROTOCOL:int = 0x01;
 		// Lifecycle events.
 		public static const CONNECT:int = 0x02;
 		public static const CONNECT_EVENT:String = "JET-CONNECT";

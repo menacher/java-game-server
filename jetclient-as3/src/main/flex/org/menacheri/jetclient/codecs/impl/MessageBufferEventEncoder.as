@@ -11,6 +11,7 @@ package org.menacheri.jetclient.codecs.impl
 	 */
 	public class MessageBufferEventEncoder implements Transform
 	{
+		import org.menacheri.jetclient.event.Events;
 		
 		public function MessageBufferEventEncoder() 
 		{
@@ -21,7 +22,11 @@ package org.menacheri.jetclient.codecs.impl
 		{
 			var event:JetEvent = input as JetEvent;
 			var message:ByteArray = new ByteArray();
-			message.writeByte(event.getType());
+			var opCode:int = event.getType();
+			message.writeByte(opCode);
+			if (opCode == Events.LOG_IN) {
+				message.writeByte(Events.JET_PROTOCOL);
+			}
 			var messageBuffer:MessageBuffer = event.getSource() as MessageBuffer
 			message.writeBytes(messageBuffer.getBuffer());
 			return message;
