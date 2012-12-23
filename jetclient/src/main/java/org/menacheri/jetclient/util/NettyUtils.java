@@ -229,7 +229,7 @@ public class NettyUtils
 			}
 			else
 			{
-				ChannelBuffer theBuffer = writeString(msg);
+				ChannelBuffer theBuffer = writeString(msg,charset);
 				if(null != theBuffer)
 				{
 					buffer = ChannelBuffers.wrappedBuffer(buffer,theBuffer);
