@@ -50,15 +50,15 @@ public interface EventDispatcher
 	 * Removes all the handlers for a session.
 	 * 
 	 * @param session
+	 *            The session instance from which event handlers need to be
+	 *            removed.
 	 * @return Returns true if all handlers were successfully removed.
 	 */
 	boolean removeHandlersForSession(Session session);
 	
 	/**
-	 * Clears all handles associated with this dispatcher and returns the number
-	 * of handlers cleared.
+	 * Clears all handles associated with this dispatcher.
 	 * 
-	 * @return
 	 */
 	void clear();
     

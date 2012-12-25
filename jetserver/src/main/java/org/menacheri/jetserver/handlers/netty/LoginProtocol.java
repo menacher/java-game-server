@@ -69,7 +69,8 @@ public interface LoginProtocol
 		 * 
 		 * @param magic1
 		 * @param magic2
-		 * @return
+		 * @return true if the two incoming bytes match any of the first two
+		 *         letter of HTTP headers like GET, POST etc.
 		 */
 		protected boolean isHttp(int magic1, int magic2)
 		{
