@@ -4,7 +4,7 @@ import org.menacheri.jetclient.app.Game;
 
 /**
  * Domain object representing a game. This is a convenience implementation of
- * the IGame interface so that simple games need not implement their own.
+ * the {@link Game} interface so that simple games need not implement their own.
  * <b>Note</b> This implementation will throw exception if any of the setter
  * methods are invoked. All variables are final in this class and expected to be
  * set at object construction.

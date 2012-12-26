@@ -17,7 +17,7 @@ The general usage steps could be as outlined below.
 1.  Add jetclient-0.1.jar and netty-3.3.1.Final.jar to your project class path.    
 2.  Create LoginBuilder, session and SessionEventHandler as shown in TestClass. example-games project has a ZombieJetClient which shows a better example.    
 3.  Use the SessionEventHandler to accept events from remote server as well as to write back events to the server.    
-4.  To write back to the remote jetserver create a tcp/udp network event using the factory method IEvent event = Events.networkEvent(messageBuffer); or Events.networkEvent(messageBuffer,DeliveryGuaranty.Fast);    
+4.  To write back to the remote jetserver create a tcp/udp network event using the factory method Event event = Events.networkEvent(messageBuffer); or Events.networkEvent(messageBuffer,DeliveryGuaranty.Fast);    
 5.  Now call session.onEvent(event); and this event will be transmitted to the remote jetserver.    
 
 Jar Dependencies

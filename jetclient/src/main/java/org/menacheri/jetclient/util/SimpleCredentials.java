@@ -2,7 +2,7 @@ package org.menacheri.jetclient.util;
 
 import org.jboss.netty.buffer.ChannelBuffer;
 
-public class SimpleCredentials implements ICredentials
+public class SimpleCredentials implements Credentials
 {
 	private final String username;
 	private final String password;

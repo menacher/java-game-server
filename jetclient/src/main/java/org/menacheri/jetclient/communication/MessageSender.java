@@ -37,7 +37,7 @@ public interface MessageSender
 	 */
 	void close();
 
-	public interface IReliable extends MessageSender{}
+	public interface Reliable extends MessageSender{}
 	
-	public interface IFast extends MessageSender{}
+	public interface Fast extends MessageSender{}
 }

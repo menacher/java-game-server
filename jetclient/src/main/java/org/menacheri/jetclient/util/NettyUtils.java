@@ -263,7 +263,9 @@ public class NettyUtils
 	 * @param charset
 	 *            The Charset say 'UTF-8' in which the encoding needs to be
 	 *            done.
-	 * @return
+	 * @return The Netty channel buffer containing the string encoded as bytes
+	 *         in the provided charset. It will return <code>null</code> if the
+	 *         string parameter is null.
 	 */
 	public static ChannelBuffer writeString(String msg, Charset charset) 
 	{

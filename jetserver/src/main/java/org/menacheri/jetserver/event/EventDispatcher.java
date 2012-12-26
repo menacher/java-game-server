@@ -65,7 +65,6 @@ public interface EventDispatcher
     /**
      * Fires event in asynchronous mode
      *
-     * @param event
      */
     public void fireEvent( Event event );
 

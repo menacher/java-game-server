@@ -3,8 +3,8 @@ package org.menacheri.jetclient.app;
 import java.util.List;
 
 import org.menacheri.jetclient.communication.MessageSender;
-import org.menacheri.jetclient.communication.MessageSender.IFast;
-import org.menacheri.jetclient.communication.MessageSender.IReliable;
+import org.menacheri.jetclient.communication.MessageSender.Fast;
+import org.menacheri.jetclient.communication.MessageSender.Reliable;
 import org.menacheri.jetclient.event.Events;
 import org.menacheri.jetclient.event.Event;
 import org.menacheri.jetclient.event.EventDispatcher;
@@ -88,11 +88,11 @@ public interface Session
 
 	void close();
 
-	void setUdpMessageSender(IFast udpMessageSender);
+	void setUdpMessageSender(Fast udpMessageSender);
 
-	IFast getUdpMessageSender();
+	Fast getUdpMessageSender();
 
-	void setTcpMessageSender(IReliable tcpMessageSender);
+	void setTcpMessageSender(Reliable tcpMessageSender);
 
-	IReliable getTcpMessageSender();
+	Reliable getTcpMessageSender();
 }

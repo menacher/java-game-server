@@ -37,9 +37,6 @@ public class ZombieSpringConfig
 	@Qualifier("messageBufferProtocol")
 	private Protocol messageBufferProtocol;
 	
-//	@Autowired
-//	private ILookupService lookupService;
-	
 	public @Bean Game zombieGame()
 	{
 		Game game = new SimpleGame(1,"Zombie");

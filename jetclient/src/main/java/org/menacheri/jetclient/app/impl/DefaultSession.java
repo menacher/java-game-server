@@ -5,8 +5,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.menacheri.jetclient.app.Session;
-import org.menacheri.jetclient.communication.MessageSender.IFast;
-import org.menacheri.jetclient.communication.MessageSender.IReliable;
+import org.menacheri.jetclient.communication.MessageSender.Fast;
+import org.menacheri.jetclient.communication.MessageSender.Reliable;
 import org.menacheri.jetclient.event.Events;
 import org.menacheri.jetclient.event.Event;
 import org.menacheri.jetclient.event.EventDispatcher;
@@ -54,8 +54,8 @@ public class DefaultSession implements Session
 
 	protected boolean isUDPEnabled;
 
-	protected IReliable tcpMessageSender;
-	protected IFast udpMessageSender;
+	protected Reliable tcpMessageSender;
+	protected Fast udpMessageSender;
 
 	protected DefaultSession(SessionBuilder sessionBuilder)
 	{
@@ -321,25 +321,25 @@ public class DefaultSession implements Session
 	}
 
 	@Override
-	public IReliable getTcpMessageSender()
+	public Reliable getTcpMessageSender()
 	{
 		return tcpMessageSender;
 	}
 
 	@Override
-	public void setTcpMessageSender(IReliable tcpMessageSender)
+	public void setTcpMessageSender(Reliable tcpMessageSender)
 	{
 		this.tcpMessageSender = tcpMessageSender;
 	}
 
 	@Override
-	public IFast getUdpMessageSender()
+	public Fast getUdpMessageSender()
 	{
 		return udpMessageSender;
 	}
 
 	@Override
-	public void setUdpMessageSender(IFast udpMessageSender)
+	public void setUdpMessageSender(Fast udpMessageSender)
 	{
 		this.udpMessageSender = udpMessageSender;
 	}

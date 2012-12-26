@@ -2,7 +2,7 @@ package org.menacheri.jetclient.communication;
 
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFutureListener;
-import org.menacheri.jetclient.communication.MessageSender.IReliable;
+import org.menacheri.jetclient.communication.MessageSender.Reliable;
 import org.menacheri.jetclient.event.Events;
 import org.menacheri.jetclient.event.Event;
 
@@ -13,7 +13,7 @@ import org.menacheri.jetclient.event.Event;
  * @author Abraham Menacherry
  * 
  */
-public class NettyTCPMessageSender implements IReliable
+public class NettyTCPMessageSender implements Reliable
 {
 	private final Channel channel;
 	private static final DeliveryGuaranty DELIVERY_GUARANTY = DeliveryGuaranty.DeliveryGuarantyOptions.RELIABLE;

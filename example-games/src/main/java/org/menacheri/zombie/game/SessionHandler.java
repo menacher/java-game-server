@@ -18,7 +18,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-//public class SessionHandler extends AsyncSessionListener implements IGameCommandInterpreter
 @SuppressWarnings("rawtypes")
 public class SessionHandler extends DefaultSessionEventHandler implements GameCommandInterpreter
 {
@@ -55,7 +54,6 @@ public class SessionHandler extends DefaultSessionEventHandler implements GameCo
 	public void interpretCommand(Object command) throws InvalidCommandException
 	{
 		cmdCount++;
-		//IGameEvent event = (IGameEvent) command;
 		MessageBuffer buf = (MessageBuffer) command;
 		int type = buf.readInt();
 		int operation = buf.readInt();

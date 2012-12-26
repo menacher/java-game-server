@@ -60,7 +60,6 @@ public interface EventDispatcher
 	 * Clears all handles associated with this dispatcher and returns the number
 	 * of handlers cleared.
 	 * 
-	 * @return
 	 */
 	void clear();
 	
