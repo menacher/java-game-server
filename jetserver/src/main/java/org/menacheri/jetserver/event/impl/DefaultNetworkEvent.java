@@ -2,8 +2,8 @@ package org.menacheri.jetserver.event.impl;
 
 import org.menacheri.jetserver.communication.DeliveryGuaranty;
 import org.menacheri.jetserver.communication.DeliveryGuaranty.DeliveryGuarantyOptions;
-import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.Event;
+import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.NetworkEvent;
 
 /**
@@ -19,8 +19,9 @@ public class DefaultNetworkEvent extends DefaultEvent implements NetworkEvent
 	private static final long serialVersionUID = 6486454029499527617L;
 
 	/**
-	 * Default constructor which will set the IDeliveryGuaranty to RELIABLE. It
-	 * will also set the type of the event to {@link Events#NETWORK_MESSAGE}.
+	 * Default constructor which will set the {@link DeliveryGuaranty} to
+	 * RELIABLE. It will also set the type of the event to
+	 * {@link Events#NETWORK_MESSAGE}.
 	 */
 	public DefaultNetworkEvent()
 	{

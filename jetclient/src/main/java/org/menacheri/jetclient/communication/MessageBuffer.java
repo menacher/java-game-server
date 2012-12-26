@@ -296,7 +296,7 @@ public interface MessageBuffer<T>
 
 	/**
 	 * Returns the actual buffer implementation that is wrapped in this
-	 * IMessageBuffer instance.
+	 * MessageBuffer instance.
 	 * 
 	 * @return This method will return the underlying buffer. For Netty that
 	 *         would be a {@link ChannelBuffer}, for a core java implementation
