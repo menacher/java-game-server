@@ -27,7 +27,9 @@
 		
 		public function AMF3Protocol() 
 		{
-			
+			lengthFieldPrepender = new LengthFieldPrepender();
+			amfSerializer = new AMFSerializer();
+			amfDeSerializer = new AMFDeserializer();
 		}
 		
 		public function getName():String
