@@ -33,7 +33,7 @@ public class EventEncoder extends OneToOneEncoder
 	{
 		if (null == msg)
 		{
-			LOG.error("Received null message in EventDecoder");
+			LOG.error("Received null message in EventEncoder");
 			return msg;
 		}
 		Event event = (Event) msg;
