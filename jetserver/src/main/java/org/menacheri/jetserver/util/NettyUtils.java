@@ -74,10 +74,10 @@ public class NettyUtils
 		}
 	}
 	
-	public static ChannelBuffer createBufferForOpcode(int opCode)
+	public static ChannelBuffer createBufferForOpcode(int opcode)
 	{
 		ChannelBuffer buffer = ChannelBuffers.buffer(1);
-		buffer.writeByte(opCode);
+		buffer.writeByte(opcode);
 		return buffer;
 	}
 

@@ -29,7 +29,7 @@ public class AMF3Protocol extends AbstractNettyProtocol
 {
 	/**
 	 * After the frame decoder retrieves the bytes from the incoming stream,
-	 * this decoder will convert it to an {@link Event} with the opCode set as
+	 * this decoder will convert it to an {@link Event} with the opcode set as
 	 * the first byte read from the buffer. And the source object of the event
 	 * created will have the rest of the {@link ChannelBuffer}.
 	 */

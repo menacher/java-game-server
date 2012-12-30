@@ -37,17 +37,17 @@ public class EventEncoder extends OneToOneEncoder
 			return msg;
 		}
 		Event event = (Event) msg;
-		ChannelBuffer opCode = ChannelBuffers.buffer(1);
-		opCode.writeByte(event.getType());
+		ChannelBuffer opcode = ChannelBuffers.buffer(1);
+		opcode.writeByte(event.getType());
 		ChannelBuffer buffer = null;
 		if(null != event.getSource())
 		{
 			ChannelBuffer data = (ChannelBuffer) event.getSource();
-			buffer = ChannelBuffers.wrappedBuffer(opCode, data);
+			buffer = ChannelBuffers.wrappedBuffer(opcode, data);
 		}
 		else
 		{
-			buffer = opCode;
+			buffer = opcode;
 		}
 		return buffer;
 	}

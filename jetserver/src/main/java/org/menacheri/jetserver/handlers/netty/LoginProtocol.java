@@ -107,10 +107,10 @@ public interface LoginProtocol
 		public boolean applyProtocol(ChannelBuffer buffer,
 				ChannelPipeline pipeline)
 		{
-			final int opCode = buffer.getUnsignedByte(buffer.readerIndex() + 2);
+			final int opcode = buffer.getUnsignedByte(buffer.readerIndex() + 2);
 			final int protocolVersion = buffer.getUnsignedByte(buffer
 					.readerIndex() + 3);
-			if (isJetProtocol(opCode, protocolVersion))
+			if (isJetProtocol(opcode, protocolVersion))
 			{
 				pipeline.addLast("framer", createLengthBasedFrameDecoder());
 				pipeline.addLast("eventDecoder", eventDecoder);

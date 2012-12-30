@@ -28,19 +28,19 @@ public class MessageBufferEventEncoder extends OneToOneEncoder
 			return msg;
 		}
 		Event event = (Event) msg;
-		ChannelBuffer opCode = ChannelBuffers.buffer(1);
-		opCode.writeByte(event.getType());
+		ChannelBuffer opcode = ChannelBuffers.buffer(1);
+		opcode.writeByte(event.getType());
 		ChannelBuffer buffer = null;
 		if(null != event.getSource())
 		{
 			@SuppressWarnings("unchecked")
 			MessageBuffer<ChannelBuffer> msgBuffer = (MessageBuffer<ChannelBuffer>)event.getSource();
 			ChannelBuffer data = msgBuffer.getNativeBuffer();
-			buffer = ChannelBuffers.wrappedBuffer(opCode, data);
+			buffer = ChannelBuffers.wrappedBuffer(opcode, data);
 		}
 		else
 		{
-			buffer = opCode;
+			buffer = opcode;
 		}
 		return buffer;
 	}

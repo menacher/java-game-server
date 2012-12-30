@@ -25,11 +25,11 @@ public class EventDecoder extends OneToOneDecoder
 			return msg;
 		}
 		ChannelBuffer buffer = (ChannelBuffer)msg;
-		int opCode = buffer.readUnsignedByte();
-		if(Events.LOG_IN == opCode){
+		int opcode = buffer.readUnsignedByte();
+		if(Events.LOG_IN == opcode){
 			buffer.readUnsignedByte();// To read-destroy the protocol version byte.
 		}
-		return Events.event(buffer, opCode);
+		return Events.event(buffer, opcode);
 	}
 	
 }

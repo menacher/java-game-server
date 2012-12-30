@@ -30,12 +30,12 @@ public class MessageBufferEventDecoder extends OneToOneDecoder
 			return msg;
 		}
 		ChannelBuffer buffer = (ChannelBuffer) msg;
-		byte opCode = buffer.readByte();
-		if (opCode == Events.NETWORK_MESSAGE)
+		byte opcode = buffer.readByte();
+		if (opcode == Events.NETWORK_MESSAGE)
 		{
-			opCode = Events.SESSION_MESSAGE;
+			opcode = Events.SESSION_MESSAGE;
 		}
-		return Events.event(new NettyMessageBuffer(buffer), opCode);
+		return Events.event(new NettyMessageBuffer(buffer), opcode);
 	}
 	
 }

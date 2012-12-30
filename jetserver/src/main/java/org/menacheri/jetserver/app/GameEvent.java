@@ -15,7 +15,7 @@ public interface GameEvent<T,O,E> {
 	public PlayerSession getPlayerSession();
 	public void setPlayerSession(PlayerSession playerSession);
 	public O getOpCode();
-	public void setOpCode(O opCode);
+	public void setOpcode(O opcode);
 	public E getEventType();
 	public void setEventType(E eventType);
 	public String getEventName();
