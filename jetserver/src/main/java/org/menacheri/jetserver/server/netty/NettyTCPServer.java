@@ -65,7 +65,7 @@ public class NettyTCPServer extends AbstractNettyServer
 	}
 
 	@Override
-	public TRANSMISSION_PROTOCOL getTransmissionProtocol()
+	public TransmissionProtocol getTransmissionProtocol()
 	{
 		return TRANSMISSION_PROTOCOL.TCP;
 	}

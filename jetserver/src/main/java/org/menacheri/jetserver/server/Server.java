@@ -6,11 +6,15 @@ import org.menacheri.jetserver.app.Session;
 
 public interface Server {
 
-	public enum TRANSMISSION_PROTOCOL{
+	public interface TransmissionProtocol{
+		
+	}
+	
+	public enum TRANSMISSION_PROTOCOL implements TransmissionProtocol {
 		TCP,UDP;
 	}
 	
-	TRANSMISSION_PROTOCOL getTransmissionProtocol();
+	TransmissionProtocol getTransmissionProtocol();
 	
 	void startServer() throws Exception;
 	
