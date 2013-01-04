@@ -296,7 +296,7 @@ public class JetlangEventDispatcher implements EventDispatcher
 		{
 			disposable.dispose();
 		}
-		disposables.clear();
+		disposableHandlerMap.clear();
 	}
 	
 	protected List<EventHandler> getHandlersToRemoveForSession(
