@@ -6,6 +6,7 @@ import org.menacheri.jetserver.communication.DeliveryGuaranty.DeliveryGuarantyOp
 import org.menacheri.jetserver.communication.NettyMessageBuffer;
 import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.NetworkEvent;
+import org.menacheri.jetserver.protocols.impl.WebSocketProtocol;
 import org.menacheri.zombie.game.Messages;
 
 public class WorldMonitor implements Task
@@ -49,9 +50,17 @@ public class WorldMonitor implements Task
 		}
 		else
 		{
-			NettyMessageBuffer buffer = new NettyMessageBuffer();
-			buffer.writeInt(world.getAlive());
-			NetworkEvent networkEvent = Events.networkEvent(buffer,DeliveryGuarantyOptions.FAST);
+			NetworkEvent networkEvent = null;
+			if(room.getProtocol() instanceof WebSocketProtocol)
+			{
+				networkEvent = Events.networkEvent(world.getAlive());
+			}
+			else
+			{
+				NettyMessageBuffer buffer = new NettyMessageBuffer();
+				buffer.writeInt(world.getAlive());
+				networkEvent = Events.networkEvent(buffer);
+			}
 			room.sendBroadcast(networkEvent);
 		}
 		

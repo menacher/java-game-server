@@ -17,6 +17,11 @@
       <attribute value="jar:file:/C:/Users/aby/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/com/google/code/gson/gson/2.2.2/gson-2.2.2.jar" sourcepath="M2_REPO/com/google/code/gson/gson/2.2.2/gson-2.2.2-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/C:/Users/aby/.m2/repository/com/google/code/gson/gson/2.2.2/gson-2.2.2-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
   <classpathentry kind="var" path="M2_REPO/org/jetlang/jetlang/0.2.9/jetlang-0.2.9.jar" sourcepath="M2_REPO/org/jetlang/jetlang/0.2.9/jetlang-0.2.9-sources.jar">
     <attributes>
       <attribute value="jar:file:/C:/Users/aby/.m2/repository/org/jetlang/jetlang/0.2.9/jetlang-0.2.9-javadoc.jar!/" name="javadoc_location"/>

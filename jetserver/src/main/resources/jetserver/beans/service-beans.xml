@@ -15,4 +15,6 @@
 	
 	<bean id="sessionRegistryService" class="org.menacheri.jetserver.service.impl.SessionRegistry"></bean>
 	
+	<bean id="gson" class="com.google.gson.Gson"></bean>
+	
 </beans>

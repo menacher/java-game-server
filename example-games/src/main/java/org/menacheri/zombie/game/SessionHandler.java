@@ -1,5 +1,7 @@
 package org.menacheri.zombie.game;
 
+import java.util.List;
+
 import org.menacheri.jetserver.app.GameCommandInterpreter;
 import org.menacheri.jetserver.app.Session;
 import org.menacheri.jetserver.app.impl.InvalidCommandException;
@@ -54,9 +56,21 @@ public class SessionHandler extends DefaultSessionEventHandler implements GameCo
 	public void interpretCommand(Object command) throws InvalidCommandException
 	{
 		cmdCount++;
-		MessageBuffer buf = (MessageBuffer) command;
-		int type = buf.readInt();
-		int operation = buf.readInt();
+		int type;
+		int operation;
+		boolean isDefaultProtocol = true;
+		if(command instanceof MessageBuffer) {
+			MessageBuffer buf = (MessageBuffer) command;
+			type = buf.readInt();
+			operation = buf.readInt();
+		}else{
+			// websocket
+			isDefaultProtocol = false;
+			List<Double> data = (List)command;
+			
+			type = data.get(0).intValue();
+			operation = data.get(1).intValue();
+		}
 		IAM iam = IAM.getWho(type);
 		ZombieCommands cmd = ZombieCommands.CommandsEnum.fromInt(operation);
 		switch (iam)
@@ -99,7 +113,12 @@ public class SessionHandler extends DefaultSessionEventHandler implements GameCo
 			buffer.writeInt(cmdCount);
 //			Event tcpEvent = Events.dataOutTcpEvent(buffer);
 //			getSession().onEvent(tcpEvent);
-			NetworkEvent udpEvent = Events.networkEvent(buffer, DeliveryGuarantyOptions.FAST);
+			NetworkEvent udpEvent = null;
+			if(isDefaultProtocol){
+				udpEvent = Events.networkEvent(buffer, DeliveryGuarantyOptions.FAST);
+			}else{
+				udpEvent = Events.networkEvent(cmdCount);// for websocket protocol.
+			}
 			getSession().onEvent(udpEvent);
 		}
 	}

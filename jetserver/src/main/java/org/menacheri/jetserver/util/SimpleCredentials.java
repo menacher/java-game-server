@@ -7,6 +7,12 @@ public class SimpleCredentials implements Credentials
 	private final String username;
 	private final String password;
 	
+	public SimpleCredentials(String username, String password)
+	{
+		this.username = username;
+		this.password = password;
+	}
+	
 	public SimpleCredentials(ChannelBuffer buffer)
 	{
 		this.username = NettyUtils.readString(buffer);

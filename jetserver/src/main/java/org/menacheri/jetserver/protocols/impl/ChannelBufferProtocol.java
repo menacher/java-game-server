@@ -42,7 +42,8 @@ public class ChannelBufferProtocol extends AbstractNettyProtocol
 	@Override
 	public void applyProtocol(PlayerSession playerSession)
 	{
-		LOG.trace("Going to apply protocol on session: {}" ,playerSession);
+		LOG.trace("Going to apply {} on session: {}", getProtocolName(),
+				playerSession);
 		
 		ChannelPipeline pipeline = NettyUtils
 				.getPipeLineOfConnection(playerSession);

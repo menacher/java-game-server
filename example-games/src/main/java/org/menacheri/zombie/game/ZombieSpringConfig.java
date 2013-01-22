@@ -37,16 +37,31 @@ public class ZombieSpringConfig
 	@Qualifier("messageBufferProtocol")
 	private Protocol messageBufferProtocol;
 	
+	@Autowired
+	@Qualifier("webSocketProtocol")
+	private Protocol webSocketProtocol;
+	
 	public @Bean Game zombieGame()
 	{
 		Game game = new SimpleGame(1,"Zombie");
 		return game;
 	}
 	
-	public @Bean GameRoom zombieRoom1()
+	public @Bean(name="Zombie_ROOM_1") GameRoom zombieRoom1()
 	{
 		GameRoomSessionBuilder sessionBuilder = new GameRoomSessionBuilder();
 		sessionBuilder.parentGame(zombieGame()).gameRoomName("Zombie_ROOM_1").protocol(messageBufferProtocol);
+		ZombieRoom room = new ZombieRoom(sessionBuilder);
+		room.setDefender(defender());
+		room.setZombie(zombie());
+		
+		return room;
+	}
+	
+	public @Bean(name="Zombie_ROOM_2") GameRoom zombieRoom2()
+	{
+		GameRoomSessionBuilder sessionBuilder = new GameRoomSessionBuilder();
+		sessionBuilder.parentGame(zombieGame()).gameRoomName("Zombie_ROOM_2").protocol(webSocketProtocol);
 		ZombieRoom room = new ZombieRoom(sessionBuilder);
 		room.setDefender(defender());
 		room.setZombie(zombie());
@@ -81,6 +96,7 @@ public class ZombieSpringConfig
 	{
 		Map<String,GameRoom> refKeyGameRoomMap = new HashMap<String, GameRoom>();
 		refKeyGameRoomMap.put("Zombie_ROOM_1_REF_KEY_1", zombieRoom1());
+		refKeyGameRoomMap.put("Zombie_ROOM_1_REF_KEY_2", zombieRoom2());
 		LookupService service = new SimpleLookupService(refKeyGameRoomMap);
 		return service;
 	}

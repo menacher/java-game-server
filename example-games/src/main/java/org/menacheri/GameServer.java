@@ -47,10 +47,13 @@ public class GameServer
 	public static void startGames(AbstractApplicationContext ctx)
 	{
 		World world = ctx.getBean(World.class);
-		GameRoom room = ctx.getBean(ZombieRoom.class);
-		Task monitor = new WorldMonitor(world,room);
+		GameRoom room1 = (GameRoom)ctx.getBean("Zombie_ROOM_1");
+		GameRoom room2 = (GameRoom)ctx.getBean("Zombie_ROOM_2");
+		Task monitor1 = new WorldMonitor(world,room1);
+		Task monitor2 = new WorldMonitor(world,room2);
 		TaskManagerService taskManager = ctx.getBean(TaskManagerService.class);
-		taskManager.scheduleWithFixedDelay(monitor, 500, 5000, TimeUnit.MILLISECONDS);
+		taskManager.scheduleWithFixedDelay(monitor1, 1000, 5000, TimeUnit.MILLISECONDS);
+		taskManager.scheduleWithFixedDelay(monitor2, 2000, 5000, TimeUnit.MILLISECONDS);
 	}
 	
 }

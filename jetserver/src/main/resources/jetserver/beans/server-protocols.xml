@@ -53,10 +53,18 @@
 		<property name="messageBufferEventEncoder" ref="messageBufferEventEncoder"></property>
 	</bean>
 
+	<bean id="webSocketProtocol" class="org.menacheri.jetserver.protocols.impl.WebSocketProtocol">
+		<property name="textWebsocketDecoder" ref="textWebsocketDecoder"></property>
+		<property name="textWebsocketEncoder" ref="textWebsocketEncoder"></property>
+	</bean>
+	
 	<!-- Login Protocols these decide what handlers are in the pipeline during 
 		login of a client to jetserver -->
-	<bean id="httpLoginProtocol" class="org.menacheri.jetserver.handlers.netty.LoginProtocol.HTTPProtocol" scope="prototype"></bean>
-	<bean id="defaultJetLoginProtocol" class="org.menacheri.jetserver.handlers.netty.LoginProtocol.DefaultJetProtocol" scope="prototype">
+	<bean id="httpLoginProtocol" class="org.menacheri.jetserver.handlers.netty.LoginProtocol.HTTPProtocol" >
+		<property name="webSocketLoginHandler" ref="webSocketLoginHandler" ></property>
+	</bean>
+	
+	<bean id="defaultJetLoginProtocol" class="org.menacheri.jetserver.handlers.netty.LoginProtocol.DefaultJetProtocol" >
 		<property name="eventDecoder" ref="eventDecoder"></property>
 		<property name="loginHandler" ref="loginHandler"></property>
 		<property name="lengthFieldPrepender" ref="lengthFieldPrepender"></property>

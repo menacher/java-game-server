@@ -10,17 +10,22 @@ import org.jboss.netty.channel.ChannelHandler;
 import org.jboss.netty.channel.ChannelPipeline;
 import org.jboss.netty.handler.codec.frame.LengthFieldBasedFrameDecoder;
 import org.jboss.netty.handler.codec.frame.LengthFieldPrepender;
+import org.jboss.netty.handler.codec.http.HttpChunkAggregator;
+import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
+import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
+import org.jboss.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import org.menacheri.jetserver.event.Events;
 
 /**
  * Applies a protocol to the incoming pipeline which will handle login.
- * Subsequent protocol may also be manipulated by this login handlers.
+ * Subsequent protocol may also be manipulated by these login handlers.
  * 
  * @author Abraham Menacherry
  * 
  */
 public interface LoginProtocol
 {
+	String LOGIN_HANDLER_NAME = "loginHandler";
 	/**
 	 * Apply a protocol on the pipeline to handle login. Implementations will
 	 * first "search" if the incoming bytes correspond to the implementations
@@ -47,17 +52,24 @@ public interface LoginProtocol
 	 */
 	public static class HTTPProtocol implements LoginProtocol
 	{
+		private WebSocketLoginHandler webSocketLoginHandler;
 		@Override
 		public boolean applyProtocol(ChannelBuffer buffer,
 				ChannelPipeline pipeline)
 		{
+			boolean isThisProtocol = false;
 			final int magic1 = buffer.getUnsignedByte(buffer.readerIndex());
 			final int magic2 = buffer.getUnsignedByte(buffer.readerIndex() + 1);
 			if (isHttp(magic1, magic2))
 			{
-				// TODO apply the protocol
+				pipeline.addLast("decoder", new HttpRequestDecoder());
+		        pipeline.addLast("aggregator", new HttpChunkAggregator(65536));
+		        pipeline.addLast("encoder", new HttpResponseEncoder());
+		        pipeline.addLast("handler", new WebSocketServerProtocolHandler("/jetsocket"));
+		        pipeline.addLast(LOGIN_HANDLER_NAME, webSocketLoginHandler);
+		        isThisProtocol = true;
 			}
-			return false;
+			return isThisProtocol;
 		}
 
 		/**
@@ -84,6 +96,16 @@ public interface LoginProtocol
 					magic1 == 'T' && magic2 == 'R' || // TRACE
 					magic1 == 'C' && magic2 == 'O'; // CONNECT
 		}
+
+		public WebSocketLoginHandler getWebSocketLoginHandler()
+		{
+			return webSocketLoginHandler;
+		}
+
+		public void setWebSocketLoginHandler(WebSocketLoginHandler webSocketLoginHandler)
+		{
+			this.webSocketLoginHandler = webSocketLoginHandler;
+		}
 	}
 
 	/**
@@ -107,6 +129,7 @@ public interface LoginProtocol
 		public boolean applyProtocol(ChannelBuffer buffer,
 				ChannelPipeline pipeline)
 		{
+			boolean isThisProtocol = false;
 			final int opcode = buffer.getUnsignedByte(buffer.readerIndex() + 2);
 			final int protocolVersion = buffer.getUnsignedByte(buffer
 					.readerIndex() + 3);
@@ -114,10 +137,11 @@ public interface LoginProtocol
 			{
 				pipeline.addLast("framer", createLengthBasedFrameDecoder());
 				pipeline.addLast("eventDecoder", eventDecoder);
-				pipeline.addLast("loginHandler", loginHandler);
+				pipeline.addLast(LOGIN_HANDLER_NAME, loginHandler);
 				pipeline.addLast("lengthFieldPrepender", lengthFieldPrepender);
+				isThisProtocol = true;
 			}
-			return true;
+			return isThisProtocol;
 		}
 
 		protected boolean isJetProtocol(int magic1, int magic2)

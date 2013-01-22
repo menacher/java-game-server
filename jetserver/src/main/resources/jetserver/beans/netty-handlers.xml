@@ -56,5 +56,14 @@
 		<property name="sessionRegistryService" ref="sessionRegistryService"></property>
 	</bean>
 	
-	
+	<bean id="webSocketLoginHandler" class="org.menacheri.jetserver.handlers.netty.WebSocketLoginHandler">
+		<property name="lookupService" ref="lookupService"></property>
+		<property name="gson" ref="gson"></property>
+	</bean>
+	<bean id="textWebsocketEncoder" class="org.menacheri.jetserver.handlers.netty.TextWebsocketEncoder">
+		<property name="gson" ref="gson"></property>
+	</bean>
+	<bean id="textWebsocketDecoder" class="org.menacheri.jetserver.handlers.netty.TextWebsocketDecoder">
+		<property name="gson" ref="gson"></property>
+	</bean>
 </beans>
