@@ -134,17 +134,22 @@
             dispatch(jet.DISCONNECT,e);
         };
         
+        ws.onerror = function (e){
+            state = 2;
+            dispatch(jet.EXCEPTION,e);
+        };
+        
         me.addHandler = function(eventName, callback){
             callbacks[eventName] = callbacks[eventName] || [];
             callbacks[eventName].push(callback);
             return me;// chainable
         };
         
-        me.send = function(aEvt){
+        me.send = function(evt){
             if(state != 1){
                throw new Error("Session is not in connected state"); 
             }
-            var payload = me.outCodecChain.transform(aEvt);
+            var payload = me.outCodecChain.transform(evt);
             ws.send( payload ); // <= send JSON/Binary data to socket server
             return me;
         };
@@ -170,15 +175,15 @@
             ws.close();  
         };
         
-        function dispatch(eventName, message){
-            dispatchToEventHandlers(callback[jet.ANY],message);
-            dispatchToEventHandlers(callbacks[eventName],message);
+        function dispatch(eventName, evt){
+            dispatchToEventHandlers(callback[jet.ANY], evt);
+            dispatchToEventHandlers(callbacks[eventName], evt);
         }
         
-        function dispatchToEventHandlers(chain, message){
+        function dispatchToEventHandlers(chain, evt){
             if(typeof chain === 'undefined') return; // no callbacks for this event
             for(var i = 0; i < chain.length; i++){
-              chain[i]( message );
+              chain[i]( evt );
             }
         }
         
