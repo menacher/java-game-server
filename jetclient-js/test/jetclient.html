@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://github.com/menacher/java-game-server/tree/master/jetclient-js/src/jet-0.1.js"></script>
+<script>
+var sessions = [];
+function startWar()
+{
+    var config = {
+        user:"user",
+        pass:"pass",
+        connectionKey:"Zombie_ROOM_1_REF_KEY_2"
+    };
+
+    for(var i=0;i<50;i++){
+        if((i % 2) === 0){
+            jet.sessionFactory("ws://localhost:18090/jetsocket",config,function (session){
+            session.addHandler(jet.SESSION_MESSAGE, displayHuman);
+            var id = window.self.setInterval(defender.bind(null,session), 500);
+            sessions.push({session:session,id:id});
+            });
+        }else{
+            jet.sessionFactory("ws://localhost:18090/jetsocket",config,function (session){
+            session.addHandler(jet.SESSION_MESSAGE, displayZombie);
+            var id = window.self.setInterval(zombie.bind(null,session), 500);
+            sessions.push({session:session,id:id});
+            });
+        }
+
+    }
+
+    function displayHuman(e){
+        document.getElementById("human").innerHTML="Humans Left: " + e.source;
+    }
+
+    function displayZombie(e){
+        document.getElementById("zombie").innerHTML="Zombies Left: " + (2000000000 - e.source);
+    }
+
+    function defender(session){
+        session.send(jet.nevent(jet.NETWORK_MESSAGE, [2,1]));
+    }
+    function zombie(session){
+        session.send(jet.nevent(jet.NETWORK_MESSAGE, [1,2]));
+    }
+}
+
+function makePeace(){
+    for(var i = 0; i < sessions.length; i++){
+        window.clearInterval(sessions[i].id);
+        sessions[i].session.close();
+    }
+}
+
+</script>
+</head>
+<body>
+
+<h1>Jet Websocket</h1>
+<p id="human">Human</p>
+<p id="zombie">Zombie</p>
+
+<button type="button" onclick="startWar()">Start War!</button>
+<button type="button" onclick="makePeace()">Make Peace</button>
+
+</body>
+</html>
