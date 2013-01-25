@@ -9,6 +9,34 @@
 	<url>https://github.com/menacher/java-game-server/tree/master/jetclient</url>
 	<description>This is a client library for jetserver https://github.com/menacher/java-game-server/tree/master/jetserver. Java clients can use this program to connect and interact with jetserver.</description>
 	
+	<parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+    
+	<licenses>
+		<license>
+			<name>GNU Lesser General Public License (LGPL), Version 2.1</name>
+            <url>http://www.gnu.org/licenses/lgpl-2.1.txt</url>
+            <distribution>repo</distribution>
+		</license>
+	</licenses>
+	
+	<scm>
+        <connection>scm:git:git@github.com:menacher/java-game-server.git</connection>
+        <developerConnection>scm:git:git@github.com:menacher/java-game-server.git</developerConnection>
+        <url>git@github.com:menacher/java-game-server.git</url>
+    </scm>
+    
+    <developers>
+        <developer>
+            <id>menacher</id>
+            <name>Abraham Menacherry</name>
+            <email>abrahammenacherry@gmail.com</email>
+        </developer>
+    </developers>
+    
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>

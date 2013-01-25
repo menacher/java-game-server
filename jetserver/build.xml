@@ -40,12 +40,14 @@
 	</target>
 
 	<target name="compile" depends="prepare">
-		<!-- <javac srcdir="${src}" destdir="${classes}" classpathref="server.classpath" /> -->
+		<javac srcdir="${src}" destdir="${classes}" classpathref="server.classpath" />
+		<!--
 		<iajc debug="true" destdir="${classes}" source="1.6" classpathRef="server.classpath">
 			<sourceroots>
 				<pathelement location="${src}" />
 			</sourceroots>
 		</iajc>
+		-->
 	</target>
 
 
