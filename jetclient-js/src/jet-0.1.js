@@ -1,39 +1,37 @@
 (function (jet) {
     "use strict";
     
-    var evts = new Uint8Array(128);
-        // do initialization
-        for (var i = 0; i < evts.length; i++) {
-            evts[i] = i;
-        }
-        
     // Event code Constants
-    jet.ANY = evts[0];
-    jet.PROTOCOL_VERSION = evts[1];
+    jet.ANY = 0x00;
+    jet.PROTOCOL_VERSION = 0x01;
 
-    jet.CONNECT = evts[2];
-    jet.CONNECT_FAILED = evts[6];
-    jet.LOG_IN = evts[8];
-    jet.LOG_OUT = evts[10];
-    jet.LOG_IN_SUCCESS = evts[11];
-    jet.LOG_IN_FAILURE = evts[12];
-    jet.LOG_OUT_SUCCESS = evts[14];
-    jet.LOG_OUT_FAILURE = evts[15];
+    jet.CONNECT = 0x02;
+    jet.CONNECT_FAILED = 0x06;
+    jet.LOG_IN = 0x08;
+    jet.LOG_OUT = 0x0a;
+    jet.LOG_IN_SUCCESS = 0x0b;
+    jet.LOG_IN_FAILURE = 0x0c;
+    jet.LOG_OUT_SUCCESS = 0x0e;
+    jet.LOG_OUT_FAILURE = 0x0f;
 
-    jet.GAME_LIST = evts[16];
-    jet.ROOM_LIST = evts[18];
-    jet.GAME_ROOM_JOIN = evts[20];
-    jet.GAME_ROOM_LEAVE = evts[22];
-    jet.GAME_ROOM_JOIN_SUCCESS = evts[24];
-    jet.GAME_ROOM_JOIN_FAILURE = evts[25];
+    jet.GAME_LIST = 0x10;
+    jet.ROOM_LIST = 0x12;
+    jet.GAME_ROOM_JOIN = 0x14;
+    jet.GAME_ROOM_LEAVE = 0x16;
+    jet.GAME_ROOM_JOIN_SUCCESS = 0x18;
+    jet.GAME_ROOM_JOIN_FAILURE = 0x19;
 
-    jet.START = evts[26];
-    jet.STOP = evts[27];
-    jet.SESSION_MESSAGE = evts[28];
-    jet.NETWORK_MESSAGE = evts[29];
-    jet.CHANGE_ATTRIBUTE = evts[32];
-    jet.DISCONNECT = evts[34];// Use this one for handling close event of ws.
-    jet.EXCEPTION = evts[36];
+    //Event sent from server to client to start message sending from client to server.
+    jet.START = 0x1a;
+    // Event sent from server to client to stop messages from being sent to server.
+    jet.STOP = 0x1b;
+    // Incoming data from server or from another session.
+    jet.SESSION_MESSAGE = 0x1c;
+    // This event is used to send data from the current machine to remote server
+    jet.NETWORK_MESSAGE = 0x1d;
+    jet.CHANGE_ATTRIBUTE = 0x20;
+    jet.DISCONNECT = 0x22;// Use this one for handling close event of ws.
+    jet.EXCEPTION = 0x24;
         
     // Functions
     // Creates a new event object
