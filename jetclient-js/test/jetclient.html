@@ -38,10 +38,10 @@ function startWar()
     }
 
     function defender(session){
-        session.send(jet.nevent(jet.NETWORK_MESSAGE, [2,1]));
+        session.send(jet.NEvent(jet.NETWORK_MESSAGE, [2,1]));
     }
     function zombie(session){
-        session.send(jet.nevent(jet.NETWORK_MESSAGE, [1,2]));
+        session.send(jet.NEvent(jet.NETWORK_MESSAGE, [1,2]));
     }
 }
 

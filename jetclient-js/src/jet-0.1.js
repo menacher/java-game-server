@@ -35,7 +35,7 @@
         
     // Functions
     // Creates a new event object
-    jet.nevent = function (eventType, payload, date){
+    jet.NEvent = function (eventType, payload, date){
         return {
             type : eventType,
             source : payload,
@@ -45,37 +45,34 @@
 
     // Creates a login event object to login to remote jetserver
     jet.LoginEvent = function (config){
-        return jet.nevent(jet.LOG_IN,[config.user,config.pass,config.connectionKey]);
+        return jet.NEvent(jet.LOG_IN,[config.user,config.pass,config.connectionKey]);
     };
     
     // If using a differnt protocol, then use this codec chain, to decode and encode incoming and outgoing requests. Something like a Chain of Responsibility pattern.
     jet.CodecChain = function (){
-        var me = this;
-        me.chain = [];
-        for(var i = 0; i < arguments.length; i++) {
-            me.chain.push(arguments[i]);
-        }
-    
-        me.add = function (func){
-            me.chain.push(func);
-        };
-    
-        me.remove = function (func){
-            var index = me.chain.indexOf(func);
-            while(index != -1){
-                me.chain.splice(index,1);
-                index = me.chain.indexOf(func);
-            }
-        };
-    
-        me.tranform = function transform(message){
-            for(var i = 0; i < me.chain.length(); i++){
-                message = me.chain[i].transform(message);
-            }
-            return message;
-        };
+        this.chain = [];
     };
     
+    jet.CodecChain.prototype.add = function (func){
+        if (func && typeof(func) === 'function') {
+            this.chain.push(func);
+        } else{
+            throw new Error("Parameter:" + func + " is not of type function.");
+        }
+        return this;
+    };
+    
+    jet.CodecChain.prototype.remove = function (func){
+       removeFromArray(this.chain,func);
+    };
+    
+    jet.CodecChain.prototype.tranform = function (message){
+        for(var i = 0; i < this.chain.length(); i++){
+            message = this.chain[i].transform(message);
+        }
+        return message;
+    };
+        
     // Default codes which use JSON to decode and encode messages.
     jet.Codecs = {
         encoder : {transform: function (e){ return JSON.stringify(e)}},
@@ -153,14 +150,7 @@
         };
       
         me.removeHandler = function(eventName, handler){
-            var handlers = callbacks[eventName];
-            if (handlers instanceof Array){
-                var index = handlers.indexOf(handler);
-                while(index != -1){
-                    handlers.splice(index,1);
-                    index = handlers.indexOf(handler);
-                }
-            }
+            removeFromArray(callbacks[eventName], handler);
         };
         
         me.clearHandlers = function (){
@@ -201,4 +191,15 @@
             dispatch(evt.type, evt);
         }
     }
+    
+    function removeFromArray(chain, func){
+        if(chain instanceof Array){
+            var index = chain.indexOf(func);
+            while(index != -1){
+                chain.splice(index,1);
+                index = chain.indexOf(func);
+            }
+        }
+    }
+    
 }( window.jet = window.jet || {}));
