@@ -54,34 +54,34 @@ public class DefaultToClientHandler extends SimpleChannelUpstreamHandler
 		session.onEvent(event);
 	}
 
-	@Override
-	public void channelDisconnected(ChannelHandlerContext ctx,
-			ChannelStateEvent e) throws Exception
-	{
-		if (!session.isShuttingDown())
-		{
-			Event event = Events.event(e, Events.DISCONNECT);
-			session.onEvent(event);
-		}
-		else
-		{
-			System.err.println("Session is already shutting down. "
-					+ "Disconnect event will be discarded for channel {}"
-					+ e.getChannel().getId());
-		}
+//	@Override
+//	public void channelDisconnected(ChannelHandlerContext ctx,
+//			ChannelStateEvent e) throws Exception
+//	{
+//		if (!session.isShuttingDown())
+//		{
+//			Event event = Events.event(e, Events.DISCONNECT);
+//			session.onEvent(event);
+//		}
+//		else
+//		{
+//			System.err.println("Session is already shutting down. "
+//					+ "Disconnect event will be discarded for channel {}"
+//					+ e.getChannel().getId());
+//		}
+//
+//	}
 
-	}
-
-	@Override
-	public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e)
-			throws Exception
-	{
-		if (!session.isShuttingDown())
-		{
-			Event event = Events.event(e, Events.DISCONNECT);
-			session.onEvent(event);
-		}
-	}
+//	@Override
+//	public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e)
+//			throws Exception
+//	{
+//		if (!session.isShuttingDown())
+//		{
+//			Event event = Events.event(e, Events.DISCONNECT);
+//			session.onEvent(event);
+//		}
+//	}
 
 	public static String getName()
 	{

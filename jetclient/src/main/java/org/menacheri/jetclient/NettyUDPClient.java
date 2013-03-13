@@ -314,12 +314,6 @@ public class NettyUDPClient
 		return datagramChannel.write(message, serverAddress);
 	}
 
-	public InetSocketAddress getLocalAddress(DatagramChannel c)
-	{
-		InetSocketAddress add = (InetSocketAddress) c.getLocalAddress();
-		return add;
-	}
-
 	public InetSocketAddress getServerAddress()
 	{
 		return serverAddress;

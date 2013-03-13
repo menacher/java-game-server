@@ -26,7 +26,6 @@ public class Sessions
 	
 	public static PlayerSession newPlayerSession(GameRoom gameRoom, Player player)
 	{
-		// TODO the player has to be set here after doing lookup.
 		return new PlayerSessionBuilder().parentGameRoom(gameRoom).player(player).build();
 	}
 

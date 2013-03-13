@@ -7,10 +7,10 @@ import org.jboss.netty.channel.MessageEvent;
 import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.jboss.netty.channel.socket.DatagramChannel;
 import org.menacheri.jetserver.app.Session;
-import org.menacheri.jetserver.communication.MessageSender;
+import org.menacheri.jetserver.communication.MessageSender.Fast;
 import org.menacheri.jetserver.communication.NettyUDPMessageSender;
-import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.Event;
+import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.service.SessionRegistryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 public class UDPUpstreamHandler extends SimpleChannelUpstreamHandler
 {
 	private static final Logger LOG = LoggerFactory.getLogger(UDPUpstreamHandler.class);
-	private SessionRegistryService sessionRegistryService;
+	private SessionRegistryService<SocketAddress> udpSessionRegistry;
 	public UDPUpstreamHandler()
 	{
 		super();
@@ -31,7 +31,7 @@ public class UDPUpstreamHandler extends SimpleChannelUpstreamHandler
 	{
 		// Get the session using the remoteAddress.
 		SocketAddress remoteAddress = e.getRemoteAddress();
-		Session session = sessionRegistryService.getSession(remoteAddress);
+		Session session = udpSessionRegistry.getSession(remoteAddress);
 		if(null != session)
 		{
 			Event event = (Event) e.getMessage();
@@ -75,22 +75,21 @@ public class UDPUpstreamHandler extends SimpleChannelUpstreamHandler
 					+ "the UDP MessageSender is not initialized till now",
 					event.getType());
 		}
-		MessageSender messageSender = new NettyUDPMessageSender(remoteAddress, udpChannel, sessionRegistryService);
+		Fast messageSender = new NettyUDPMessageSender(remoteAddress, udpChannel, udpSessionRegistry);
 		Event connectEvent = Events.connectEvent(messageSender);
 		
 		return connectEvent;
 	}
+
+	public SessionRegistryService<SocketAddress> getUdpSessionRegistry()
+	{
+		return udpSessionRegistry;
+	}
+
+	public void setUdpSessionRegistry(
+			SessionRegistryService<SocketAddress> udpSessionRegistry)
+	{
+		this.udpSessionRegistry = udpSessionRegistry;
+	}
 	
-	public SessionRegistryService getSessionRegistryService()
-	{
-		return sessionRegistryService;
-	}
-
-	public void setSessionRegistryService(
-			SessionRegistryService sessionRegistryService)
-	{
-		this.sessionRegistryService = sessionRegistryService;
-	}
-
-		
 }

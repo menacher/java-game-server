@@ -155,9 +155,9 @@ public class NettyTCPClient
 
 	/**
 	 * This method delegates to the
-	 * {@link #connect(ChannelPipelineFactory, Event, int, TimeUnit)}
-	 * method internally. It will pass in a default of 5 seconds wait time to
-	 * the delegated method.
+	 * {@link #connect(ChannelPipelineFactory, Event, int, TimeUnit)} method
+	 * internally. It will pass in a default of 5 seconds wait time to the
+	 * delegated method.
 	 * 
 	 * @param pipelineFactory
 	 *            The factory used to create a pipeline of decoders and encoders
@@ -172,8 +172,7 @@ public class NettyTCPClient
 	 * @throws InterruptedException
 	 */
 	public Channel connect(final ChannelPipelineFactory pipelineFactory,
-			final Event loginEvent)
-			throws InterruptedException
+			final Event loginEvent) throws InterruptedException
 	{
 		return connect(pipelineFactory, loginEvent, 5, TimeUnit.SECONDS);
 	}

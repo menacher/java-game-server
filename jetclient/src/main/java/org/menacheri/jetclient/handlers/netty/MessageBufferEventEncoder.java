@@ -34,7 +34,7 @@ public class MessageBufferEventEncoder extends OneToOneEncoder
 		Event event = (Event) msg;
 		ChannelBuffer opcode = ChannelBuffers.buffer(1);
 		opcode.writeByte(event.getType());
-		if (Events.LOG_IN == event.getType())
+		if (Events.LOG_IN == event.getType() || Events.RECONNECT == event.getType())
 		{
 			// write protocol version also
 			ChannelBuffer protocolVersion = ChannelBuffers.buffer(1);

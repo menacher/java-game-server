@@ -13,10 +13,10 @@ public class DefaultEvent implements Event, Serializable
 	 */
 	private static final long serialVersionUID = 8188757584720622237L;
 	
-	private EventContext eventContext;
-	private int type;
-	private Object source;
-	private long timeStamp;
+	protected EventContext eventContext;
+	protected int type;
+	protected Object source;
+	protected long timeStamp;
 	
 	@Override
 	public EventContext getEventContext()

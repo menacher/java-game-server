@@ -1,6 +1,5 @@
 package org.menacheri.jetserver.service.impl;
 
-import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -8,30 +7,30 @@ import org.menacheri.jetserver.app.Session;
 import org.menacheri.jetserver.service.SessionRegistryService;
 
 
-public class SessionRegistry implements SessionRegistryService
+public class SessionRegistry<T> implements SessionRegistryService<T>
 {
-	private final Map<InetSocketAddress, Session> udpSessions;
+	protected final Map<T, Session> sessions;
 	
 	public SessionRegistry()
 	{
-		udpSessions = new ConcurrentHashMap<InetSocketAddress, Session>(1000);
+		sessions = new ConcurrentHashMap<T, Session>(1000);
 	}
 	
 	@Override
-	public Session getSession(Object key)
+	public Session getSession(T key)
 	{
-		return udpSessions.get(key);
+		return sessions.get(key);
 	}
 
 	@Override
-	public boolean putSession(Object key, Session session)
+	public boolean putSession(T key, Session session)
 	{
 		if(null == key ||  null == session)
 		{
 			return false;
 		}
 		
-		if(null == udpSessions.put((InetSocketAddress)key, session))
+		if(null == sessions.put(key, session))
 		{
 			return true;
 		}
@@ -41,7 +40,7 @@ public class SessionRegistry implements SessionRegistryService
 	@Override
 	public boolean removeSession(Object key)
 	{
-		if(null != udpSessions.remove(key))
+		if(null != sessions.remove(key))
 		{
 			return true;
 		}

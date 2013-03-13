@@ -18,6 +18,8 @@ import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.impl.DefaultEvent;
 import org.menacheri.jetserver.service.LookupService;
+import org.menacheri.jetserver.service.UniqueIDGeneratorService;
+import org.menacheri.jetserver.service.impl.ReconnectSessionRegistry;
 import org.menacheri.jetserver.util.Credentials;
 import org.menacheri.jetserver.util.SimpleCredentials;
 import org.slf4j.Logger;
@@ -41,6 +43,9 @@ public class WebSocketLoginHandler extends SimpleChannelUpstreamHandler
 			.getLogger(WebSocketLoginHandler.class);
 
 	private LookupService lookupService;
+	protected ReconnectSessionRegistry reconnectRegistry;
+	protected UniqueIDGeneratorService idGeneratorService;
+	
 	private Gson gson;
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -195,6 +200,26 @@ public class WebSocketLoginHandler extends SimpleChannelUpstreamHandler
 	public void setGson(Gson gson)
 	{
 		this.gson = gson;
+	}
+
+	public ReconnectSessionRegistry getReconnectRegistry()
+	{
+		return reconnectRegistry;
+	}
+
+	public void setReconnectRegistry(ReconnectSessionRegistry reconnectRegistry)
+	{
+		this.reconnectRegistry = reconnectRegistry;
+	}
+
+	public UniqueIDGeneratorService getIdGeneratorService()
+	{
+		return idGeneratorService;
+	}
+
+	public void setIdGeneratorService(UniqueIDGeneratorService idGeneratorService)
+	{
+		this.idGeneratorService = idGeneratorService;
 	}
 
 }

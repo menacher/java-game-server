@@ -78,7 +78,7 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
 		{
 			if (null == id)
 			{
-				id = String.valueOf(SESSION_ID.incrementAndGet());
+				id = String.valueOf(ID_GENERATOR_SERVICE.generateFor(GameRoomSession.class));
 			}
 			if(null == sessionAttributes)
 			{
@@ -170,7 +170,7 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
 	public synchronized boolean disconnectSession(PlayerSession playerSession)
 	{
 		final boolean removeHandlers = this.eventDispatcher.removeHandlersForSession(playerSession);
-		playerSession.getEventDispatcher().clear(); // remove network handlers of the session.
+		//playerSession.getEventDispatcher().clear(); // remove network handlers of the session.
 		return (removeHandlers && sessions.remove(playerSession));
 	}
 

@@ -59,7 +59,7 @@ public class WorldMonitor implements Task
 			{
 				NettyMessageBuffer buffer = new NettyMessageBuffer();
 				buffer.writeInt(world.getAlive());
-				networkEvent = Events.networkEvent(buffer);
+				networkEvent = Events.networkEvent(buffer,DeliveryGuarantyOptions.FAST);
 			}
 			room.sendBroadcast(networkEvent);
 		}

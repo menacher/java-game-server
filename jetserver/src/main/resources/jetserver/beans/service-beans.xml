@@ -1,20 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
 
-	<bean id="taskManagerService" class="org.menacheri.jetserver.service.impl.SimpleTaskManagerService" destroy-method="shutdown">
-		<constructor-arg type="int" index="0" value="2" ></constructor-arg>
+	<!-- Configure all properties files here, wildcards like *.properties are 
+		also allowed -->
+	<context:property-placeholder location="jetserver/props/jetserver.properties" />
+
+	<bean id="taskManagerService"
+		class="org.menacheri.jetserver.service.impl.SimpleTaskManagerService"
+		destroy-method="shutdown">
+		<constructor-arg type="int" index="0" value="2"></constructor-arg>
 	</bean>
-	
-	<bean id="gameAdminService" class="org.menacheri.jetserver.service.impl.SimpleGameAdminService">
+
+	<bean id="gameAdminService"
+		class="org.menacheri.jetserver.service.impl.SimpleGameAdminService">
 		<property name="games">
 			<set></set>
 		</property>
 	</bean>
-	
-	<bean id="sessionRegistryService" class="org.menacheri.jetserver.service.impl.SessionRegistry"></bean>
-	
+
+	<bean id="udpSessionRegistry" class="org.menacheri.jetserver.service.impl.SessionRegistry"></bean>
+
+	<bean id="reconnectSessionRegistry"
+		class="org.menacheri.jetserver.service.impl.ReconnectSessionRegistry">
+		<property name="taskManagerService" ref="taskManagerService"></property>
+		<property name="reconnectDelay" value="${reconnect.delay}"></property>
+	</bean>
+
+	<bean id="simpleUniqueIdGenerator"
+		class="org.menacheri.jetserver.service.impl.SimpleUniqueIdGenerator"></bean>
+
 	<bean id="gson" class="com.google.gson.Gson"></bean>
-	
+
 </beans>

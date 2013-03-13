@@ -30,6 +30,11 @@ public class Events
 	public final static byte ANY = 0x00;
 	// Lifecycle events.
 	public final static byte CONNECT = 0x02;
+	/**
+	 * Similar to LOG_IN but parameters are different. This event is sent from
+	 * client to server.
+	 */
+	public static final byte RECONNECT = 0x3;
 	public final static byte CONNECT_FAILED = 0x06;
 	public static final byte LOG_IN = 0x08;
 	public static final byte LOG_OUT = 0x0a;

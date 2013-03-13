@@ -30,13 +30,13 @@ public class NettyUDPMessageSender implements Fast
 			.getLogger(NettyUDPMessageSender.class);
 	private final SocketAddress remoteAddress;
 	private final DatagramChannel channel;
-	private final SessionRegistryService sessionRegistryService;
+	private final SessionRegistryService<SocketAddress> sessionRegistryService;
 
 	private static final DeliveryGuaranty DELIVERY_GUARANTY = DeliveryGuarantyOptions.FAST;
 
 	public NettyUDPMessageSender(SocketAddress remoteAddress,
 			DatagramChannel channel,
-			SessionRegistryService sessionRegistryService)
+			SessionRegistryService<SocketAddress> sessionRegistryService)
 	{
 		this.remoteAddress = remoteAddress;
 		this.channel = channel;
@@ -61,7 +61,7 @@ public class NettyUDPMessageSender implements Fast
 		Session session = sessionRegistryService.getSession(remoteAddress);
 		if (sessionRegistryService.removeSession(remoteAddress))
 		{
-			LOG.info("Successfully removed session: {}", session);
+			LOG.debug("Successfully removed session: {}", session);
 		}
 		else
 		{
@@ -97,7 +97,7 @@ public class NettyUDPMessageSender implements Fast
 		return sender;
 	}
 
-	public SessionRegistryService getSessionRegistryService()
+	protected SessionRegistryService<SocketAddress> getSessionRegistryService()
 	{
 		return sessionRegistryService;
 	}

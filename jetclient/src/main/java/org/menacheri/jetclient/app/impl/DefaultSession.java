@@ -5,13 +5,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.menacheri.jetclient.app.Session;
+import org.menacheri.jetclient.communication.ReconnectPolicy;
 import org.menacheri.jetclient.communication.MessageSender.Fast;
 import org.menacheri.jetclient.communication.MessageSender.Reliable;
-import org.menacheri.jetclient.event.Events;
 import org.menacheri.jetclient.event.Event;
 import org.menacheri.jetclient.event.EventDispatcher;
 import org.menacheri.jetclient.event.EventHandler;
 import org.menacheri.jetclient.event.impl.DefaultEventDispatcher;
+import org.menacheri.jetclient.util.Config;
+import org.menacheri.jetclient.util.LoginHelper;
 
 /**
  * The default implementation of the session class. This class is responsible
@@ -54,9 +56,12 @@ public class DefaultSession implements Session
 
 	protected boolean isUDPEnabled;
 
+	protected ReconnectPolicy reconnectPolicy;
+	
 	protected Reliable tcpMessageSender;
 	protected Fast udpMessageSender;
 
+	
 	protected DefaultSession(SessionBuilder sessionBuilder)
 	{
 		// validate variables and provide default values if necessary. Normally
@@ -71,6 +76,7 @@ public class DefaultSession implements Session
 		this.isWriteable = sessionBuilder.isWriteable;
 		this.isShuttingDown = sessionBuilder.isShuttingDown;
 		this.isUDPEnabled = sessionBuilder.isUDPEnabled;
+		this.reconnectPolicy = sessionBuilder.reconnectPolicy;
 	}
 
 	/**
@@ -93,7 +99,8 @@ public class DefaultSession implements Session
 		private boolean isWriteable = true;
 		private volatile boolean isShuttingDown = false;
 		private boolean isUDPEnabled = false;// By default UDP is not enabled.
-
+		private ReconnectPolicy reconnectPolicy = null;
+		
 		public Session build()
 		{
 			return new DefaultSession(this);
@@ -115,6 +122,10 @@ public class DefaultSession implements Session
 			if (null == sessionAttributes)
 			{
 				sessionAttributes = new HashMap<String, Object>();
+			}
+			if (null == reconnectPolicy)
+			{
+				reconnectPolicy = ReconnectPolicy.NO_RECONNECT;
 			}
 			creationTime = System.currentTimeMillis();
 		}
@@ -173,7 +184,12 @@ public class DefaultSession implements Session
 			this.isUDPEnabled = isUDPEnabled;
 			return this;
 		}
-
+		
+		public SessionBuilder reconnectPolicy(ReconnectPolicy reconnectPolicy)
+		{
+			this.reconnectPolicy = reconnectPolicy;
+			return this;
+		}
 	}
 
 	@Override
@@ -233,16 +249,12 @@ public class DefaultSession implements Session
 	public void removeAttribute(String key)
 	{
 		sessionAttributes.remove(key);
-		Event event = Events.changeAttributeEvent(key, null);
-		eventDispatcher.fireEvent(event);
 	}
 
 	@Override
 	public void setAttribute(String key, Object value)
 	{
 		sessionAttributes.put(key, value);
-		Event event = Events.changeAttributeEvent(key, value);
-		eventDispatcher.fireEvent(event);
 	}
 
 	@Override
@@ -310,6 +322,23 @@ public class DefaultSession implements Session
 	}
 
 	@Override
+	public void reconnect(LoginHelper loginHelper)
+	{
+		String reconnectKey = (String)sessionAttributes.get(Config.RECONNECT_KEY);
+		if(null != reconnectKey)
+		{
+			try
+			{
+				new SessionFactory(loginHelper).reconnectSession(this, reconnectKey);
+			}
+			catch (Exception e)
+			{
+				throw new RuntimeException(e);
+			}
+		}
+	}
+	
+	@Override
 	public boolean isShuttingDown()
 	{
 		return isShuttingDown;
@@ -371,5 +400,15 @@ public class DefaultSession implements Session
 		else if (!id.equals(other.id))
 			return false;
 		return true;
+	}
+
+	public ReconnectPolicy getReconnectPolicy()
+	{
+		return reconnectPolicy;
+	}
+
+	public void setReconnectPolicy(ReconnectPolicy reconnectPolicy)
+	{
+		this.reconnectPolicy = reconnectPolicy;
 	}
 }

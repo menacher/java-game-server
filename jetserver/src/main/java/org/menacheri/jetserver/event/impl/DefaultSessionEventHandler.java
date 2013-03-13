@@ -3,13 +3,15 @@ package org.menacheri.jetserver.event.impl;
 import org.menacheri.jetserver.app.PlayerSession;
 import org.menacheri.jetserver.app.Session;
 import org.menacheri.jetserver.communication.DeliveryGuaranty;
-import org.menacheri.jetserver.communication.DeliveryGuaranty.DeliveryGuarantyOptions;
+import static org.menacheri.jetserver.communication.DeliveryGuaranty.DeliveryGuarantyOptions.FAST;
 import org.menacheri.jetserver.communication.MessageSender.Fast;
-import org.menacheri.jetserver.communication.MessageSender.Reliable;
-import org.menacheri.jetserver.event.Events;
+import org.menacheri.jetserver.event.ConnectEvent;
 import org.menacheri.jetserver.event.Event;
+import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.NetworkEvent;
 import org.menacheri.jetserver.event.SessionEventHandler;
+import org.menacheri.jetserver.service.SessionRegistryService;
+import org.menacheri.jetserver.util.JetConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,8 +53,7 @@ public class DefaultSessionEventHandler implements SessionEventHandler
 
 	protected void doEventHandlerMethodLookup(Event event)
 	{
-		int eventType = event.getType();
-		switch (eventType)
+		switch (event.getType())
 		{
 		case Events.SESSION_MESSAGE:
 			onDataIn(event);
@@ -67,7 +68,7 @@ public class DefaultSessionEventHandler implements SessionEventHandler
 			onLoginFailure(event);
 			break;
 		case Events.CONNECT:
-			onConnect(event);
+			onConnect((ConnectEvent)event);
 			break;
 		case Events.START:
 			onStart(event);
@@ -82,10 +83,16 @@ public class DefaultSessionEventHandler implements SessionEventHandler
 			onDisconnect(event);
 			break;
 		case Events.CHANGE_ATTRIBUTE:
-			onChangeAttribute(event);
+			onChangeAttribute((ChangeAttributeEvent)event);
 			break;
 		case Events.EXCEPTION:
 			onException(event);
+			break;
+		case Events.RECONNECT:
+			onReconnect((ConnectEvent)event);
+			break;
+		case Events.LOG_OUT:
+			onLogout(event);
 			break;
 		default:
 			onCustomEvent(event);
@@ -101,7 +108,7 @@ public class DefaultSessionEventHandler implements SessionEventHandler
 			NetworkEvent networkEvent = new DefaultNetworkEvent(event);
 			if (pSession.isUDPEnabled())
 			{
-				networkEvent.setDeliveryGuaranty(DeliveryGuarantyOptions.FAST);
+				networkEvent.setDeliveryGuaranty(FAST);
 			}
 			pSession.getGameRoom().sendBroadcast(networkEvent);
 		}
@@ -109,19 +116,27 @@ public class DefaultSessionEventHandler implements SessionEventHandler
 
 	protected void onNetworkMessage(NetworkEvent event)
 	{
+		Session session = getSession();
+		if (!session.isWriteable())
+			return;
 		DeliveryGuaranty guaranty = event.getDeliveryGuaranty();
-		if(guaranty.getGuaranty() == DeliveryGuarantyOptions.FAST.getGuaranty()){
-			Fast udpSender = getSession().getUdpSender();
-			if(null != udpSender)
+		if (guaranty.getGuaranty() == FAST.getGuaranty())
+		{
+			Fast udpSender = session.getUdpSender();
+			if (null != udpSender)
 			{
 				udpSender.sendMessage(event);
 			}
 			else
 			{
-				LOG.trace("Going to discard event: {} since udpSender is null in session: {}",event,session);
+				LOG.trace(
+						"Going to discard event: {} since udpSender is null in session: {}",
+						event, session);
 			}
-		}else{
-			getSession().getTcpSender().sendMessage(event);
+		}
+		else
+		{
+			session.getTcpSender().sendMessage(event);
 		}
 	}
 	
@@ -135,13 +150,12 @@ public class DefaultSessionEventHandler implements SessionEventHandler
 		getSession().getTcpSender().sendMessage(event);
 	}
 	
-	protected void onConnect(Event event)
+	protected void onConnect(ConnectEvent event)
 	{
-		Object source = event.getSource();
 		Session session = getSession();
-		if (source instanceof Reliable)
+		if (null != event.getTcpSender())
 		{
-			session.setTcpSender((Reliable) source);
+			session.setTcpSender(event.getTcpSender());
 			// Now send the start event to session
 			session.onEvent(Events.event(null, Events.START));
 		}
@@ -154,11 +168,28 @@ public class DefaultSessionEventHandler implements SessionEventHandler
 			else
 			{
 				session.setUDPEnabled(true);
-				session.setUdpSender((Fast) source);
+				session.setUdpSender(event.getUdpSender());
 			}
 		}
 	}
-
+	
+	protected void onReconnect(ConnectEvent event)
+	{
+		Session session = getSession();
+		// To synchronize with task for closing session in ReconnectRegistry service.
+		synchronized(session){
+			@SuppressWarnings("unchecked")
+			SessionRegistryService<String> reconnectRegistry = ((SessionRegistryService<String>) session
+					.getAttribute(JetConfig.RECONNECT_REGISTRY));
+			if (null != reconnectRegistry && Session.Status.CLOSED != session.getStatus())
+			{
+				reconnectRegistry.removeSession((String) session
+						.getAttribute(JetConfig.RECONNECT_KEY));
+			}
+		}
+		onConnect(event);
+	}
+	
 	protected void onStart(Event event)
 	{
 		getSession().getTcpSender().sendMessage(event);
@@ -176,23 +207,48 @@ public class DefaultSessionEventHandler implements SessionEventHandler
 
 	protected void onDisconnect(Event event)
 	{
-		LOG.debug("Received disconnect event in session. "
-				+ "Going to close session");
+		LOG.debug("Received disconnect event in session. ");
+		onException(event);
+	}
+	
+	protected void onChangeAttribute(ChangeAttributeEvent event)
+	{
+		getSession().setAttribute(event.getKey(), event.getValue());
+	}
+
+	@SuppressWarnings("unchecked")
+	protected void onException(Event event)
+	{
+		Session session = getSession();
+		session.setStatus(Session.Status.NOT_CONNECTED);
+		session.setWriteable(false);
+		session.setUDPEnabled(false);// will be set to true by udpupstream handler on connect event.
+		String reconnectKey = (String) session
+				.getAttribute(JetConfig.RECONNECT_KEY);
+		SessionRegistryService<String> registry = (SessionRegistryService<String>)session.getAttribute(JetConfig.RECONNECT_REGISTRY);
+		if (null != reconnectKey && null != registry)
+		{
+			// If session is already in registry then do not re-register.
+			if(null == registry.getSession(reconnectKey)){
+				registry.putSession(
+						reconnectKey, getSession());
+				LOG.debug("Received exception/disconnect event in session. "
+					+ "Going to put session in reconnection registry");
+			}
+		}
+		else
+		{
+			LOG.debug("Received exception/disconnect event in session. "
+					+ "Going to close session");
+			onClose(event);
+		}
+	}
+
+	protected void onLogout(Event event)
+	{
 		onClose(event);
 	}
 	
-	protected void onChangeAttribute(Event event)
-	{
-
-	}
-
-	protected void onException(Event event)
-	{
-		LOG.debug("Received exception event in session. "
-				+ "Going to close session");
-		onClose(event);
-	}
-
 	protected void onClose(Event event)
 	{
 		getSession().close();

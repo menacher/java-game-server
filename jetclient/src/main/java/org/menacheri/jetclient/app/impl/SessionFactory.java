@@ -18,9 +18,10 @@ import org.menacheri.jetclient.communication.MessageSender.Fast;
 import org.menacheri.jetclient.communication.MessageSender.Reliable;
 import org.menacheri.jetclient.communication.NettyTCPMessageSender;
 import org.menacheri.jetclient.communication.NettyUDPMessageSender;
-import org.menacheri.jetclient.event.Events;
 import org.menacheri.jetclient.event.Event;
 import org.menacheri.jetclient.event.EventHandler;
+import org.menacheri.jetclient.event.Events;
+import org.menacheri.jetclient.event.SessionEventHandler;
 import org.menacheri.jetclient.handlers.netty.TCPPipelineFactory;
 import org.menacheri.jetclient.handlers.netty.UDPPipelineFactory;
 import org.menacheri.jetclient.util.LoginHelper;
@@ -75,15 +76,32 @@ public class SessionFactory
 	/**
 	 * Creates a {@link Session} and connects it to the remote jetserver.
 	 * 
-	 * @return The session instance created.
+	 * @return The session instance created and connected to remote jetserver.
 	 * @throws InterruptedException
 	 * @throws Exception
 	 */
 	public Session createAndConnectSession() throws InterruptedException,
 			Exception
 	{
+		return createAndConnectSession((EventHandler[]) null);
+	}
+
+	/**
+	 * Creates a {@link Session}, adds the event handlers to the session and
+	 * then connects it to the remote jetserver. This way events will not be
+	 * lost on connect.
+	 * 
+	 * @param eventHandlers
+	 *            The handlers to be added to listen to session.
+	 * @return The session instance created and connected to remote jetserver.
+	 * @throws InterruptedException
+	 * @throws Exception
+	 */
+	public Session createAndConnectSession(EventHandler... eventHandlers)
+			throws InterruptedException, Exception
+	{
 		Session session = createSession();
-		connectSession(session);
+		connectSession(session, eventHandlers);
 		return session;
 	}
 
@@ -111,61 +129,152 @@ public class SessionFactory
 	public void connectSession(final Session session)
 			throws InterruptedException, Exception
 	{
-		InetSocketAddress localAddress = null;
+		connectSession(session, (EventHandler[]) null);
+	}
+
+	/**
+	 * Connects the session to remote jetserver. Depending on the connection
+	 * parameters provided to LoginHelper, it can connect both TCP and UDP
+	 * transports.
+	 * 
+	 * @param session
+	 *            The session to be connected to remote jetserver.
+	 * @param eventHandlers
+	 *            The handlers to be added to session.
+	 * @throws InterruptedException
+	 * @throws Exception
+	 */
+	public void connectSession(final Session session,
+			EventHandler... eventHandlers) throws InterruptedException,
+			Exception
+	{
+		InetSocketAddress udpAddress = null;
 		if (null != udpClient)
 		{
-			final DatagramChannel datagramChannel = udpClient
-					.createDatagramChannel();
-			localAddress = udpClient.getLocalAddress(datagramChannel);
-			// Add a start event handler to the session which will send the udp
-			// connect on server START signal.
-			EventHandler startEventHandler = new EventHandler()
-			{
-				@Override
-				public void onEvent(Event event)
-				{
-					try
-					{
-						udpClient.connect(session, datagramChannel);
-					}
-					catch (UnknownHostException e)
-					{
-						throw new RuntimeException(e);
-					}
-					catch (InterruptedException e)
-					{
-						throw new RuntimeException(e);
-					}
-				}
-
-				@Override
-				public int getEventType()
-				{
-					return Events.START;
-				}
-			};
-			session.addHandler(startEventHandler);
-			Fast udpMessageSender = new NettyUDPMessageSender(
-					udpClient.getServerAddress(), datagramChannel);
-			session.setUdpMessageSender(udpMessageSender);
+			udpAddress = doUdpConnection(session);
 		}
 
+		if (null != eventHandlers)
+		{
+			for (EventHandler eventHandler : eventHandlers)
+			{
+				session.addHandler(eventHandler);
+				if (eventHandler instanceof SessionEventHandler)
+				{
+					((SessionEventHandler) eventHandler).setSession(session);
+				}
+			}
+		}
+
+		MessageBuffer<ChannelBuffer> buffer = loginHelper
+				.getLoginBuffer(udpAddress);
+		Event loginEvent = Events.event(buffer, Events.LOG_IN);
+		doTcpConnection(session, loginEvent);
+	}
+
+	/**
+	 * Method used to reconnect existing session which probably got disconnected
+	 * due to some exception. It will first close existing tcp and udp
+	 * connections and then try re-connecting using the reconnect key from
+	 * server.
+	 * 
+	 * @param session
+	 *            The session which needs to be re-connected.
+	 * @param reconnectKey
+	 *            This is provided by the server on
+	 *            {@link Events#GAME_ROOM_JOIN_SUCCESS} event and stored in the
+	 *            session.
+	 * @throws InterruptedException
+	 * @throws Exception
+	 */
+	public void reconnectSession(final Session session, String reconnectKey)
+			throws InterruptedException, Exception
+	{
+		session.getTcpMessageSender().close();
+		if (null != session.getUdpMessageSender())
+			session.getUdpMessageSender().close();
+
+		InetSocketAddress udpAddress = null;
+		if (null != udpClient)
+		{
+			udpAddress = doUdpConnection(session);
+		}
+
+		Event reconnectEvent = Events.event(
+				loginHelper.getReconnectBuffer(reconnectKey, udpAddress),
+				Events.RECONNECT);
+
+		doTcpConnection(session, reconnectEvent);
+	}
+
+	protected void doTcpConnection(final Session session, Event event)
+			throws Exception, InterruptedException
+	{
 		// Connect session using tcp to remote jetserver
 		TCPPipelineFactory tcpFactory = new TCPPipelineFactory(session);
-		MessageBuffer<ChannelBuffer> buffer = loginHelper
-				.getLoginBuffer(localAddress);
-		Event loginEvent = Events.event(buffer, Events.LOG_IN);
+
 		// This will in turn invoke the startEventHandler when server sends
 		// Events.START event.
-		Channel channel = tcpClient.connect(tcpFactory, loginEvent);
-		Reliable tcpMessageSender = new NettyTCPMessageSender(channel);
-		session.setTcpMessageSender(tcpMessageSender);
+		Channel channel = tcpClient.connect(tcpFactory, event);
+		if (null != channel)
+		{
+			Reliable tcpMessageSender = new NettyTCPMessageSender(channel);
+			session.setTcpMessageSender(tcpMessageSender);
+		}
+		else
+		{
+			throw new Exception("Could not create TCP connection to server");
+		}
+	}
+
+	protected InetSocketAddress doUdpConnection(final Session session)
+			throws UnknownHostException
+	{
+		InetSocketAddress localAddress;
+		final DatagramChannel datagramChannel = udpClient
+				.createDatagramChannel();
+		localAddress = datagramChannel.getLocalAddress();
+		// Add a start event handler to the session which will send the udp
+		// connect on server START signal.
+		final EventHandler startEventHandler = new EventHandler()
+		{
+			@Override
+			public void onEvent(Event event)
+			{
+				try
+				{
+					udpClient.connect(session, datagramChannel);
+					// remove after use
+					session.removeHandler(this);
+				}
+				catch (UnknownHostException e)
+				{
+					throw new RuntimeException(e);
+				}
+				catch (InterruptedException e)
+				{
+					throw new RuntimeException(e);
+				}
+			}
+
+			@Override
+			public int getEventType()
+			{
+				return Events.START;
+			}
+		};
+		session.addHandler(startEventHandler);
+		Fast udpMessageSender = new NettyUDPMessageSender(
+				udpClient.getServerAddress(), datagramChannel);
+		session.setUdpMessageSender(udpMessageSender);
+		return localAddress;
 	}
 
 	public PlayerSession createPlayerSession(Player player)
 	{
 		SessionBuilder sessionBuilder = new SessionBuilder();
-		DefaultPlayerSession playerSession = new DefaultPlayerSession(sessionBuilder, player);
+		DefaultPlayerSession playerSession = new DefaultPlayerSession(
+				sessionBuilder, player);
 		return playerSession;
 	}
 

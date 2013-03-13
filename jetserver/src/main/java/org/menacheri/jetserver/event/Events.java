@@ -2,14 +2,15 @@ package org.menacheri.jetserver.event;
 
 import org.menacheri.jetserver.app.Session;
 import org.menacheri.jetserver.communication.DeliveryGuaranty;
-import org.menacheri.jetserver.communication.MessageSender;
 import org.menacheri.jetserver.communication.DeliveryGuaranty.DeliveryGuarantyOptions;
-import org.menacheri.jetserver.event.impl.DefaultSessionEventHandler;
+import org.menacheri.jetserver.communication.MessageSender.Fast;
+import org.menacheri.jetserver.communication.MessageSender.Reliable;
 import org.menacheri.jetserver.event.impl.ChangeAttributeEvent;
-import org.menacheri.jetserver.event.impl.ConnectEvent;
+import org.menacheri.jetserver.event.impl.DefaultConnectEvent;
 import org.menacheri.jetserver.event.impl.DefaultEvent;
 import org.menacheri.jetserver.event.impl.DefaultEventContext;
 import org.menacheri.jetserver.event.impl.DefaultNetworkEvent;
+import org.menacheri.jetserver.event.impl.DefaultSessionEventHandler;
 
 
 public class Events
@@ -21,9 +22,21 @@ public class Events
 	 * event. For e.g. {@link DefaultSessionEventHandler}
 	 */
 	public final static byte ANY = 0x00;
+	
 	// Lifecycle events.
 	public final static byte CONNECT = 0x02;
+	/**
+	 * Similar to LOG_IN but parameters are different. This event is sent from
+	 * client to server.
+	 */
+	public static final byte RECONNECT = 0x3;
 	public final static byte CONNECT_FAILED = 0x06;
+	/**
+	 * Event used to log in to a server from a remote client. Example payload
+	 * will be <b>login opcode 0x08-protocl version 0x01- username as string
+	 * bytes- password as string bytes - connection key as string bytes -
+	 * optional udp client address as bytes</b>
+	 */
 	public static final byte LOG_IN = 0x08;
 	public static final byte LOG_OUT = 0x0a;
 	public static final byte LOG_IN_SUCCESS = 0x0b;
@@ -66,6 +79,10 @@ public class Events
 	 * If a remote connection is disconnected or closed then raise this event.
 	 */
 	public static final byte DISCONNECT = 0x22;
+	
+	/**
+	 * A network exception will in turn cause this even to be raised.
+	 */
 	public static final byte EXCEPTION = 0x24;
 	
 	public static Event event(Object source, int eventType)
@@ -130,9 +147,20 @@ public class Events
 		return networkEvent;
 	}
 	
-	public static Event connectEvent(MessageSender messageSender){
-		Event event = new ConnectEvent();
-		event.setSource(messageSender);
+	public static Event connectEvent(Reliable tcpSender){
+		Event event = new DefaultConnectEvent(tcpSender);
+		event.setTimeStamp(System.currentTimeMillis());
+		return event;
+	}
+	
+	public static Event connectEvent(Fast udpSender){
+		Event event = new DefaultConnectEvent(udpSender);
+		event.setTimeStamp(System.currentTimeMillis());
+		return event;
+	}
+	
+	public static Event connectEvent(Reliable tcpSender, Fast udpSender){
+		Event event = new DefaultConnectEvent(tcpSender, udpSender);
 		event.setTimeStamp(System.currentTimeMillis());
 		return event;
 	}
@@ -144,10 +172,6 @@ public class Events
 	
 	public static Event changeAttributeEvent(String key, Object value)
 	{
-		ChangeAttributeEvent changeAttributeEvent = new ChangeAttributeEvent();
-		changeAttributeEvent.setType(CHANGE_ATTRIBUTE);
-		changeAttributeEvent.setKey(key);
-		changeAttributeEvent.setValue(value);
-		return changeAttributeEvent;
+		return new ChangeAttributeEvent(key,value);
 	}
 }

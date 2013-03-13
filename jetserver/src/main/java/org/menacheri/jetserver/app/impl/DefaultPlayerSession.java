@@ -70,7 +70,7 @@ public class DefaultPlayerSession extends DefaultSession implements
 		{
 			if (null == parentGameRoom)
 			{
-				throw new IllegalStateException(
+				throw new IllegalArgumentException(
 						"GameRoom instance is null, session will not be constructed");
 			}
 			this.parentGameRoom = parentGameRoom;

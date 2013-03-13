@@ -1,9 +1,11 @@
 package org.menacheri.jetserver.handlers.netty;
 
 import java.net.InetSocketAddress;
+import java.net.SocketAddress;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.jboss.netty.buffer.ChannelBuffer;
+import org.jboss.netty.buffer.ChannelBuffers;
 import org.jboss.netty.channel.Channel;
 import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
@@ -15,13 +17,18 @@ import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.menacheri.jetserver.app.GameRoom;
 import org.menacheri.jetserver.app.Player;
 import org.menacheri.jetserver.app.PlayerSession;
+import org.menacheri.jetserver.app.Session;
 import org.menacheri.jetserver.communication.NettyTCPMessageSender;
 import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.event.Events;
+import org.menacheri.jetserver.event.impl.ReconnetEvent;
 import org.menacheri.jetserver.server.netty.AbstractNettyServer;
 import org.menacheri.jetserver.service.LookupService;
 import org.menacheri.jetserver.service.SessionRegistryService;
+import org.menacheri.jetserver.service.UniqueIDGeneratorService;
+import org.menacheri.jetserver.service.impl.ReconnectSessionRegistry;
 import org.menacheri.jetserver.util.Credentials;
+import org.menacheri.jetserver.util.JetConfig;
 import org.menacheri.jetserver.util.NettyUtils;
 import org.menacheri.jetserver.util.SimpleCredentials;
 import org.slf4j.Logger;
@@ -35,25 +42,34 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 			.getLogger(LoginHandler.class);
 
 	protected LookupService lookupService;
-	protected SessionRegistryService sessionRegistryService;
+	protected SessionRegistryService<SocketAddress> udpSessionRegistry;
+	protected ReconnectSessionRegistry reconnectRegistry;
+	protected UniqueIDGeneratorService idGeneratorService;
+	
 	/**
 	 * Used for book keeping purpose. It will count all open channels. Currently
 	 * closed channels will not lead to a decrement.
 	 */
-	private static final AtomicInteger CHANNEL_COUNTER =  new AtomicInteger(0);
-	
-	public void messageReceived(final ChannelHandlerContext ctx, final MessageEvent e)
-			throws Exception
+	private static final AtomicInteger CHANNEL_COUNTER = new AtomicInteger(0);
+
+	public void messageReceived(final ChannelHandlerContext ctx,
+			final MessageEvent e) throws Exception
 	{
-		final Event event = (Event)e.getMessage();
+		final Event event = (Event) e.getMessage();
 		final ChannelBuffer buffer = (ChannelBuffer) event.getSource();
 		final Channel channel = e.getChannel();
-		if(event.getType() == Events.LOG_IN)
+		int type = event.getType();
+		if (type == Events.LOG_IN)
 		{
-			LOG.trace("Login attempt from {}",channel.getRemoteAddress());
+			LOG.debug("Login attempt from {}", channel.getRemoteAddress());
 			Player player = lookupPlayer(buffer, channel);
-			handleLogin(player,channel);
-			handleGameRoomJoin(player, channel,buffer);
+			handleLogin(player, channel, buffer);
+		}
+		else if (type == Events.RECONNECT)
+		{
+			LOG.debug("Reconnect attempt from {}", channel.getRemoteAddress());
+			PlayerSession playerSession = lookupSession(buffer);
+			handleReconnect(playerSession, channel, buffer);
 		}
 		else
 		{
@@ -83,12 +99,36 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 		return player;
 	}
 	
-	public void handleLogin(Player player,Channel channel)
+	public PlayerSession lookupSession(final ChannelBuffer buffer)
+	{
+		String reconnectKey = NettyUtils.readString(buffer);
+		PlayerSession playerSession = (PlayerSession)reconnectRegistry.getSession(reconnectKey);
+		if(null != playerSession)
+		{
+			synchronized(playerSession){
+				// if its an already active session then do not allow a
+				// reconnect. So the only state in which a client is allowed to
+				// reconnect is if it is "NOT_CONNECTED"
+				if(playerSession.getStatus() == Session.Status.NOT_CONNECTED)
+				{
+					playerSession.setStatus(Session.Status.CONNECTING);
+				}
+				else
+				{
+					playerSession = null;
+				}
+			}
+		}
+		return playerSession;
+	}
+	
+	public void handleLogin(Player player, Channel channel, ChannelBuffer buffer)
 	{
 		if (null != player)
 		{
 			channel.write(NettyUtils
 					.createBufferForOpcode(Events.LOG_IN_SUCCESS));
+			handleGameRoomJoin(player, channel, buffer);
 		}
 		else
 		{
@@ -96,7 +136,30 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 			closeChannelWithLoginFailure(channel);
 		}
 	}
-	
+
+	protected void handleReconnect(PlayerSession playerSession, Channel channel, ChannelBuffer buffer)
+	{
+		if (null != playerSession)
+		{
+			channel.write(NettyUtils
+					.createBufferForOpcode(Events.LOG_IN_SUCCESS));
+			GameRoom gameRoom = playerSession.getGameRoom();
+			gameRoom.disconnectSession(playerSession);
+			if (null != playerSession.getTcpSender())
+				playerSession.getTcpSender().close();
+
+			if (null != playerSession.getUdpSender())
+				playerSession.getUdpSender().close();
+			
+			handleReJoin(playerSession, gameRoom, channel, buffer);
+		}
+		else
+		{
+			// Write future and close channel
+			closeChannelWithLoginFailure(channel);
+		}
+	}
+
 	/**
 	 * Helper method which will close the channel after writing
 	 * {@link Events#LOG_IN_FAILURE} to remote connection.
@@ -120,8 +183,13 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 		{
 			PlayerSession playerSession = gameRoom.createPlayerSession(player);
 			gameRoom.onLogin(playerSession);
+			String reconnectKey = (String)idGeneratorService
+					.generateFor(playerSession.getClass());
+			playerSession.setAttribute(JetConfig.RECONNECT_KEY, reconnectKey);
+			playerSession.setAttribute(JetConfig.RECONNECT_REGISTRY, reconnectRegistry);
 			LOG.trace("Sending GAME_ROOM_JOIN_SUCCESS to channel {}", channel.getId());
-			ChannelFuture future = channel.write(NettyUtils.createBufferForOpcode(Events.GAME_ROOM_JOIN_SUCCESS));
+			ChannelBuffer reconnectKeyBuffer = ChannelBuffers.wrappedBuffer(NettyUtils.createBufferForOpcode(Events.GAME_ROOM_JOIN_SUCCESS), NettyUtils.writeString(reconnectKey));
+			ChannelFuture future = channel.write(reconnectKeyBuffer);
 			connectToGameRoom(gameRoom, playerSession, future);
 			loginUdp(playerSession, buffer);
 		}
@@ -132,6 +200,23 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 			future.addListener(ChannelFutureListener.CLOSE);
 			LOG.error("Invalid ref key provided by client: {}. Channel {} will be closed",refKey,channel.getId());
 		}
+	}
+	
+	protected void handleReJoin(PlayerSession playerSession, GameRoom gameRoom, Channel channel,
+			ChannelBuffer buffer)
+	{
+		LOG.trace("Going to clear pipeline");
+		// Clear the existing pipeline
+		NettyUtils.clearPipeline(channel.getPipeline());
+		// Set the tcp channel on the session. 
+		NettyTCPMessageSender sender = new NettyTCPMessageSender(channel);
+		playerSession.setTcpSender(sender);
+		// Connect the pipeline to the game room.
+		gameRoom.connectSession(playerSession);
+		playerSession.setWriteable(true);
+		// Send the re-connect event so that it will in turn send the START event.
+		playerSession.onEvent(new ReconnetEvent(sender));
+		loginUdp(playerSession, buffer);
 	}
 	
 	public void connectToGameRoom(final GameRoom gameRoom, final PlayerSession playerSession, ChannelFuture future)
@@ -181,7 +266,7 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 		InetSocketAddress remoteAdress = NettyUtils.readSocketAddress(buffer);
 		if(null != remoteAdress)
 		{
-			sessionRegistryService.putSession(remoteAdress, playerSession);
+			udpSessionRegistry.putSession(remoteAdress, playerSession);
 		}
 	}
 	
@@ -195,15 +280,33 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 		this.lookupService = lookupService;
 	}
 
-	public SessionRegistryService getSessionRegistryService()
-	{
-		return sessionRegistryService;
+	public UniqueIDGeneratorService getIdGeneratorService() {
+		return idGeneratorService;
 	}
 
-	public void setSessionRegistryService(
-			SessionRegistryService sessionRegistryService)
+	public void setIdGeneratorService(UniqueIDGeneratorService idGeneratorService) {
+		this.idGeneratorService = idGeneratorService;
+	}
+
+	public SessionRegistryService<SocketAddress> getUdpSessionRegistry()
 	{
-		this.sessionRegistryService = sessionRegistryService;
+		return udpSessionRegistry;
+	}
+
+	public void setUdpSessionRegistry(
+			SessionRegistryService<SocketAddress> udpSessionRegistry)
+	{
+		this.udpSessionRegistry = udpSessionRegistry;
+	}
+
+	public ReconnectSessionRegistry getReconnectRegistry()
+	{
+		return reconnectRegistry;
+	}
+
+	public void setReconnectRegistry(ReconnectSessionRegistry reconnectRegistry)
+	{
+		this.reconnectRegistry = reconnectRegistry;
 	}
 
 }

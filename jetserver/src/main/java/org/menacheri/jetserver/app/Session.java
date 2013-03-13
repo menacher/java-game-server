@@ -18,7 +18,7 @@ public interface Session
 	 */
 	enum Status
 	{
-		NOT_CONNECTED, CONNECTING, CONNECTED,CLOSED
+		NOT_CONNECTED, CONNECTING, CONNECTED, CLOSED
 	}
 
 	Object getId();

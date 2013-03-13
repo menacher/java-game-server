@@ -54,7 +54,7 @@ public class NettyTCPMessageSender implements Reliable
 	@Override
 	public void close()
 	{
-		LOG.info("Going to close tcp connection in class: {}", this
+		LOG.debug("Going to close tcp connection in class: {}", this
 				.getClass().getName());
 		Event event = Events.event(null, Events.DISCONNECT);
 		if (channel.isConnected())
@@ -63,7 +63,8 @@ public class NettyTCPMessageSender implements Reliable
 		}
 		else
 		{
-			LOG.warn("Unable to write the Event {} with type {} to socket",
+			channel.close();
+			LOG.trace("Unable to write the Event {} with type {} to socket",
 					event, event.getType());
 		}
 	}

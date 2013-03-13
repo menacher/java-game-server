@@ -210,8 +210,8 @@ public class LoginHelper
 	 *         connection key, udp local bind address etc.
 	 * @throws Exception
 	 */
-	public MessageBuffer<ChannelBuffer> getLoginBuffer(InetSocketAddress localUDPAddress)
-			throws Exception
+	public MessageBuffer<ChannelBuffer> getLoginBuffer(
+			InetSocketAddress localUDPAddress) throws Exception
 	{
 		ChannelBuffer loginBuffer;
 		ChannelBuffer credentials = NettyUtils.writeStrings(username, password,
@@ -228,6 +228,36 @@ public class LoginHelper
 			loginBuffer = credentials;
 		}
 		return new NettyMessageBuffer(loginBuffer);
+	}
+
+	/**
+	 * Creates a wrapped netty buffer with reconnect key and udp address as its
+	 * payload.
+	 * 
+	 * @param reconnectKey
+	 *            The key that was initially sent by server on game room join
+	 *            success event will be sent back to server for reconnecting
+	 * @param udpAddress
+	 *            If udp connection is required, then the new udpAddress need to
+	 *            be sent.
+	 * @return Returns the channel buffer containing reconnect key and udp
+	 *         address in binary format.
+	 */
+	public MessageBuffer<ChannelBuffer> getReconnectBuffer(String reconnectKey,
+			InetSocketAddress udpAddress)
+	{
+		ChannelBuffer reconnectBuffer = null;
+		ChannelBuffer buffer = NettyUtils.writeString(reconnectKey);
+		if (null != udpAddress)
+		{
+			reconnectBuffer = ChannelBuffers.wrappedBuffer(buffer,
+					NettyUtils.writeSocketAddress(udpAddress));
+		}
+		else
+		{
+			reconnectBuffer = buffer;
+		}
+		return new NettyMessageBuffer(reconnectBuffer);
 	}
 
 	public String getUsername()

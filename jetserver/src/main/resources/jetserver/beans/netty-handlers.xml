@@ -5,11 +5,6 @@
 
 	<import resource="service-beans.xml"></import>
 	
-<!-- Configure all properties files here, wildcards like *.properties are 
-		also allowed -->
-	<context:property-placeholder
-		location="jetserver/props/jetserver.properties" />
-		
 	<!-- Netty and decoders encoders and handlers -->
 	<bean id="stringDecoder" class="org.jboss.netty.handler.codec.string.StringDecoder"></bean>
 	<bean id="stringEncoder" class="org.jboss.netty.handler.codec.string.StringEncoder"></bean>
@@ -48,16 +43,20 @@
 	<bean id="messageBufferEventDecoder" class="org.menacheri.jetserver.handlers.netty.MessageBufferEventDecoder"></bean>
 	<bean id="messageBufferEventEncoder" class="org.menacheri.jetserver.handlers.netty.MessageBufferEventEncoder"></bean>
 	<bean id="udpUpstreamHandler" class="org.menacheri.jetserver.handlers.netty.UDPUpstreamHandler">
-		<property name="sessionRegistryService" ref="sessionRegistryService"></property>
+		<property name="udpSessionRegistry" ref="udpSessionRegistry"></property>
 	</bean>
 	
 	<bean id="loginHandler" class="org.menacheri.jetserver.handlers.netty.LoginHandler">
 		<property name="lookupService" ref="lookupService"></property>
-		<property name="sessionRegistryService" ref="sessionRegistryService"></property>
+		<property name="udpSessionRegistry" ref="udpSessionRegistry"></property>
+		<property name="idGeneratorService" ref="simpleUniqueIdGenerator"></property>
+		<property name="reconnectRegistry" ref="reconnectSessionRegistry"></property>
 	</bean>
 	
 	<bean id="webSocketLoginHandler" class="org.menacheri.jetserver.handlers.netty.WebSocketLoginHandler">
 		<property name="lookupService" ref="lookupService"></property>
+		<property name="idGeneratorService" ref="simpleUniqueIdGenerator"></property>
+		<property name="reconnectRegistry" ref="reconnectSessionRegistry"></property>
 		<property name="gson" ref="gson"></property>
 	</bean>
 	<bean id="textWebsocketEncoder" class="org.menacheri.jetserver.handlers.netty.TextWebsocketEncoder">

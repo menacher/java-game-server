@@ -2,6 +2,7 @@ package org.menacheri.jetserver.handlers.netty;
 
 import static org.menacheri.jetserver.event.Events.LOG_IN;
 import static org.menacheri.jetserver.event.Events.PROTCOL_VERSION;
+import static org.menacheri.jetserver.event.Events.RECONNECT;
 
 import java.util.List;
 
@@ -146,7 +147,7 @@ public interface LoginProtocol
 
 		protected boolean isJetProtocol(int magic1, int magic2)
 		{
-			return magic1 == LOG_IN && magic2 == PROTCOL_VERSION;
+			return ((magic1 == LOG_IN || magic1 == RECONNECT) && magic2 == PROTCOL_VERSION);
 		}
 
 		public ChannelHandler createLengthBasedFrameDecoder()

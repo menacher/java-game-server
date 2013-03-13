@@ -1,14 +1,24 @@
 package org.menacheri.jetserver.event.impl;
 
+import org.menacheri.jetserver.event.Events;
+
 public class ChangeAttributeEvent extends DefaultEvent
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -5257419644823465715L;
 	private String key;
 	private Object value;
 
+	public ChangeAttributeEvent(String key, Object value)
+	{
+		this.key = key;
+		this.value = value;
+	}
+	
+	@Override
+	public int getType() {
+		return Events.CHANGE_ATTRIBUTE;
+	}
+	
 	public String getKey()
 	{
 		return key;
@@ -28,6 +38,12 @@ public class ChangeAttributeEvent extends DefaultEvent
 	{
 		this.value = value;
 		this.setSource(value);
+	}
+
+	@Override
+	public String toString() {
+		return "ChangeAttributeEvent [key=" + key + ", value=" + value
+				+ ", type=" + type + "]";
 	}
 
 }

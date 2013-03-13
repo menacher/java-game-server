@@ -3,12 +3,14 @@ package org.menacheri.jetclient.app;
 import java.util.List;
 
 import org.menacheri.jetclient.communication.MessageSender;
+import org.menacheri.jetclient.communication.ReconnectPolicy;
 import org.menacheri.jetclient.communication.MessageSender.Fast;
 import org.menacheri.jetclient.communication.MessageSender.Reliable;
 import org.menacheri.jetclient.event.Events;
 import org.menacheri.jetclient.event.Event;
 import org.menacheri.jetclient.event.EventDispatcher;
 import org.menacheri.jetclient.event.EventHandler;
+import org.menacheri.jetclient.util.LoginHelper;
 
 /**
  * This interface abstracts a session in jetclient. A session can be thought of
@@ -95,4 +97,10 @@ public interface Session
 	void setTcpMessageSender(Reliable tcpMessageSender);
 
 	Reliable getTcpMessageSender();
+	
+	void reconnect(LoginHelper loginHelper);
+	
+	void setReconnectPolicy(ReconnectPolicy reconnectPolicy);
+	
+	ReconnectPolicy getReconnectPolicy();
 }

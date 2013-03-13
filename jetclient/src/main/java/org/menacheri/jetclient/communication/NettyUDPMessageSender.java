@@ -10,14 +10,15 @@ import org.menacheri.jetclient.event.Events;
 
 /**
  * This class is used to send messages to a remote UDP client or server. An
- * instance of this class will be created when the {@link Events#CONNECT}
- * event is sent to a {@link Session}
+ * instance of this class will be created when the {@link Events#CONNECT} event
+ * is sent to a {@link Session}
  * 
  * @author Abraham Menacherry
  * 
  */
 public class NettyUDPMessageSender implements Fast
 {
+	private boolean isClosed = false;
 	private final SocketAddress remoteAddress;
 	private final DatagramChannel channel;
 	private static final DeliveryGuaranty DELIVERY_GUARANTY = DeliveryGuaranty.DeliveryGuarantyOptions.FAST;
@@ -42,8 +43,10 @@ public class NettyUDPMessageSender implements Fast
 	}
 
 	@Override
-	public void close()
+	public synchronized void close()
 	{
+		if (isClosed)
+			return;
 		Session session = NettyUDPClient.CLIENTS.remove(channel
 				.getLocalAddress());
 		if (null == session)
@@ -53,7 +56,7 @@ public class NettyUDPMessageSender implements Fast
 					+ channel.getLocalAddress()
 					+ " could not be removed from NettyUDPClient.CLIENTS map");
 		}
-		channel.close();
+		isClosed = true;
 	}
 
 	public SocketAddress getRemoteAddress()

@@ -3,7 +3,6 @@ package org.menacheri.jetserver.app.impl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.menacheri.jetserver.app.Session;
 import org.menacheri.jetserver.communication.MessageSender.Fast;
@@ -11,8 +10,9 @@ import org.menacheri.jetserver.communication.MessageSender.Reliable;
 import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.event.EventDispatcher;
 import org.menacheri.jetserver.event.EventHandler;
-import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.impl.EventDispatchers;
+import org.menacheri.jetserver.service.UniqueIDGeneratorService;
+import org.menacheri.jetserver.service.impl.SimpleUniqueIdGenerator;
 
 
 /**
@@ -93,12 +93,12 @@ public class DefaultSession implements Session
 		/**
 		 * Used to set a unique id on the incoming sessions to this room.
 		 */
-		protected static final AtomicInteger SESSION_ID = new AtomicInteger(0);
+		protected static final UniqueIDGeneratorService ID_GENERATOR_SERVICE = new SimpleUniqueIdGenerator();
 		protected Object id = null;
 		protected EventDispatcher eventDispatcher = null;
 		protected Map<String, Object> sessionAttributes = null;
-		protected long creationTime = 0l;
-		protected long lastReadWriteTime = 0l;
+		protected long creationTime = 0L;
+		protected long lastReadWriteTime = 0L;
 		protected Status status = Status.NOT_CONNECTED;
 		protected boolean isWriteable = true;
 		protected volatile boolean isShuttingDown = false;
@@ -119,7 +119,7 @@ public class DefaultSession implements Session
 		protected void validateAndSetValues(){
 			if (null == id)
 			{
-				id = String.valueOf(SESSION_ID.incrementAndGet());
+				id = String.valueOf(ID_GENERATOR_SERVICE.generateFor(DefaultSession.class));
 			}
 			if (null == eventDispatcher)
 			{
@@ -181,7 +181,6 @@ public class DefaultSession implements Session
 			this.isUDPEnabled = isUDPEnabled;
 			return this;
 		}
-		
 	}
 	
 	@Override
@@ -238,16 +237,12 @@ public class DefaultSession implements Session
 	public void removeAttribute(String key)
 	{
 		sessionAttributes.remove(key);
-		Event event = Events.changeAttributeEvent(key, null);
-		eventDispatcher.fireEvent(event);
 	}
 
 	@Override
 	public void setAttribute(String key, Object value)
 	{
 		sessionAttributes.put(key, value);
-		Event event = Events.changeAttributeEvent(key, value);
-		eventDispatcher.fireEvent(event);
 	}
 
 	@Override

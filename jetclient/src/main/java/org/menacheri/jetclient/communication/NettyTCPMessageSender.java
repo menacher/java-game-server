@@ -1,6 +1,7 @@
 package org.menacheri.jetclient.communication;
 
 import org.jboss.netty.channel.Channel;
+import org.jboss.netty.channel.ChannelFuture;
 import org.jboss.netty.channel.ChannelFutureListener;
 import org.menacheri.jetclient.communication.MessageSender.Reliable;
 import org.menacheri.jetclient.event.Events;
@@ -15,6 +16,7 @@ import org.menacheri.jetclient.event.Event;
  */
 public class NettyTCPMessageSender implements Reliable
 {
+	private boolean isClosed = false;
 	private final Channel channel;
 	private static final DeliveryGuaranty DELIVERY_GUARANTY = DeliveryGuaranty.DeliveryGuarantyOptions.RELIABLE;
 
@@ -41,9 +43,18 @@ public class NettyTCPMessageSender implements Reliable
 		return channel;
 	}
 
-	public void close()
+	public synchronized void close()
 	{
-		channel.close();
+		if (isClosed)
+			return;
+		ChannelFuture closeFuture = channel.close();
+		closeFuture.awaitUninterruptibly();
+		if (!closeFuture.isSuccess())
+		{
+			System.err.println("TCP channel " + channel.getId()
+					+ " did not close successfully");
+		}
+		isClosed = true;
 	}
 
 	/**

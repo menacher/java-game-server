@@ -12,4 +12,5 @@ import org.menacheri.jetclient.app.Session;
 public interface SessionEventHandler extends EventHandler
 {
 	Session getSession();
+	void setSession(Session session);
 }

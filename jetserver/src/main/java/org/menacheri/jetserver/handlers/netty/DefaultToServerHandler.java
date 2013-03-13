@@ -46,43 +46,25 @@ public class DefaultToServerHandler extends SimpleChannelUpstreamHandler
 	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e)
 			throws Exception
 	{
-		LOG.error("Exception in DefaultToServerHandler class: {}.",e);
-		Event event = Events.event(e,Events.EXCEPTION);
+		LOG.error("Exception during network communication: {}.", e);
+		Event event = Events.event(e, Events.EXCEPTION);
 		playerSession.onEvent(event);
 	}
 
 	@Override
-	public void channelDisconnected(ChannelHandlerContext ctx,
-			ChannelStateEvent e) throws Exception
-	{
-		if (!playerSession.isShuttingDown())
-		{
-			LOG.debug("Channel {} is disconnected, "
-					+ "raising the event to session", e.getChannel().getId());
-			Event event = Events.event(e, Events.DISCONNECT);
-			playerSession.onEvent(event);
-		}
-		else
-		{
-			LOG.debug("Session is already shutting down. "
-					+ "Disconnect event will be discarded for channel {}", 
-					e.getChannel().getId());
-		}
-		
-	}
-	
-	@Override
 	public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e)
 			throws Exception
 	{
-		LOG.debug("Channel {} is closed and resources released", e.getChannel().getId());
+		LOG.debug("Netty Channel {} is closed.", e.getChannel().getId());
 		if (!playerSession.isShuttingDown())
 		{
+			// Should not send close to session, since reconnection/other
+			// business logic might be in place.
 			Event event = Events.event(e, Events.DISCONNECT);
 			playerSession.onEvent(event);
 		}
 	}
-	
+
 	public PlayerSession getPlayerSession()
 	{
 		return playerSession;

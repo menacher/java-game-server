@@ -1,12 +1,15 @@
 package org.menacheri.jetclient.event.impl;
 
+import org.jboss.netty.buffer.ChannelBuffer;
 import org.menacheri.jetclient.app.Session;
 import org.menacheri.jetclient.communication.DeliveryGuaranty.DeliveryGuarantyOptions;
+import org.menacheri.jetclient.communication.MessageBuffer;
 import org.menacheri.jetclient.communication.MessageSender;
-import org.menacheri.jetclient.event.Events;
 import org.menacheri.jetclient.event.Event;
+import org.menacheri.jetclient.event.Events;
 import org.menacheri.jetclient.event.NetworkEvent;
 import org.menacheri.jetclient.event.SessionEventHandler;
+import org.menacheri.jetclient.util.Config;
 
 /**
  * Provides default implementation for most of the events. Subclasses can
@@ -20,13 +23,18 @@ import org.menacheri.jetclient.event.SessionEventHandler;
 public abstract class AbstractSessionEventHandler implements
 		SessionEventHandler
 {
-	protected final int eventType;
+	protected static final int eventType = Events.ANY;
 
-	private final Session session;
+	protected Session session;
+	
+	protected volatile boolean isReconnecting = false;
 
+	public AbstractSessionEventHandler()
+	{
+	}
+	
 	public AbstractSessionEventHandler(Session session)
 	{
-		this.eventType = Events.ANY;
 		this.session = session;
 	}
 
@@ -51,7 +59,7 @@ public abstract class AbstractSessionEventHandler implements
 			onDataIn(event);
 			break;
 		case Events.NETWORK_MESSAGE:
-			onNetworkMessage((NetworkEvent)event);
+			onNetworkMessage((NetworkEvent) event);
 			break;
 		case Events.LOG_IN_SUCCESS:
 			onLoginSuccess(event);
@@ -64,6 +72,9 @@ public abstract class AbstractSessionEventHandler implements
 			break;
 		case Events.STOP:
 			onStart(event);
+			break;
+		case Events.GAME_ROOM_JOIN_SUCCESS:
+			onGameRoomJoin(event);
 			break;
 		case Events.CONNECT_FAILED:
 			onConnectFailed(event);
@@ -104,9 +115,22 @@ public abstract class AbstractSessionEventHandler implements
 			messageSender.sendMessage(networkEvent);
 		}
 	}
-	
+
 	public void onLoginSuccess(Event event)
 	{
+	}
+
+	public void onGameRoomJoin(Event event)
+	{
+		if (null != event.getSource()
+				&& (event.getSource() instanceof MessageBuffer))
+		{
+			@SuppressWarnings("unchecked")
+			String reconnectKey = ((MessageBuffer<ChannelBuffer>) event
+					.getSource()).readString();
+			if (null != reconnectKey)
+				getSession().setAttribute(Config.RECONNECT_KEY, reconnectKey);
+		}
 	}
 
 	public void onLoginFailure(Event event)
@@ -115,6 +139,7 @@ public abstract class AbstractSessionEventHandler implements
 
 	public void onStart(Event event)
 	{
+		isReconnecting = false;
 		getSession().setWriteable(true);
 	}
 
@@ -130,9 +155,7 @@ public abstract class AbstractSessionEventHandler implements
 
 	public void onDisconnect(Event event)
 	{
-		System.out.println("Received disconnect event in session. "
-				+ "Going to close session");
-		onClose(event);
+		//onException(event);
 	}
 
 	public void onChangeAttribute(Event event)
@@ -140,11 +163,36 @@ public abstract class AbstractSessionEventHandler implements
 
 	}
 
-	public void onException(Event event)
+	public synchronized void onException(Event event)
 	{
-		System.out.println("Received exception event in session. "
-				+ "Going to close session");
-		onClose(event);
+		Session session = getSession();
+		String reconnectKey = (String) session
+				.getAttribute(Config.RECONNECT_KEY);
+		if (null != reconnectKey)
+		{
+			if(isReconnecting){
+				return;
+			}else{
+				isReconnecting = true;
+			}
+			session.setWriteable(false);
+			if (null != session.getReconnectPolicy())
+			{
+				session.getReconnectPolicy().applyPolicy(session);
+			}
+			else
+			{
+				System.err.println("Received exception event in session. "
+						+ "Going to close session");
+				onClose(event);
+			}
+		}
+		else
+		{
+			System.err.println("Received exception event in session. "
+					+ "Going to close session");
+			onClose(event);
+		}
 	}
 
 	public void onClose(Event event)
@@ -163,4 +211,10 @@ public abstract class AbstractSessionEventHandler implements
 		return session;
 	}
 
+	@Override
+	public void setSession(Session session)
+	{
+		this.session = session;
+	}
+	
 }
