@@ -160,9 +160,6 @@ public class JetlangEventDispatcherTest {
 
 		// start test
 		gameRoom.disconnectSession(playerSession);
-		JetlangEventDispatcher playerDispatcher = (JetlangEventDispatcher) playerSession
-				.getEventDispatcher();
-		assertNoListeners(playerDispatcher);
 		JetlangEventDispatcher gameDispatcher = (JetlangEventDispatcher) gameRoomSession
 				.getEventDispatcher();
 		assertNoListeners(gameDispatcher);
