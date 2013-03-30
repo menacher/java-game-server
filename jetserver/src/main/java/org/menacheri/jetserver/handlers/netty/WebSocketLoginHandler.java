@@ -13,14 +13,17 @@ import org.jboss.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.menacheri.jetserver.app.GameRoom;
 import org.menacheri.jetserver.app.Player;
 import org.menacheri.jetserver.app.PlayerSession;
+import org.menacheri.jetserver.app.Session;
 import org.menacheri.jetserver.communication.NettyTCPMessageSender;
 import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.impl.DefaultEvent;
+import org.menacheri.jetserver.event.impl.ReconnetEvent;
 import org.menacheri.jetserver.service.LookupService;
 import org.menacheri.jetserver.service.UniqueIDGeneratorService;
 import org.menacheri.jetserver.service.impl.ReconnectSessionRegistry;
 import org.menacheri.jetserver.util.Credentials;
+import org.menacheri.jetserver.util.JetConfig;
 import org.menacheri.jetserver.util.SimpleCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,8 +63,8 @@ public class WebSocketLoginHandler extends SimpleChannelUpstreamHandler
 			String data = frame.getText();
 			LOG.trace("From websocket: " + data);
 			Event event = gson.fromJson(data, DefaultEvent.class);
-
-			if (Events.LOG_IN == event.getType())
+			int type = event.getType();
+			if (Events.LOG_IN == type)
 			{
 				LOG.trace("Login attempt from {}", channel.getRemoteAddress());
 				List<String> credList = null;
@@ -69,6 +72,12 @@ public class WebSocketLoginHandler extends SimpleChannelUpstreamHandler
 				Player player = lookupPlayer(credList.get(0), credList.get(1));
 				handleLogin(player, channel);
 				handleGameRoomJoin(player, channel, credList.get(2));
+			}
+			else if (type == Events.RECONNECT)
+			{
+				LOG.debug("Reconnect attempt from {}", channel.getRemoteAddress());
+				PlayerSession playerSession = lookupSession((String)event.getSource());
+				handleReconnect(playerSession, channel);
 			}
 			else
 			{
@@ -86,6 +95,60 @@ public class WebSocketLoginHandler extends SimpleChannelUpstreamHandler
 		}
 	}
 
+	public PlayerSession lookupSession(final String reconnectKey)
+	{
+		PlayerSession playerSession = (PlayerSession)reconnectRegistry.getSession(reconnectKey);
+		if(null != playerSession)
+		{
+			synchronized(playerSession){
+				// if its an already active session then do not allow a
+				// reconnect. So the only state in which a client is allowed to
+				// reconnect is if it is "NOT_CONNECTED"
+				if(playerSession.getStatus() == Session.Status.NOT_CONNECTED)
+				{
+					playerSession.setStatus(Session.Status.CONNECTING);
+				}
+				else
+				{
+					playerSession = null;
+				}
+			}
+		}
+		return playerSession;
+	}
+	
+	protected void handleReconnect(PlayerSession playerSession, Channel channel)
+	{
+		if (null != playerSession)
+		{
+			channel.write(eventToFrame(Events.LOG_IN_SUCCESS, null));
+			GameRoom gameRoom = playerSession.getGameRoom();
+			gameRoom.disconnectSession(playerSession);
+			if (null != playerSession.getTcpSender())
+				playerSession.getTcpSender().close();
+
+			handleReJoin(playerSession, gameRoom, channel);
+		}
+		else
+		{
+			// Write future and close channel
+			closeChannelWithLoginFailure(channel);
+		}
+	}
+	
+	protected void handleReJoin(PlayerSession playerSession, GameRoom gameRoom, Channel channel)
+	{
+		// Set the tcp channel on the session. 
+		NettyTCPMessageSender sender = new NettyTCPMessageSender(channel);
+		playerSession.setTcpSender(sender);
+		// Connect the pipeline to the game room.
+		gameRoom.connectSession(playerSession);
+		channel.write(Events.GAME_ROOM_JOIN_SUCCESS, null);//assumes that the protocol applied will take care of event objects.
+		playerSession.setWriteable(true);// TODO remove if unnecessary. It should be done in start event
+		// Send the re-connect event so that it will in turn send the START event.
+		playerSession.onEvent(new ReconnetEvent(sender));
+	}
+	
 	public Player lookupPlayer(String username, String password)
 	{
 		Credentials credentials = new SimpleCredentials(username, password);
@@ -124,10 +187,14 @@ public class WebSocketLoginHandler extends SimpleChannelUpstreamHandler
 		{
 			PlayerSession playerSession = gameRoom.createPlayerSession(player);
 			gameRoom.onLogin(playerSession);
+			String reconnectKey = (String)idGeneratorService
+					.generateFor(playerSession.getClass());
+			playerSession.setAttribute(JetConfig.RECONNECT_KEY, reconnectKey);
+			playerSession.setAttribute(JetConfig.RECONNECT_REGISTRY, reconnectRegistry);
 			LOG.trace("Sending GAME_ROOM_JOIN_SUCCESS to channel {}",
 					channel.getId());
 			ChannelFuture future = channel.write(eventToFrame(
-					Events.GAME_ROOM_JOIN_SUCCESS, null));
+					Events.GAME_ROOM_JOIN_SUCCESS, reconnectKey));
 			connectToGameRoom(gameRoom, playerSession, future);
 		}
 		else

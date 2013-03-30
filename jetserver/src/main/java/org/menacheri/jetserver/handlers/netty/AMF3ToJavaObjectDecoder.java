@@ -60,6 +60,7 @@ public class AMF3ToJavaObjectDecoder extends OneToOneDecoder implements Transfor
 			// do the deserialization.
 			o = serializer.fromAmf(bis);
 			LOG.trace("Serialized object: {}",o);
+			bis.close();
 		}
 		catch (IOException e)
 		{

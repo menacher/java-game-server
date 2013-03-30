@@ -59,16 +59,17 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 		final ChannelBuffer buffer = (ChannelBuffer) event.getSource();
 		final Channel channel = e.getChannel();
 		int type = event.getType();
-		if (type == Events.LOG_IN)
+		if (Events.LOG_IN == type)
 		{
 			LOG.debug("Login attempt from {}", channel.getRemoteAddress());
 			Player player = lookupPlayer(buffer, channel);
 			handleLogin(player, channel, buffer);
 		}
-		else if (type == Events.RECONNECT)
+		else if (Events.RECONNECT == type)
 		{
 			LOG.debug("Reconnect attempt from {}", channel.getRemoteAddress());
-			PlayerSession playerSession = lookupSession(buffer);
+			String reconnectKey = NettyUtils.readString(buffer);
+			PlayerSession playerSession = lookupSession(reconnectKey);
 			handleReconnect(playerSession, channel, buffer);
 		}
 		else
@@ -99,9 +100,8 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 		return player;
 	}
 	
-	public PlayerSession lookupSession(final ChannelBuffer buffer)
+	public PlayerSession lookupSession(final String reconnectKey)
 	{
-		String reconnectKey = NettyUtils.readString(buffer);
 		PlayerSession playerSession = (PlayerSession)reconnectRegistry.getSession(reconnectKey);
 		if(null != playerSession)
 		{
@@ -213,7 +213,7 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 		playerSession.setTcpSender(sender);
 		// Connect the pipeline to the game room.
 		gameRoom.connectSession(playerSession);
-		playerSession.setWriteable(true);
+		playerSession.setWriteable(true);// TODO remove if unnecessary. It should be done in start event
 		// Send the re-connect event so that it will in turn send the START event.
 		playerSession.onEvent(new ReconnetEvent(sender));
 		loginUdp(playerSession, buffer);
