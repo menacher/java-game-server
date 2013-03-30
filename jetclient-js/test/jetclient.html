@@ -4,6 +4,49 @@
 <script src="https://raw.github.com/menacher/java-game-server/master/jetclient-js/src/jet-0.1.js"></script>
 <script>
 var sessions = [];
+function displayHumanSessionCB(session){
+    session.onmessage = displayHuman;
+    var id = window.self.setInterval(defender.bind(null, session), 500);
+    push({session:session,id:id});
+}
+
+function displayZombieSessionCB(session){
+    session.onmessage = displayZombie;
+    var id = window.self.setInterval(zombie.bind(null,session), 500);
+    push({session:session,id:id});
+}
+
+function displayHuman(e){
+    document.getElementById("human").innerHTML="Humans Left: " + e.source;
+}
+
+function displayZombie(e){
+    document.getElementById("zombie").innerHTML="Zombies Left: " + (2000000000 - e.source);
+}
+
+function defender(session){
+    session.send(jet.NEvent(jet.NETWORK_MESSAGE, [2,1]));
+}
+function zombie(session){
+    session.send(jet.NEvent(jet.NETWORK_MESSAGE, [1,2]));
+}
+
+function push(sessionId){
+    for(var i = 0; i < sessions.length; i++){
+        if(sessions[i].session === sessionId.session){
+            removeFromArray(sessions, i);
+            break;
+        }
+    }
+    sessions.push(sessionId);
+}
+
+function removeFromArray(arr, index){
+    if(index != -1){
+        arr.splice(index,1);
+    }
+}
+
 function startWar()
 {
     var config = {
@@ -14,34 +57,11 @@ function startWar()
 
     for(var i=0;i<50;i++){
         if((i % 2) === 0){
-            jet.sessionFactory("ws://localhost:18090/jetsocket",config,function (session){
-            session.addHandler(jet.SESSION_MESSAGE, displayHuman);
-            var id = window.self.setInterval(defender.bind(null,session), 500);
-            sessions.push({session:session,id:id});
-            });
+            jet.sessionFactory("ws://localhost:18090/jetsocket", config, displayHumanSessionCB);
         }else{
-            jet.sessionFactory("ws://localhost:18090/jetsocket",config,function (session){
-            session.addHandler(jet.SESSION_MESSAGE, displayZombie);
-            var id = window.self.setInterval(zombie.bind(null,session), 500);
-            sessions.push({session:session,id:id});
-            });
+            jet.sessionFactory("ws://localhost:18090/jetsocket", config, displayZombieSessionCB);
         }
 
-    }
-
-    function displayHuman(e){
-        document.getElementById("human").innerHTML="Humans Left: " + e.source;
-    }
-
-    function displayZombie(e){
-        document.getElementById("zombie").innerHTML="Zombies Left: " + (2000000000 - e.source);
-    }
-
-    function defender(session){
-        session.send(jet.NEvent(jet.NETWORK_MESSAGE, [2,1]));
-    }
-    function zombie(session){
-        session.send(jet.NEvent(jet.NETWORK_MESSAGE, [1,2]));
     }
 }
 
@@ -49,6 +69,22 @@ function makePeace(){
     for(var i = 0; i < sessions.length; i++){
         window.clearInterval(sessions[i].id);
         sessions[i].session.close();
+    }
+}
+
+function testReconnect(){
+    for(var i = 0; i < sessions.length; i++){
+        window.clearInterval(sessions[i].id);
+        sessions[i].session.addHandler(jet.EXCEPTION, function (evt) { console.log("In exception handler");
+        evt.target.disconnect()});
+        sessions[i].session.onevent(jet.NEvent(jet.EXCEPTION, "Test Reconnect",sessions[i].session));
+    }
+    for(var j = 0; j < sessions.length; j++){
+        if((j % 2) === 0){
+            jet.reconnect(sessions[j].session, jet.ReconnetPolicies.reconnectOnce, displayHumanSessionCB);
+        }else{
+            jet.reconnect(sessions[j].session, jet.ReconnetPolicies.reconnectOnce, displayZombieSessionCB);
+        }
     }
 }
 
@@ -62,6 +98,7 @@ function makePeace(){
 
 <button type="button" onclick="startWar()">Start War!</button>
 <button type="button" onclick="makePeace()">Make Peace</button>
+<button type="button" onclick="testReconnect()">Test Reconnect</button>
 
 </body>
 </html>
