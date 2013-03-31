@@ -47,7 +47,7 @@ public class FlashPolicyServerHandler extends SimpleChannelUpstreamHandler {
 			}
 			catch (IOException e)
 			{
-
+				LOG.error("Unable to open flash policy file", e);
 			}
 		}
 	}

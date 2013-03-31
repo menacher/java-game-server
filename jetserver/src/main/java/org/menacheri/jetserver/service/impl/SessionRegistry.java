@@ -40,14 +40,7 @@ public class SessionRegistry<T> implements SessionRegistryService<T>
 	@Override
 	public boolean removeSession(Object key)
 	{
-		if(null != sessions.remove(key))
-		{
-			return true;
-		}
-		else
-		{
-			return false;
-		}
+		return null != sessions.remove(key) ? true : false;
 	}
 
 }

@@ -89,7 +89,7 @@ public class PlayerSessionWithEventDispatcherTest
 					}
 				}
 			}
-		});
+		},"Event-Injector");
 		t.start();
 
 		assertTrue(LATCH.await(20, TimeUnit.SECONDS));

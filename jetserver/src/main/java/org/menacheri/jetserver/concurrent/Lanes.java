@@ -3,6 +3,9 @@ package org.menacheri.jetserver.concurrent;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ThreadFactory;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public enum Lanes
 {
 	LANES;
@@ -13,6 +16,8 @@ public enum Lanes
 	@SuppressWarnings("unchecked")
 	Lanes()
 	{
+		final Logger LOG = LoggerFactory.getLogger(Lanes.class);
+		
 		int cores = 1;
 		if (null != serverCores)
 		{
@@ -22,6 +27,7 @@ public enum Lanes
 			}
 			catch (NumberFormatException e)
 			{
+				LOG.warn("Invalid server cores {} passed in, going to ignore",serverCores);
 				// ignore;
 			}
 		}

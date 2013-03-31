@@ -124,7 +124,7 @@ public class DefaultPlayerSession extends DefaultSession implements
 	}
 
 	@Override
-	public void close()
+	public synchronized void close()
 	{
 		if (!isShuttingDown)
 		{
