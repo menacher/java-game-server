@@ -1,8 +1,11 @@
-JetServer is a java nio based server specifically designed for mutliplayer games. It supports UDP and TCP transports. It uses [JBoss Netty](http://netty.io/) for high speed network transmission and [Jetlang](http://code.google.com/p/jetlang/ "jetlang") for extremely fast in-vm message passing between player sessions and game rooms. The project also uses spring for its dependency injection. This way, it is highly configurable and you can swap out any part of the server with your own implementations.
+JetServer is a java nio based server specifically designed for mutliplayer games. It supports UDP and TCP transports. It uses [Netty](http://netty.io/) for high speed network transmission and [Jetlang](http://code.google.com/p/jetlang/ "jetlang") for extremely fast in-vm message passing between player sessions and game rooms. The project also uses spring for its dependency injection. This way, it is highly configurable and you can swap out any part of the server with your own implementations.
 
 Wiki
 ====
 The [wiki](https://github.com/menacher/java-game-server/wiki) provides implementation level details and answers to general questions that a developer starting to use jetserver might have about it.
+Support Group
+=============
+For general discussion please use the [jetserver google group](https://groups.google.com/forum/#!forum/jetserver). Issues and bugs can be raised directly in github.
 Installation
 ============
 Using pre-built jar files
@@ -11,7 +14,7 @@ The pre-built jar files of this project are located in the jetserver/binaries di
 
 With Maven and using Eclipse
 ----------------------------
-**Pre-requisites**: Please have maven 3+ and [Spring source tool suite](http://www.springsource.com/developer/sts "STS") or eclipse installed. If you are using plain vanilla eclipse, then M2Eclipse and EGit plugins need to be installed. If you are using another IDE then the maven-eclipse plugin part in the pom.xml needs to be modified. This project has some AspectJ aspects, but it is not necessary for clients to use them.
+**Pre-requisites**: Please have maven 3+ and [Spring source tool suite](http://www.springsource.com/developer/sts "STS") or eclipse installed. If you are using plain vanilla eclipse, then M2Eclipse and EGit plugins though not required will be helpful. If you are using another IDE then the maven-eclipse plugin part in the pom.xml needs to be modified. 
 
 Steps
 -----
