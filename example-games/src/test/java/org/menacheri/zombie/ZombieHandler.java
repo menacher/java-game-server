@@ -1,81 +1,35 @@
 package org.menacheri.zombie;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundMessageHandlerAdapter;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.DatagramChannel;
+
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
-import org.jboss.netty.channel.socket.DatagramChannel;
-import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.Event;
+import org.menacheri.jetserver.event.Events;
 import org.menacheri.zombie.domain.IAM;
 
-public class ZombieHandler extends SimpleChannelUpstreamHandler
+public class ZombieHandler extends ChannelInboundMessageHandlerAdapter<Event>
 {
 	private static final IAM I_AM = IAM.ZOMBIE;
 	private static final Map<InetSocketAddress, DatagramChannel> CLIENTS = new HashMap<InetSocketAddress, DatagramChannel>();
 	private final UDPClient udpClient;
 
-	public ZombieHandler()
+	public ZombieHandler() throws UnknownHostException, InterruptedException
 	{
 		udpClient = new UDPClient(this, I_AM, "255.255.255.255", 18090,
-				Executors.newCachedThreadPool());
+				new NioEventLoopGroup());
 	}
 
-	@Override
-	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e)
-			throws Exception
-	{
-		Object message = e.getMessage();
-		if (message instanceof Event)
-		{
-			Event event = (Event) message;
-			if (Events.START == event.getType())
-			{
-				// TCP write to server
-				WriteByte write = new WriteByte(e.getChannel(), null,
-						IAM.ZOMBIE);
-				ZombieClient.SERVICE.scheduleAtFixedRate(write, 2000l,
-						500l, TimeUnit.MILLISECONDS);
-				// For UDP write to server
-				connectUDP(e.getChannel());
-			}
-			else if (Events.LOG_IN_SUCCESS == event.getType())
-			{
-				
-			}
-			else if (Events.NETWORK_MESSAGE == event.getType())
-			{
-				ChannelBuffer buffer = (ChannelBuffer) event.getSource();
-				if (buffer.readableBytes() >= 4)
-				{
-					System.out
-							.println("UDP event from server in ZombieHandler: "
-									+ buffer.readInt());
-				}
-				else
-				{
-					System.out
-							.println("UDP Event does not have expected data in ZombieHandler");
-				}
-			}
-			else
-			{
-				super.messageReceived(ctx, e);
-			}
-		}
-
-	}
-
-	public InetSocketAddress connectLocal() throws UnknownHostException
+	public InetSocketAddress connectLocal() throws UnknownHostException, InterruptedException
 	{
 		DatagramChannel c = udpClient.createDatagramChannel();
 		InetSocketAddress localAddress = udpClient.getLocalAddress(c);
@@ -85,7 +39,7 @@ public class ZombieHandler extends SimpleChannelUpstreamHandler
 	
 	public void connectUDP(Channel channel)
 	{
-		InetSocketAddress address = ZombieClient.CHANNEL_ID_ADDRESS_MAP.get(channel.getId());
+		InetSocketAddress address = ZombieClient.CHANNEL_ID_ADDRESS_MAP.get(channel.id());
 		System.out.println("UDP address for connect UDP: " + address);
 		final DatagramChannel c = CLIENTS.get(address);
 		if ((udpClient != null) && (c != null))
@@ -105,11 +59,45 @@ public class ZombieHandler extends SimpleChannelUpstreamHandler
 	}
 
 	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e)
-			throws Exception
-	{
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
+			throws Exception {
 		System.out.println("\nException caught in class ZombieHandler");
-		System.out.println(e.getCause());
-		e.getChannel().close();
+		cause.printStackTrace();
+		ctx.channel().close();
+	}
+
+	@Override
+	public void messageReceived(ChannelHandlerContext ctx, Event event)
+			throws Exception {
+		if (Events.START == event.getType())
+		{
+			// TCP write to server
+			WriteByte write = new WriteByte(ctx.channel(), null,
+					IAM.ZOMBIE);
+			ZombieClient.SERVICE.scheduleAtFixedRate(write, 2000l,
+					500l, TimeUnit.MILLISECONDS);
+			// For UDP write to server
+			connectUDP(ctx.channel());
+		}
+		else if (Events.LOG_IN_SUCCESS == event.getType())
+		{
+			
+		}
+		else if (Events.NETWORK_MESSAGE == event.getType())
+		{
+			ByteBuf buffer = (ByteBuf) event.getSource();
+			if (buffer.readableBytes() >= 4)
+			{
+				System.out
+						.println("UDP event from server in ZombieHandler: "
+								+ buffer.readInt());
+			}
+			else
+			{
+				System.out
+						.println("UDP Event does not have expected data in ZombieHandler");
+			}
+		}
+		
 	}
 }

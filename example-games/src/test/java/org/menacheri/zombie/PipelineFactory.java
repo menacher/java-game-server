@@ -1,26 +1,28 @@
 package org.menacheri.zombie;
 
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.codec.MessageToMessageDecoder;
+
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandler;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.Channels;
-import org.jboss.netty.handler.codec.frame.LengthFieldBasedFrameDecoder;
-import org.jboss.netty.handler.codec.frame.LengthFieldPrepender;
-import org.jboss.netty.handler.codec.oneone.OneToOneDecoder;
-import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.Event;
+import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.handlers.netty.EventDecoder;
+import org.menacheri.jetserver.handlers.netty.MessageBufferEventEncoder;
 
 
-public class PipelineFactory implements ChannelPipelineFactory
+public class PipelineFactory extends ChannelInitializer<SocketChannel>
 {
 	private static final LengthFieldPrepender LENGTH_FIELD_PREPENDER = new LengthFieldPrepender(2);
 	private static final TimerCanceller CANCELLER = new TimerCanceller("Zombie",ZombieClient.SERVICE);
 	private static final EventDecoder EVENT_DECODER = new EventDecoder();
+	private static final MessageBufferEventEncoder EVENT_ENCODER= new MessageBufferEventEncoder();
 	private static final StartEventCounter COUNTER = new StartEventCounter();
 	private final ChannelHandler businessHandler;
 	private static final AtomicInteger INTEGER = new AtomicInteger(0);
@@ -30,27 +32,23 @@ public class PipelineFactory implements ChannelPipelineFactory
 	}
 	
 	@Override
-	public ChannelPipeline getPipeline() throws Exception
-	{
-		ChannelPipeline pipeline = Channels.pipeline();
+	protected void initChannel(SocketChannel ch) throws Exception {
+		ChannelPipeline pipeline = ch.pipeline();
 		pipeline.addLast("lengthDecoder", new LengthFieldBasedFrameDecoder(256, 0, 2,0,2));
 		pipeline.addLast("lengthFieldPrepender", LENGTH_FIELD_PREPENDER);
 		pipeline.addLast("eventDecoder", EVENT_DECODER);
+		//pipeline.addLast("eventEncoder" , EVENT_ENCODER);
 		pipeline.addLast("counter", COUNTER);
 		pipeline.addLast("businessHandler",businessHandler);
 		pipeline.addLast("canceller",CANCELLER);
-		
-		return pipeline;
 	}
-
-	public static class StartEventCounter extends OneToOneDecoder
+	
+	public static class StartEventCounter extends MessageToMessageDecoder<Event>
 	{
 		private final AtomicInteger counter = new AtomicInteger(0);
 		@Override
-		protected Object decode(ChannelHandlerContext ctx, Channel channel,
-				Object msg) throws Exception
-		{
-			Event event = (Event)msg;
+		protected Object decode(ChannelHandlerContext ctx, Event event)
+				throws Exception {
 			if(Events.START == event.getType())
 			{
 				int started = counter.incrementAndGet();
@@ -64,7 +62,8 @@ public class PipelineFactory implements ChannelPipelineFactory
 			{
 				System.out.println("Recieved eventType: " + event.getType());
 			}
-			return msg;
+			return event;
 		}
 	}
+	
 }

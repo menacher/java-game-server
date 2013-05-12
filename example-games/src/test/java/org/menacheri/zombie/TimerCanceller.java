@@ -1,18 +1,17 @@
 package org.menacheri.zombie;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundMessageHandlerAdapter;
+
 import java.util.concurrent.ScheduledExecutorService;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.Event;
 import org.menacheri.zombie.domain.ZombieCommands;
 
 
-public class TimerCanceller extends SimpleChannelUpstreamHandler
+public class TimerCanceller extends ChannelInboundMessageHandlerAdapter<Event>
 {
 	String type = null;
 	ScheduledExecutorService service = null;
@@ -23,52 +22,29 @@ public class TimerCanceller extends SimpleChannelUpstreamHandler
 	}
 	
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e)
-			throws Exception
-	{
-		Object message = e.getMessage();
-		if(message instanceof Event)
+	public void messageReceived(io.netty.channel.ChannelHandlerContext ctx,
+			Event event) throws Exception {
+		if(Events.NETWORK_MESSAGE == event.getType())
 		{
-			Event event = (Event)message;
-			if(Events.NETWORK_MESSAGE == event.getType())
-			{
-				ChannelBuffer apocalypse = (ChannelBuffer) event.getSource();
-				if(apocalypse.readableBytes()>=4)
-				{
-					int cmd = apocalypse.readInt();
-					ZombieCommands command = ZombieCommands.CommandsEnum.fromInt(cmd);
-					if(command == ZombieCommands.APOCALYPSE)
-					{
-						System.out.println("Cancelling " + type +  " timer due to apocalypse");
-						service.shutdown();
-						e.getChannel().close();
-					}
-				}
-			}
-		}
-		if(message instanceof ChannelBuffer)
-		{
-			ChannelBuffer apocalypse = (ChannelBuffer) message;
+			ByteBuf apocalypse = (ByteBuf) event.getSource();
 			if(apocalypse.readableBytes()>=4)
 			{
 				int cmd = apocalypse.readInt();
 				ZombieCommands command = ZombieCommands.CommandsEnum.fromInt(cmd);
 				if(command == ZombieCommands.APOCALYPSE)
 				{
-					System.out.println("Cancelling " + type +  " timer");
+					System.out.println("Cancelling " + type +  " timer due to apocalypse");
 					service.shutdown();
-					e.getChannel().close();
+					ctx.channel().close();
 				}
 			}
 		}
-		super.messageReceived(ctx, e);
 	}
 	
 	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e)
-			throws Exception
-	{
-		System.out.println("Going to close channel in timer canceller handler");
-		e.getChannel().close();
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
+			throws Exception {
+		cause.printStackTrace();
+		ctx.channel().close();
 	}
 }

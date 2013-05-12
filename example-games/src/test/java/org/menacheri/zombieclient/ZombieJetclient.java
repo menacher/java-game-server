@@ -18,23 +18,40 @@ public class ZombieJetclient
 	public static void main(String[] args) throws Exception
 	{
 		LoginBuilder builder = new LoginBuilder().username("user")
-				.password("pass").connectionKey("Zombie_ROOM_1_REF_KEY_1")
+				.password("pass").connectionKey("Zombie_ROOM_1")
 				.jetserverTcpHostName("localhost").tcpPort(18090)
 				.jetserverUdpHostName("255.255.255.255").udpPort(18090);
-		LoginHelper loginHelper = builder.build();
-		SessionFactory sessionFactory = new SessionFactory(loginHelper);
 		ScheduledExecutorService taskExecutor = Executors.newSingleThreadScheduledExecutor();
-		for(int i = 1; i<=50; i++){
-			Session session = sessionFactory.createAndConnectSession();
-			addDefaultHandlerToSession(session);
-			GamePlay task = null;
-			if((i % 2) == 0){
-				task = new GamePlay(IAM.DEFENDER, session);
+		SessionFactory sessionFactory = null;
+		for(int i = 1; i<=5 ; i++)
+		{
+			builder.connectionKey("Zombie_ROOM_" + i);
+			LoginHelper loginHelper = builder.build();
+			if (i == 1) 
+			{
+				sessionFactory = new SessionFactory(loginHelper);
+			} 
+			else 
+			{
+				// no need to create session factory objects again.
+				sessionFactory.setLoginHelper(loginHelper);
 			}
-			else{
-				task = new GamePlay(IAM.ZOMBIE, session);
+
+			for (int j = 1; j <= 20; j++) 
+			{
+				Session session = sessionFactory.createAndConnectSession();
+				addDefaultHandlerToSession(session);
+				GamePlay task = null;
+				if ((i % 2) == 0) 
+				{
+					task = new GamePlay(IAM.DEFENDER, session);
+				} else 
+				{
+					task = new GamePlay(IAM.ZOMBIE, session);
+				}
+				taskExecutor.scheduleAtFixedRate(task, 2000, 200,
+						TimeUnit.MILLISECONDS);
 			}
-			taskExecutor.scheduleAtFixedRate(task, 2000, 200, TimeUnit.MILLISECONDS);
 		}
 	}
 	

@@ -1,5 +1,15 @@
 package org.menacheri.zombie;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.nio.NioSocketChannel;
 
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -8,17 +18,8 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFactory;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
-import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.util.NettyUtils;
-
 
 public class ZombieClient
 {
@@ -37,67 +38,86 @@ public class ZombieClient
 		});
 	}
 	
-	public static void main(String[] args) throws UnknownHostException
+	public static void main(String[] args) throws UnknownHostException, InterruptedException
 	{
 		String host = "localhost";
 		int port = 18090;
-		ChannelFactory factory = new NioClientSocketChannelFactory(Executors
-				.newCachedThreadPool(), Executors.newCachedThreadPool());
 		final DefenderHandler defHandler = new DefenderHandler();
 		PipelineFactory defFactory = new PipelineFactory(defHandler);
 		final ZombieHandler zomHandler = new ZombieHandler();
 		PipelineFactory zomFactory = new PipelineFactory(zomHandler);
-		ClientBootstrap bootstrap = new ClientBootstrap(factory);
-		// At client side option is tcpNoDelay and at server child.tcpNoDelay
-		bootstrap.setOption("tcpNoDelay", true);
-		bootstrap.setOption("keepAlive", true);
-		for (int i = 1; i<=50;i++){
-			final InetSocketAddress udpLocalAddress;
+		EventLoopGroup boss = new NioEventLoopGroup();
+		Bootstrap bootstrap = new Bootstrap();
+		bootstrap.group(boss).channel(NioSocketChannel.class)
+				.option(ChannelOption.TCP_NODELAY, true)
+				.option(ChannelOption.SO_KEEPALIVE, true);
+		for (int i = 1; i<=1;i++){
+			final InetSocketAddress udpLocalAddress = null;
 			if(i%2==0){
-				bootstrap.setPipelineFactory(defFactory);
-				udpLocalAddress = defHandler.connectLocal();
+				bootstrap.handler(defFactory);
+				//udpLocalAddress = defHandler.connectLocal();
 			}else{
-				bootstrap.setPipelineFactory(zomFactory);
-				udpLocalAddress = zomHandler.connectLocal();
+				bootstrap.handler(zomFactory);
+				//udpLocalAddress = zomHandler.connectLocal();
 			}
-			
-			ChannelFuture future = bootstrap.connect(new InetSocketAddress(host,
-					port));
+			InetSocketAddress remoteAddress = new InetSocketAddress(host,
+					port);
+			ChannelFuture future = bootstrap.connect(remoteAddress);
 			
 			future.addListener(new ChannelFutureListener()
 			{
 				@Override
 				public void operationComplete(ChannelFuture future) throws Exception
 				{
-					ChannelBuffer loginBuffer = getLoginBuffer("Zombie_ROOM_1_REF_KEY_1",writeSocketAddressToBuffer(udpLocalAddress));
-					Channel channel = future.getChannel();
-					CHANNEL_ID_ADDRESS_MAP.put(channel.getId(), udpLocalAddress);
-					channel.write(loginBuffer);
+					if (future.isSuccess()) 
+					{
+						ByteBuf loginBuffer = getLoginBuffer("Zombie_ROOM_1",
+								writeSocketAddressToBuffer(udpLocalAddress));
+						Channel channel = future.channel();
+						CHANNEL_ID_ADDRESS_MAP.put(channel.id(),
+								udpLocalAddress);
+						ChannelFuture writeFuture = channel.write(loginBuffer);
+						writeFuture.addListener(new ChannelFutureListener() 
+						{
+							@Override
+							public void operationComplete(ChannelFuture future)
+									throws Exception 
+							{
+								if (!future.isSuccess()) 
+								{
+									future.cause().printStackTrace();
+								}
+							}
+						});
+					} 
+					else 
+					{
+						future.cause().printStackTrace();
+					}
 				}
 			});
 		}
 	}
 	
-	public static ChannelBuffer getLoginBuffer(String refKey, ChannelBuffer udpAddress)
+	public static ByteBuf getLoginBuffer(String refKey, ByteBuf udpAddress)
 	{
-		ChannelBuffer opcode = ChannelBuffers.buffer(1);
-		ChannelBuffer protocol = ChannelBuffers.buffer(1);
-		opcode.writeByte(Events.LOG_IN);
-		protocol.writeByte(Events.PROTCOL_VERSION);
+		ByteBuf header = Unpooled.buffer(2);
+		header.writeByte(Events.LOG_IN);
+		header.writeByte(Events.PROTCOL_VERSION);
 		String username = "user";
 		String password = "pass";
 		// write username,password and ref key.
-		ChannelBuffer buffer = ChannelBuffers.wrappedBuffer(opcode,protocol,
+		ByteBuf buffer = Unpooled.wrappedBuffer(header,
 				NettyUtils.writeStrings(username,password,refKey),udpAddress);
 		return buffer;
 	}
 	
-	public static ChannelBuffer writeSocketAddressToBuffer(InetSocketAddress localAddress){
-		ChannelBuffer hostName = NettyUtils.writeString(localAddress
+	public static ByteBuf writeSocketAddressToBuffer(InetSocketAddress localAddress){
+		ByteBuf hostName = NettyUtils.writeString(localAddress
 				.getHostName());
-		ChannelBuffer portNum = ChannelBuffers.buffer(4);
+		ByteBuf portNum = Unpooled.buffer(4);
 		portNum.writeInt(localAddress.getPort());
-		ChannelBuffer socketAddress = ChannelBuffers.wrappedBuffer(hostName,
+		ByteBuf socketAddress = Unpooled.wrappedBuffer(hostName,
 				portNum);
 		return socketAddress;
 	}

@@ -1,7 +1,8 @@
 package org.menacheri.zombie.game;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+
 import org.menacheri.zombie.domain.ZombieCommands;
 
 
@@ -12,9 +13,9 @@ import org.menacheri.zombie.domain.ZombieCommands;
  */
 public class Messages
 {
-	public static ChannelBuffer apocalypse()
+	public static ByteBuf apocalypse()
 	{
-		ChannelBuffer buffer = ChannelBuffers.buffer(4);
+		ByteBuf buffer = Unpooled.buffer(4);
 		int cmd = ZombieCommands.APOCALYPSE.getCommand();
 		buffer.writeInt(cmd);
 		return buffer;

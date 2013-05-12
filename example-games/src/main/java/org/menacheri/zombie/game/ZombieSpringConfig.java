@@ -1,6 +1,8 @@
 package org.menacheri.zombie.game;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.menacheri.jetserver.app.Game;
@@ -47,21 +49,24 @@ public class ZombieSpringConfig
 		return game;
 	}
 	
-	public @Bean(name="Zombie_ROOM_1") GameRoom zombieRoom1()
+	public @Bean(name="Zombie_Rooms") List<GameRoom> zombieRooms()
 	{
-		GameRoomSessionBuilder sessionBuilder = new GameRoomSessionBuilder();
-		sessionBuilder.parentGame(zombieGame()).gameRoomName("Zombie_ROOM_1").protocol(messageBufferProtocol);
-		ZombieRoom room = new ZombieRoom(sessionBuilder);
-		room.setDefender(defender());
-		room.setZombie(zombie());
-		
-		return room;
+		List<GameRoom> roomList = new ArrayList<GameRoom>(500);
+		for (int i=1; i<= 500; i++){
+			GameRoomSessionBuilder sessionBuilder = new GameRoomSessionBuilder();
+			sessionBuilder.parentGame(zombieGame()).gameRoomName("Zombie_ROOM_" + i).protocol(messageBufferProtocol);
+			ZombieRoom room = new ZombieRoom(sessionBuilder);
+			room.setDefender(defender());
+			room.setZombie(zombie());
+			roomList.add(room);
+		}
+		return roomList;
 	}
 	
-	public @Bean(name="Zombie_ROOM_2") GameRoom zombieRoom2()
+	public @Bean(name="Zombie_Room_Websocket") GameRoom zombieRoom2()
 	{
 		GameRoomSessionBuilder sessionBuilder = new GameRoomSessionBuilder();
-		sessionBuilder.parentGame(zombieGame()).gameRoomName("Zombie_ROOM_2").protocol(webSocketProtocol);
+		sessionBuilder.parentGame(zombieGame()).gameRoomName("Zombie_Room_Websocket").protocol(webSocketProtocol);
 		ZombieRoom room = new ZombieRoom(sessionBuilder);
 		room.setDefender(defender());
 		room.setZombie(zombie());
@@ -95,7 +100,10 @@ public class ZombieSpringConfig
 	public @Bean(name="lookupService") LookupService lookupService()
 	{
 		Map<String,GameRoom> refKeyGameRoomMap = new HashMap<String, GameRoom>();
-		refKeyGameRoomMap.put("Zombie_ROOM_1_REF_KEY_1", zombieRoom1());
+		List<GameRoom> zombieRooms = zombieRooms();
+		for(GameRoom room: zombieRooms){
+			refKeyGameRoomMap.put(room.getGameRoomName(), room);
+		}
 		refKeyGameRoomMap.put("Zombie_ROOM_1_REF_KEY_2", zombieRoom2());
 		LookupService service = new SimpleLookupService(refKeyGameRoomMap);
 		return service;

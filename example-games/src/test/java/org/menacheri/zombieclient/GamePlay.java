@@ -1,6 +1,7 @@
 package org.menacheri.zombieclient;
 
-import org.jboss.netty.buffer.ChannelBuffer;
+import io.netty.buffer.ByteBuf;
+
 import org.menacheri.jetclient.app.Session;
 import org.menacheri.jetclient.communication.DeliveryGuaranty.DeliveryGuarantyOptions;
 import org.menacheri.jetclient.communication.MessageBuffer;
@@ -36,10 +37,12 @@ public class GamePlay implements Runnable
 			break;
 		}
 		
-		MessageBuffer<ChannelBuffer> messageBuffer = new NettyMessageBuffer();
-		messageBuffer.writeInt(type);
-		messageBuffer.writeInt(operation);
-		Event event = Events.networkEvent(messageBuffer,DeliveryGuarantyOptions.FAST);
-		session.onEvent(event);
+		for(int i = 1; i<10; i++){
+			MessageBuffer<ByteBuf> messageBuffer = new NettyMessageBuffer();
+			messageBuffer.writeInt(type);
+			messageBuffer.writeInt(operation);
+			Event event = Events.networkEvent(messageBuffer, DeliveryGuarantyOptions.FAST);
+			session.onEvent(event);
+		}
 	}
 }

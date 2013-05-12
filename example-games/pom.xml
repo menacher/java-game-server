@@ -53,21 +53,10 @@
 				<artifactId>maven-eclipse-plugin</artifactId>
 				<version>2.8</version>
 				<configuration>
-					<!-- Uncomment for aspectj support -->
-					<!-- <ajdtVersion>1.6</ajdtVersion>  -->
 					<additionalProjectnatures>
-						<!-- Uncomment for aspectj support -->
-						<!-- <projectnature>org.eclipse.ajdt.ui.ajnature</projectnature> -->
 						<projectnature>org.springframework.ide.eclipse.core.springnature</projectnature>
 						<projectnature>org.eclipse.wst.common.project.facet.core.nature</projectnature>
 					</additionalProjectnatures>
-					<!-- Uncomment for aspectj support -->
-					<!-- Source includes is necessary to allow aspectj files in the java 
-						folder, else eclipse will throw a filtering exception 
-					<sourceIncludes>
-						<sourceInclude>**/*.aj</sourceInclude>
-					</sourceIncludes>
-					-->
 					<!-- Download sources will make maven download and attach source files 
 						where available -->
 					<downloadSources>true</downloadSources>
@@ -82,54 +71,6 @@
 					<compilerVersion>1.6</compilerVersion>
 				</configuration>
 			</plugin>
-			<!-- 
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>aspectj-maven-plugin</artifactId>
-				<version>1.4</version>
-				<dependencies>
-					<dependency>
-						<groupId>org.aspectj</groupId>
-						<artifactId>aspectjrt</artifactId>
-						<version>1.6.1</version>
-					</dependency>
-					<dependency>
-						<groupId>org.aspectj</groupId>
-						<artifactId>aspectjtools</artifactId>
-						<version>1.6.1</version>
-					</dependency>
-					<dependency>
-						<groupId>org.menacheri</groupId>
-						<artifactId>jetserver</artifactId>
-						<version>0.1</version>
-					</dependency>
-				</dependencies>
-				<configuration>
-					<source>1.6</source>
-					<complianceLevel>1.6</complianceLevel>
-					<verbose>true</verbose>
-					<showWeaveInfo>true</showWeaveInfo>
-					<target>1.6</target>
-					// The following sets up aspectj weaving path. jetserver jar has the 
-					//compiled aspect which is used to weave classes in this app '
-					<aspectLibraries>
-						<aspectLibrary>
-							<groupId>org.menacheri</groupId>
-							<artifactId>jetserver</artifactId>
-						</aspectLibrary>
-					</aspectLibraries>
-
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>compile</goal>
-							<goal>test-compile</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			 -->
 
 		</plugins>
 	</build>
