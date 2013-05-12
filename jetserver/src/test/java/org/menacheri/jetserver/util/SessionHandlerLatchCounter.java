@@ -4,6 +4,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.menacheri.jetserver.app.Session;
+import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.event.NetworkEvent;
 import org.menacheri.jetserver.event.impl.DefaultSessionEventHandler;
 
@@ -23,8 +24,18 @@ public class SessionHandlerLatchCounter extends DefaultSessionEventHandler {
 	public void onNetworkMessage(NetworkEvent event) {
 		counter.incrementAndGet();
 		latch.countDown();
+		System.out.println("invoked onNetworkMessage");
 	}
 
+	@Override
+	protected void onDisconnect(Event event)
+	{
+		counter.incrementAndGet();
+		latch.countDown();
+		System.out.println("invoked onDisconnect");
+		super.onDisconnect(event);
+	}
+	
 	public AtomicLong getCounter() {
 		return counter;
 	}
