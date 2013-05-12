@@ -1,11 +1,12 @@
 package org.menacheri.jetserver.protocols.impl;
 
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.handler.codec.base64.Base64Decoder;
-import org.jboss.netty.handler.codec.base64.Base64Encoder;
-import org.jboss.netty.handler.codec.frame.DelimiterBasedFrameDecoder;
-import org.jboss.netty.handler.codec.frame.Delimiters;
-import org.jboss.netty.handler.codec.frame.TooLongFrameException;
+import io.netty.channel.ChannelPipeline;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.handler.codec.Delimiters;
+import io.netty.handler.codec.TooLongFrameException;
+import io.netty.handler.codec.base64.Base64Decoder;
+import io.netty.handler.codec.base64.Base64Encoder;
+
 import org.menacheri.jetserver.app.PlayerSession;
 import org.menacheri.jetserver.handlers.netty.AMF3ToJavaObjectDecoder;
 import org.menacheri.jetserver.handlers.netty.JavaObjectToAMF3Encoder;

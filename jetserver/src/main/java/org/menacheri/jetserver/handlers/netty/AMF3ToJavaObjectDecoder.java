@@ -1,51 +1,48 @@
 package org.menacheri.jetserver.handlers.netty;
 
+import flex.messaging.io.SerializationContext;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.ByteToMessageDecoder;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandler.Sharable;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.handler.codec.oneone.OneToOneDecoder;
 import org.menacheri.jetserver.convert.Transform;
 import org.menacheri.jetserver.convert.flex.AMFDeSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import flex.messaging.io.SerializationContext;
-
 /**
- * This class takes a {@link ChannelBuffer} containing AMF3 object as input and
+ * This class takes a {@link ByteBuf} containing AMF3 object as input and
  * creates a java object from it using the {@link AMFDeSerializer} class. 
  * 
  * @author Abraham Menacherry.
  * 
  */
 @Sharable
-public class AMF3ToJavaObjectDecoder extends OneToOneDecoder implements Transform<ChannelBuffer, Object>
+public class AMF3ToJavaObjectDecoder extends ByteToMessageDecoder implements Transform<ByteBuf, Object>
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AMF3ToJavaObjectDecoder.class);
 	
 	@Override
-	protected Object decode(ChannelHandlerContext ctx, Channel channel,
-			Object msg) throws Exception
-	{
-		if(null == msg)
+	protected Object decode(ChannelHandlerContext ctx, ByteBuf in)
+			throws Exception {
+		if(null == in)
 		{
 			LOG.warn("Incoming message is null");
-			return msg;
+			return in;
 		}
-		ChannelBuffer buffer = (ChannelBuffer)msg;
 		// buffer.array() will ignore the readerIndex. Hence readBytes is used
 		// and then .array is called
-		ByteArrayInputStream bis = new ByteArrayInputStream(buffer.readBytes(
-				buffer.readableBytes()).array());
+		ByteArrayInputStream bis = new ByteArrayInputStream(in.readBytes(
+				in.readableBytes()).array());
 		return deSerializeObjectFromStream(bis);
 	}
-
+	
 	@Override
-	public Object convert(ChannelBuffer buffer) throws Exception {
+	public Object convert(ByteBuf buffer) throws Exception {
 		ByteArrayInputStream bis = new ByteArrayInputStream(buffer.array());
 		return deSerializeObjectFromStream(bis);
 	}
@@ -75,4 +72,5 @@ public class AMF3ToJavaObjectDecoder extends OneToOneDecoder implements Transfor
 		}
 		return o;
 	}
+
 }

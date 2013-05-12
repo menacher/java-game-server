@@ -180,6 +180,49 @@ public class JetlangEventDispatcherTest {
 		assertTrue(latch.await(500, TimeUnit.MILLISECONDS));
 	}
 
+	@Test
+    public void multiSessionDisconnectValidation() throws InterruptedException {
+        // create necessary setup objects.
+        Game game = new SimpleGame(1, "Test");
+        Protocol dummyProtocol = new DummyProtocol();
+        GameRoomSessionBuilder sessionBuilder = new GameRoomSessionBuilder();
+        sessionBuilder.parentGame(game).gameRoomName("Zombie_ROOM_1")
+                .protocol(dummyProtocol);
+        CountDownLatch latch1 = new CountDownLatch(2);
+        CountDownLatch latch2 = new CountDownLatch(2);
+        AtomicLong counter = new AtomicLong(0l);
+        Session gameRoomSession = new TestGameRoom(sessionBuilder, counter,
+                latch1);
+        GameRoom gameRoom = (GameRoom) gameRoomSession;
+        PlayerSession playerSession = gameRoom.createPlayerSession(null);
+        PlayerSession playerSession2 = gameRoom.createPlayerSession(null);
+        PlayerSession playerSession3 = gameRoom.createPlayerSession(null);
+        gameRoom.connectSession(playerSession);
+        gameRoom.connectSession(playerSession2);
+        gameRoom.connectSession(playerSession3);
+        playerSession.addHandler(new SessionHandlerLatchCounter(playerSession,
+                counter, latch1));
+        playerSession2.addHandler(new SessionHandlerLatchCounter(playerSession2,
+                counter, latch2));
+        playerSession3.addHandler(new SessionHandlerLatchCounter(playerSession3,
+                counter, latch2));
+        // start test
+        Event event1 = Events.event(null, Events.DISCONNECT);
+        playerSession.onEvent(event1);// disconnect session 1.
+        assertFalse(latch1.await(1000, TimeUnit.MILLISECONDS));// This is just a wait
+        Event message = Events.event(null, Events.SESSION_MESSAGE);
+        playerSession.onEvent(message);
+        assertFalse(latch1.await(500, TimeUnit.MILLISECONDS));// Ensure that the message is not sent.
+        Event event2 = Events.event(null, Events.DISCONNECT);
+        Event event3 = Events.event(null, Events.DISCONNECT);
+        playerSession2.onEvent(event2);
+        playerSession3.onEvent(event3);
+
+        assertTrue(latch2.await(500, TimeUnit.MILLISECONDS));
+        // 1 ondisconnect(session1) + 0 onnetwork(session1) + 2 ondisconnect(session2 and 3)
+        assertTrue(counter.get() == 3);
+    }
+	
 	private void assertNoListeners(JetlangEventDispatcher dispatcher) {
 		Map<Integer, List<EventHandler>> listeners = dispatcher
 				.getListenersByEventType();

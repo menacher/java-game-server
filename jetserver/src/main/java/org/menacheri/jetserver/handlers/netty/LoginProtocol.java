@@ -3,18 +3,18 @@ package org.menacheri.jetserver.handlers.netty;
 import static org.menacheri.jetserver.event.Events.LOG_IN;
 import static org.menacheri.jetserver.event.Events.PROTCOL_VERSION;
 import static org.menacheri.jetserver.event.Events.RECONNECT;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelPipeline;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.codec.http.HttpObjectAggregator;
+import io.netty.handler.codec.http.HttpRequestDecoder;
+import io.netty.handler.codec.http.HttpResponseEncoder;
+import io.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 
 import java.util.List;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.ChannelHandler;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.handler.codec.frame.LengthFieldBasedFrameDecoder;
-import org.jboss.netty.handler.codec.frame.LengthFieldPrepender;
-import org.jboss.netty.handler.codec.http.HttpChunkAggregator;
-import org.jboss.netty.handler.codec.http.HttpRequestDecoder;
-import org.jboss.netty.handler.codec.http.HttpResponseEncoder;
-import org.jboss.netty.handler.codec.http.websocketx.WebSocketServerProtocolHandler;
 import org.menacheri.jetserver.event.Events;
 
 /**
@@ -41,7 +41,7 @@ public interface LoginProtocol
 	 *            to be set.
 	 * @return Returs true if the protocol was applied, else false.
 	 */
-	public boolean applyProtocol(ChannelBuffer buffer, ChannelPipeline pipeline);
+	public boolean applyProtocol(ByteBuf buffer, ChannelPipeline pipeline);
 
 	/**
 	 * Searches the incoming bytes of a client connection to determine if its an
@@ -55,7 +55,7 @@ public interface LoginProtocol
 	{
 		private WebSocketLoginHandler webSocketLoginHandler;
 		@Override
-		public boolean applyProtocol(ChannelBuffer buffer,
+		public boolean applyProtocol(ByteBuf buffer,
 				ChannelPipeline pipeline)
 		{
 			boolean isThisProtocol = false;
@@ -64,7 +64,7 @@ public interface LoginProtocol
 			if (isHttp(magic1, magic2))
 			{
 				pipeline.addLast("decoder", new HttpRequestDecoder());
-		        pipeline.addLast("aggregator", new HttpChunkAggregator(65536));
+		        pipeline.addLast("aggregator", new HttpObjectAggregator(65536));
 		        pipeline.addLast("encoder", new HttpResponseEncoder());
 		        pipeline.addLast("handler", new WebSocketServerProtocolHandler("/jetsocket"));
 		        pipeline.addLast(LOGIN_HANDLER_NAME, webSocketLoginHandler);
@@ -127,7 +127,7 @@ public interface LoginProtocol
 		private LengthFieldPrepender lengthFieldPrepender;
 
 		@Override
-		public boolean applyProtocol(ChannelBuffer buffer,
+		public boolean applyProtocol(ByteBuf buffer,
 				ChannelPipeline pipeline)
 		{
 			boolean isThisProtocol = false;
@@ -202,7 +202,7 @@ public interface LoginProtocol
 		private List<LoginProtocol> protocols;
 
 		@Override
-		public boolean applyProtocol(ChannelBuffer buffer,
+		public boolean applyProtocol(ByteBuf buffer,
 				ChannelPipeline pipeline)
 		{
 			if (null != protocols)

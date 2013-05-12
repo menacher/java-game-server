@@ -1,9 +1,10 @@
 package org.menacheri.jetserver.handlers.netty;
 
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import org.jboss.netty.handler.codec.oneone.OneToOneDecoder;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.handler.codec.MessageToMessageDecoder;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+
 import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.impl.DefaultEvent;
@@ -23,22 +24,22 @@ import com.google.gson.Gson;
  * @author Abraham Menacherry
  * 
  */
-public class TextWebsocketDecoder extends OneToOneDecoder
+@Sharable
+public class TextWebsocketDecoder extends MessageToMessageDecoder<TextWebSocketFrame>
 {
 
 	private static final Logger LOG = LoggerFactory
-			.getLogger(ByteArrayStreamDecoder.class);
+			.getLogger(TextWebsocketDecoder.class);
 	private Gson gson;
 
 	@Override
-	protected Object decode(ChannelHandlerContext ctx, Channel channel,
-			Object msg) throws Exception
+	protected Object decode(ChannelHandlerContext ctx,
+			TextWebSocketFrame frame) throws Exception
 	{
 		Event event = null;
 		try
 		{
-			TextWebSocketFrame frame = (TextWebSocketFrame) msg;
-			event = gson.fromJson(frame.getText(), DefaultEvent.class);
+			event = gson.fromJson(frame.text(), DefaultEvent.class);
 			if (event.getType() == Events.NETWORK_MESSAGE)
 			{
 				event.setType(Events.SESSION_MESSAGE);

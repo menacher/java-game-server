@@ -1,8 +1,9 @@
 package org.menacheri.jetserver.service.impl;
 
+import io.netty.channel.group.ChannelGroupFuture;
+
 import java.util.Collection;
 
-import org.jboss.netty.channel.group.ChannelGroupFuture;
 import org.menacheri.jetserver.app.Game;
 import org.menacheri.jetserver.app.GameRoom;
 import org.menacheri.jetserver.service.GameAdminService;

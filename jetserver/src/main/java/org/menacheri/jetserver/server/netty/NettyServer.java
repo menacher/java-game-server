@@ -1,8 +1,8 @@
 package org.menacheri.jetserver.server.netty;
 
-import org.jboss.netty.bootstrap.Bootstrap;
-import org.jboss.netty.bootstrap.ServerBootstrap;
-import org.jboss.netty.channel.ChannelPipelineFactory;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelInitializer;
+
 import org.menacheri.jetserver.server.Server;
 
 /**
@@ -15,49 +15,30 @@ import org.menacheri.jetserver.server.Server;
 public interface NettyServer extends Server
 {
 	/**
-	 * Creates a {@link ServerBootstrap} object which is used to start a server.
-	 * 
-	 * @return Returns the created {@link ServerBootstrap}.
-	 */
-	public Bootstrap createServerBootstrap();
-
-	/**
-	 * If thread pools or TCP/IP parameters or the pipeline factory need to be
-	 * modified then it is this method that needs to be overriden.
-	 * 
-	 * @param optionsList
-	 *            Used to set tcp ip options like noDelay etc.
-	 */
-	public void configureServerBootStrap(String[] optionsList);
-
-	/**
 	 * createServerBootstrap will create a pipeline factory and save it as a
 	 * class variable. This method can then be used to retrieve that value.
 	 * 
 	 * @return Returns the channel pipeline factory that is associated with this
 	 *         netty server.
 	 */
-	public ChannelPipelineFactory getPipelineFactory();
+	public ChannelInitializer<? extends Channel> getChannelInitializer();
 
 	/**
 	 * Method can be used to set the pipeline factory that is to be used by the
 	 * netty server.
 	 * 
-	 * @param factory
+	 * @param initializer
 	 *            The factory which will create a pipeline on each incoming
 	 *            connection.
 	 */
-	public void setPipelineFactory(ChannelPipelineFactory factory);
+	public void setChannelInitializer(ChannelInitializer<? extends Channel> initializer);
 
 	/**
-	 * @return Returns the created server bootstrap object.
-	 */
-	public Bootstrap getServerBootstrap();
-
-	/**
-	 * Sets the server bootstrap, could be TCP, UDP bootstrap.
+	 * Get the netty configuration associated with this server.
 	 * 
-	 * @param serverBootstrap
+	 * @return returns the configuration instance which is passed in via
+	 *         constructor.
 	 */
-	public void setServerBootstrap(Bootstrap serverBootstrap);
+	public NettyConfig getNettyConfig();
+	
 }

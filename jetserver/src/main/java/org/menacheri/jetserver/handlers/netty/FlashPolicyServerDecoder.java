@@ -1,30 +1,28 @@
 package org.menacheri.jetserver.handlers.netty;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.handler.codec.replay.ReplayingDecoder;
-import org.jboss.netty.handler.codec.replay.VoidEnum;
-import org.jboss.netty.util.CharsetUtil;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.ReplayingDecoder;
+import io.netty.util.CharsetUtil;
 
 /**
  * @author <a href="http://www.waywardmonkeys.com/">Bruce Mitchener</a>
  */
-public class FlashPolicyServerDecoder extends ReplayingDecoder<VoidEnum> {
+public class FlashPolicyServerDecoder extends ReplayingDecoder<ByteBuf> {
     // We don't check for the trailing NULL to make telnet-based debugging easier.
-    private final ChannelBuffer requestBuffer = ChannelBuffers.copiedBuffer("<policy-file-request/>", CharsetUtil.US_ASCII);
+    private final ByteBuf requestBuffer = Unpooled.copiedBuffer("<policy-file-request/>", CharsetUtil.US_ASCII);
 
     @Override
     protected Object decode(
-            ChannelHandlerContext ctx, Channel channel,
-            ChannelBuffer buffer, VoidEnum state) {
+            ChannelHandlerContext ctx, 
+            ByteBuf buffer) {
 
-        ChannelBuffer data = buffer.readBytes(requestBuffer.readableBytes());
+    	ByteBuf data = buffer.readBytes(requestBuffer.readableBytes());
         if (data.equals(requestBuffer)) {
             return data;
         }
-        channel.close();
+        ctx.close();
         return null;
     }
 }

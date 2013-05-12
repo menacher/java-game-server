@@ -6,76 +6,67 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd 
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
 
-	<import resource="netty-handlers.xml"></import>
+	<import resource="netty-handlers.xml" />
 	
 	<context:annotation-config />
 	
-	<!-- Communication protocols that are available by default -->
-	<bean id="simpleByteArrayProtocol" class="org.menacheri.jetserver.protocols.impl.SimpleByteArrayProtocol">
-		<property name="byteArrayToChannelBufferEncoder" ref="byteArrayToChannelBufferEncoder"/>
-		<property name="lengthFieldPrepender" ref="lengthFieldPrepender"></property>
-		<property name="byteArrayDecoder" ref="byteArrayDecoder"></property>
-	</bean>
-	
 	<bean id="amf3Protocol"  class="org.menacheri.jetserver.protocols.impl.AMF3Protocol">
-		<property name="lengthFieldPrepender" ref="lengthFieldPrepender"></property>
-		<property name="eventDecoder" ref="eventDecoder"></property>
-		<property name="eventEncoder" ref="eventEncoder"></property>
-		<property name="amf3ToEventSourceDecoder" ref="AMF3ToEventSourceDecoder"></property>
-		<property name="eventSourceToAMF3Encoder" ref="eventSourceToAMF3Encoder"></property>
+		<property name="lengthFieldPrepender" ref="lengthFieldPrepender" />
+		<property name="amf3ToJavaObjectDecoder" ref="AMF3ToJavaObjectDecoder" />
+		<property name="javaObjectToAMF3Encoder" ref="javaToAMF3Encoder" />
 	</bean>
 	
 	<bean id="amf3StringProtocol" class="org.menacheri.jetserver.protocols.impl.AMF3StringProtocol">
-		<property name="maxFrameSize" value="4096"></property>
-		<property name="nulEncoder" ref="nulEncoder"></property>
-		<property name="base64Decoder" ref="base64Decoder"></property>
-		<property name="base64Encoder" ref="base64Encoder"></property>
-		<property name="amf3ToJavaObjectDecoder" ref="AMF3ToJavaObjectDecoder"></property>
-		<property name="javaObjectToAMF3Encoder" ref="javaToAMF3Encoder"></property>
+		<property name="maxFrameSize" value="4096" />
+		<property name="nulEncoder" ref="nulEncoder" />
+		<property name="base64Decoder" ref="base64Decoder" />
+		<property name="base64Encoder" ref="base64Encoder" />
+		<property name="amf3ToJavaObjectDecoder" ref="AMF3ToJavaObjectDecoder" />
+		<property name="javaObjectToAMF3Encoder" ref="javaToAMF3Encoder" />
 	</bean>
 	
 	<bean id="stringProtocol" class="org.menacheri.jetserver.protocols.impl.StringProtocol">
-		<property name="frameSize" value="4096"></property>
-		<property name="nulEncoder" ref="nulEncoder"></property>
-		<property name="stringDecoder" ref="stringDecoder"></property>
-		<property name="stringEncoder" ref="stringEncoder"></property>
+		<property name="frameSize" value="4096" />
+		<property name="nulEncoder" ref="nulEncoder" />
+		<property name="stringDecoder" ref="stringDecoder" />
+		<property name="stringEncoder" ref="stringMessageEncoder" />
 	</bean>
 	
 	<bean id="channelBufferProtocol" class="org.menacheri.jetserver.protocols.impl.ChannelBufferProtocol">
-		<property name="eventDecoder" ref="eventDecoder"></property>
-		<property name="lengthFieldPrepender" ref="lengthFieldPrepender"></property>
-		<property name="eventEncoder" ref="eventEncoder"></property>
+		<property name="eventDecoder" ref="eventDecoder" />
+		<property name="lengthFieldPrepender" ref="lengthFieldPrepender" />
+		<property name="eventEncoder" ref="eventEncoder" />
 	</bean>
 	
 	<bean id="messageBufferProtocol" class="org.menacheri.jetserver.protocols.impl.MessageBufferProtocol">
-		<property name="lengthFieldPrepender" ref="lengthFieldPrepender"></property>
-		<property name="messageBufferEventDecoder" ref="messageBufferEventDecoder"></property>
-		<property name="messageBufferEventEncoder" ref="messageBufferEventEncoder"></property>
+		<property name="lengthFieldPrepender" ref="lengthFieldPrepender" />
+		<property name="messageBufferEventDecoder" ref="messageBufferEventDecoder" />
+		<property name="messageBufferEventEncoder" ref="messageBufferEventEncoder" />
 	</bean>
 
 	<bean id="webSocketProtocol" class="org.menacheri.jetserver.protocols.impl.WebSocketProtocol">
-		<property name="textWebsocketDecoder" ref="textWebsocketDecoder"></property>
-		<property name="textWebsocketEncoder" ref="textWebsocketEncoder"></property>
+		<property name="textWebsocketDecoder" ref="textWebsocketDecoder" />
+		<property name="textWebsocketEncoder" ref="textWebsocketEncoder" />
 	</bean>
 	
 	<!-- Login Protocols these decide what handlers are in the pipeline during 
 		login of a client to jetserver -->
-	<bean id="httpLoginProtocol" class="org.menacheri.jetserver.handlers.netty.LoginProtocol.HTTPProtocol" >
-		<property name="webSocketLoginHandler" ref="webSocketLoginHandler" ></property>
+	<bean id="httpLoginProtocol" class="org.menacheri.jetserver.handlers.netty.LoginProtocol.HTTPProtocol">
+		<property name="webSocketLoginHandler" ref="webSocketLoginHandler" />
 	</bean>
 	
-	<bean id="defaultJetLoginProtocol" class="org.menacheri.jetserver.handlers.netty.LoginProtocol.DefaultJetProtocol" >
-		<property name="eventDecoder" ref="eventDecoder"></property>
-		<property name="loginHandler" ref="loginHandler"></property>
-		<property name="lengthFieldPrepender" ref="lengthFieldPrepender"></property>
+	<bean id="defaultJetLoginProtocol" class="org.menacheri.jetserver.handlers.netty.LoginProtocol.DefaultJetProtocol">
+		<property name="eventDecoder" ref="eventDecoder" />
+		<property name="loginHandler" ref="loginHandler" />
+		<property name="lengthFieldPrepender" ref="lengthFieldPrepender" />
 	</bean>
 	
 	
 	<bean id="compositeLoginProtocol" class="org.menacheri.jetserver.handlers.netty.LoginProtocol.CompositeProtocol" scope="prototype">
 		<property name="protocols">
 			<list>
-				<ref bean="defaultJetLoginProtocol"/>
-				<ref bean="httpLoginProtocol"/>
+				<ref bean="defaultJetLoginProtocol" />
+				<ref bean="httpLoginProtocol" />
 			</list>
 		</property>
 	</bean>

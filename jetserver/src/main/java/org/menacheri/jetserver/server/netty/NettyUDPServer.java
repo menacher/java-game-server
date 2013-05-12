@@ -1,19 +1,16 @@
 package org.menacheri.jetserver.server.netty;
 
-import java.net.InetSocketAddress;
-import java.util.Arrays;
-import java.util.concurrent.Executors;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.socket.nio.NioDatagramChannel;
 
-import org.jboss.netty.bootstrap.Bootstrap;
-import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelException;
-import org.jboss.netty.channel.FixedReceiveBufferSizePredictorFactory;
-import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
-import org.menacheri.jetserver.concurrent.NamedThreadFactory;
+import java.util.Map;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 
 /**
  * This server does UDP connection less broadcast. Since it does not store the
@@ -27,121 +24,67 @@ import org.slf4j.LoggerFactory;
  * @author Abraham Menacherry
  * 
  */
-public class NettyUDPServer extends AbstractNettyServer
+public class NettyUDPServer extends AbstractNettyServer 
 {
-	private static final Logger LOG = LoggerFactory.getLogger(NettyUDPServer.class);
-	private FixedReceiveBufferSizePredictorFactory bufferSizePredictor;
-	private String[] args;
+	private static final Logger LOG = LoggerFactory
+			.getLogger(NettyUDPServer.class);
+	private Bootstrap bootstrap;
 	
-	/**
-	 * The connected channel for this server. This reference can be used to
-	 * shutdown this server.
-	 */
-	private Channel channel;
-	
-	public NettyUDPServer()
+	public NettyUDPServer(NettyConfig nettyConfig, ChannelInitializer<? extends Channel> channelInitializer) 
 	{
-
+		super(nettyConfig, channelInitializer);
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
-	public void startServer(int port) throws Exception
+	public void startServer() throws Exception 
 	{
-		portNumber = port;
-		startServer(args);
-	}
-	
-	@Override
-	public void startServer() throws Exception
-	{
-		startServer(args);
-	}
-	
-	public void startServer(String[] args)  throws Exception
-	{
-		int portNumber = getPortNumber(args);
-		InetSocketAddress socketAddress = new InetSocketAddress(portNumber);
-		startServer(socketAddress);
-	}
-
-	@Override
-	public Bootstrap createServerBootstrap()
-	{
-		serverBootstrap = new ConnectionlessBootstrap(
-				new NioDatagramChannelFactory(Executors
-						.newCachedThreadPool(new NamedThreadFactory(
-								"UDP-Server-Worker"))));
-		return serverBootstrap;
-	}
-
-	@Override
-	public void stopServer() throws Exception
-	{
-		if(null != channel)
+		try 
 		{
-			channel.close();
+			bootstrap = new Bootstrap();
+			Map<ChannelOption<?>, Object> channelOptions = nettyConfig
+					.getChannelOptions();
+			if (null != channelOptions) 
+			{
+				Set<ChannelOption<?>> keySet = channelOptions.keySet();
+				for (@SuppressWarnings("rawtypes") ChannelOption option : keySet) 
+				{
+					bootstrap.option(option, channelOptions.get(option));
+				}
+			}
+			Channel channel = bootstrap.group(getBossGroup())
+					.channel(NioDatagramChannel.class)
+					.handler(getChannelInitializer())
+					.bind(nettyConfig.getSocketAddress()).channel();
+			ALL_CHANNELS.add(channel);
+		} 
+		catch (Exception e) 
+		{
+			LOG.error("UDP Server start error {}, going to shut down", e);
+			super.stopServer();
+			throw e;
 		}
-		super.stopServer();
-	}
-	
-	public FixedReceiveBufferSizePredictorFactory getBufferSizePredictor()
-	{
-		return bufferSizePredictor;
-	}
-
-	public void setBufferSizePredictor(
-			FixedReceiveBufferSizePredictorFactory bufferSizePredictor)
-	{
-		this.bufferSizePredictor = bufferSizePredictor;
 	}
 
 	@Override
-	public TransmissionProtocol getTransmissionProtocol()
+	public TransmissionProtocol getTransmissionProtocol() 
 	{
 		return TRANSMISSION_PROTOCOL.UDP;
 	}
 
 	@Override
-	public void startServer(InetSocketAddress socketAddress)
+	public String toString() 
 	{
-		this.socketAddress = socketAddress;
-		//TODO these should be set from spring
-		serverBootstrap.setOption("broadcast", "false");
-		serverBootstrap.setOption("receiveBufferSizePredictorFactory",
-				bufferSizePredictor);
-		serverBootstrap.setOption("sendBufferSize", 65536);
-		serverBootstrap.setOption("receiveBufferSize", 65536);
-		configureServerBootStrap(args);
-
-		try
-		{
-			channel = ((ConnectionlessBootstrap) serverBootstrap)
-					.bind(socketAddress);
-		}
-		catch (ChannelException e)
-		{
-			LOG.error("Unable to start UDP server due to error {}",e);
-			throw e;
-		}
-		
-	}
-
-	public String[] getArgs()
-	{
-		return args;
-	}
-
-	public void setArgs(String[] args)
-	{
-		this.args = args;
+		return "NettyUDPServer [socketAddress=" + nettyConfig.getSocketAddress()
+				+ ", portNumber=" + nettyConfig.getPortNumber() + "]";
 	}
 
 	@Override
-	public String toString()
+	public void setChannelInitializer(
+			ChannelInitializer<? extends Channel> initializer) 
 	{
-		return "NettyUDPServer [args=" + Arrays.toString(args)
-				+ ", socketAddress=" + socketAddress + ", portNumber=" + portNumber
-				+ "]";
+		this.channelInitializer = initializer;
+		bootstrap.handler(initializer);
 	}
 
 }

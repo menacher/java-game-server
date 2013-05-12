@@ -1,9 +1,10 @@
 package org.menacheri.jetserver.handlers.netty;
 
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.handler.codec.http.websocketx.TextWebSocketFrame;
-import org.jboss.netty.handler.codec.oneone.OneToOneEncoder;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.handler.codec.MessageToMessageEncoder;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+
 import org.menacheri.jetserver.event.Event;
 
 import com.google.gson.Gson;
@@ -16,14 +17,15 @@ import com.google.gson.Gson;
  * @author Abraham Menacherry
  * 
  */
-public class TextWebsocketEncoder extends OneToOneEncoder
+@Sharable
+public class TextWebsocketEncoder extends MessageToMessageEncoder<Event>
 {
 
 	private Gson gson;
 
 	@Override
-	protected Object encode(ChannelHandlerContext ctx, Channel channel,
-			Object msg) throws Exception
+	protected Object encode(ChannelHandlerContext ctx, 
+			Event msg) throws Exception
 	{
 		String json = gson.toJson(msg);
 		return new TextWebSocketFrame(json);

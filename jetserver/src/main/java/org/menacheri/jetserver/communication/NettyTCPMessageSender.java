@@ -1,11 +1,12 @@
 package org.menacheri.jetserver.communication;
 
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFutureListener;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFutureListener;
+
 import org.menacheri.jetserver.communication.DeliveryGuaranty.DeliveryGuarantyOptions;
 import org.menacheri.jetserver.communication.MessageSender.Reliable;
-import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.Event;
+import org.menacheri.jetserver.event.Events;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +58,7 @@ public class NettyTCPMessageSender implements Reliable
 		LOG.debug("Going to close tcp connection in class: {}", this
 				.getClass().getName());
 		Event event = Events.event(null, Events.DISCONNECT);
-		if (channel.isConnected())
+		if (channel.isActive())
 		{
 			channel.write(event).addListener(ChannelFutureListener.CLOSE);
 		}
@@ -75,7 +76,7 @@ public class NettyTCPMessageSender implements Reliable
 		String channelId = "TCP channel with Id: ";
 		if (null != channel)
 		{
-			channelId += channel.getId().toString();
+			channelId += channel.id().toString();
 		}
 		else
 		{

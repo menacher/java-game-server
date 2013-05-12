@@ -1,19 +1,18 @@
 package org.menacheri.jetserver.handlers.netty;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.CompositeByteBuf;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundMessageHandlerAdapter;
+
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
-import org.jboss.netty.channel.ChannelHandler.Sharable;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelStateEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
 import org.menacheri.jetserver.app.GameRoom;
 import org.menacheri.jetserver.app.Player;
 import org.menacheri.jetserver.app.PlayerSession;
@@ -36,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 
 @Sharable
-public class LoginHandler extends SimpleChannelUpstreamHandler
+public class LoginHandler extends ChannelInboundMessageHandlerAdapter<Event>
 {
 	private static final Logger LOG = LoggerFactory
 			.getLogger(LoginHandler.class);
@@ -53,44 +52,43 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 	private static final AtomicInteger CHANNEL_COUNTER = new AtomicInteger(0);
 
 	public void messageReceived(final ChannelHandlerContext ctx,
-			final MessageEvent e) throws Exception
+			final Event event) throws Exception
 	{
-		final Event event = (Event) e.getMessage();
-		final ChannelBuffer buffer = (ChannelBuffer) event.getSource();
-		final Channel channel = e.getChannel();
+		final ByteBuf buffer = (ByteBuf) event.getSource();
+		final Channel channel =  ctx.channel();
 		int type = event.getType();
 		if (Events.LOG_IN == type)
 		{
-			LOG.debug("Login attempt from {}", channel.getRemoteAddress());
+			LOG.debug("Login attempt from {}", channel.remoteAddress());
 			Player player = lookupPlayer(buffer, channel);
-			handleLogin(player, channel, buffer);
+			handleLogin(player, ctx, buffer);
 		}
 		else if (Events.RECONNECT == type)
 		{
-			LOG.debug("Reconnect attempt from {}", channel.getRemoteAddress());
+			LOG.debug("Reconnect attempt from {}", channel.remoteAddress());
 			String reconnectKey = NettyUtils.readString(buffer);
 			PlayerSession playerSession = lookupSession(reconnectKey);
-			handleReconnect(playerSession, channel, buffer);
+			handleReconnect(playerSession, ctx, buffer);
 		}
 		else
 		{
 			LOG.error("Invalid event {} sent from remote address {}. "
 					+ "Going to close channel {}",
-					new Object[] { event.getType(), channel.getRemoteAddress(),
-							channel.getId() });
+					new Object[] { event.getType(), channel.remoteAddress(),
+							channel.id() });
 			closeChannelWithLoginFailure(channel);
 		}
 	}
 
 	@Override
-	public void channelOpen(ChannelHandlerContext ctx, ChannelStateEvent e)
-			throws Exception {
-		AbstractNettyServer.ALL_CHANNELS.add(e.getChannel());
-		LOG.debug("Added Channel with id: {} as the {}th open channel", e
-				.getChannel().getId(), CHANNEL_COUNTER.incrementAndGet());
+	public void channelActive(ChannelHandlerContext ctx) throws Exception 
+	{
+		AbstractNettyServer.ALL_CHANNELS.add(ctx.channel());
+		LOG.debug("Added Channel with id: {} as the {}th open channel", ctx
+				.channel().id(), CHANNEL_COUNTER.incrementAndGet());
 	}
 	
-	public Player lookupPlayer(final ChannelBuffer buffer, final Channel channel)
+	public Player lookupPlayer(final ByteBuf buffer, final Channel channel)
 	{
 		Credentials credentials = new SimpleCredentials(buffer);
 		Player player = lookupService.playerLookup(credentials);
@@ -122,26 +120,26 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 		return playerSession;
 	}
 	
-	public void handleLogin(Player player, Channel channel, ChannelBuffer buffer)
+	public void handleLogin(Player player, ChannelHandlerContext ctx, ByteBuf buffer)
 	{
 		if (null != player)
 		{
-			channel.write(NettyUtils
+			ctx.write(NettyUtils
 					.createBufferForOpcode(Events.LOG_IN_SUCCESS));
-			handleGameRoomJoin(player, channel, buffer);
+			handleGameRoomJoin(player, ctx, buffer);
 		}
 		else
 		{
 			// Write future and close channel
-			closeChannelWithLoginFailure(channel);
+			closeChannelWithLoginFailure(ctx.channel());
 		}
 	}
 
-	protected void handleReconnect(PlayerSession playerSession, Channel channel, ChannelBuffer buffer)
+	protected void handleReconnect(PlayerSession playerSession, ChannelHandlerContext ctx, ByteBuf buffer)
 	{
 		if (null != playerSession)
 		{
-			channel.write(NettyUtils
+			ctx.write(NettyUtils
 					.createBufferForOpcode(Events.LOG_IN_SUCCESS));
 			GameRoom gameRoom = playerSession.getGameRoom();
 			gameRoom.disconnectSession(playerSession);
@@ -151,12 +149,12 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 			if (null != playerSession.getUdpSender())
 				playerSession.getUdpSender().close();
 			
-			handleReJoin(playerSession, gameRoom, channel, buffer);
+			handleReJoin(playerSession, gameRoom, ctx.channel(), buffer);
 		}
 		else
 		{
 			// Write future and close channel
-			closeChannelWithLoginFailure(channel);
+			closeChannelWithLoginFailure(ctx.channel());
 		}
 	}
 
@@ -174,10 +172,10 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 		future.addListener(ChannelFutureListener.CLOSE);
 	}
 	
-	public void handleGameRoomJoin(Player player, Channel channel, ChannelBuffer buffer)
+	public void handleGameRoomJoin(Player player, ChannelHandlerContext ctx, ByteBuf buffer)
 	{
 		String refKey = NettyUtils.readString(buffer);
-		
+		Channel channel = ctx.channel();
 		GameRoom gameRoom = lookupService.gameRoomLookup(refKey);
 		if(null != gameRoom)
 		{
@@ -187,8 +185,9 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 					.generateFor(playerSession.getClass());
 			playerSession.setAttribute(JetConfig.RECONNECT_KEY, reconnectKey);
 			playerSession.setAttribute(JetConfig.RECONNECT_REGISTRY, reconnectRegistry);
-			LOG.trace("Sending GAME_ROOM_JOIN_SUCCESS to channel {}", channel.getId());
-			ChannelBuffer reconnectKeyBuffer = ChannelBuffers.wrappedBuffer(NettyUtils.createBufferForOpcode(Events.GAME_ROOM_JOIN_SUCCESS), NettyUtils.writeString(reconnectKey));
+			LOG.trace("Sending GAME_ROOM_JOIN_SUCCESS to channel {}", channel.id());
+			CompositeByteBuf compositeBuffer = ctx.alloc().compositeBuffer();
+			ByteBuf reconnectKeyBuffer = compositeBuffer.addComponents(NettyUtils.createBufferForOpcode(Events.GAME_ROOM_JOIN_SUCCESS), NettyUtils.writeString(reconnectKey));
 			ChannelFuture future = channel.write(reconnectKeyBuffer);
 			connectToGameRoom(gameRoom, playerSession, future);
 			loginUdp(playerSession, buffer);
@@ -198,16 +197,16 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 			// Write failure and close channel.
 			ChannelFuture future = channel.write(NettyUtils.createBufferForOpcode(Events.GAME_ROOM_JOIN_FAILURE));
 			future.addListener(ChannelFutureListener.CLOSE);
-			LOG.error("Invalid ref key provided by client: {}. Channel {} will be closed",refKey,channel.getId());
+			LOG.error("Invalid ref key provided by client: {}. Channel {} will be closed",refKey,channel.id());
 		}
 	}
 	
 	protected void handleReJoin(PlayerSession playerSession, GameRoom gameRoom, Channel channel,
-			ChannelBuffer buffer)
+			ByteBuf buffer)
 	{
 		LOG.trace("Going to clear pipeline");
 		// Clear the existing pipeline
-		NettyUtils.clearPipeline(channel.getPipeline());
+		NettyUtils.clearPipeline(channel.pipeline());
 		// Set the tcp channel on the session. 
 		NettyTCPMessageSender sender = new NettyTCPMessageSender(channel);
 		playerSession.setTcpSender(sender);
@@ -227,13 +226,13 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 			public void operationComplete(ChannelFuture future)
 					throws Exception
 			{
-				Channel channel = future.getChannel();
-				LOG.trace("Sending GAME_ROOM_JOIN_SUCCESS to channel {} completed", channel.getId());
+				Channel channel = future.channel();
+				LOG.trace("Sending GAME_ROOM_JOIN_SUCCESS to channel {} completed", channel.id());
 				if (future.isSuccess())
 				{
 					LOG.trace("Going to clear pipeline");
 					// Clear the existing pipeline
-					NettyUtils.clearPipeline(channel.getPipeline());
+					NettyUtils.clearPipeline(channel.pipeline());
 					// Set the tcp channel on the session. 
 					NettyTCPMessageSender sender = new NettyTCPMessageSender(channel);
 					playerSession.setTcpSender(sender);
@@ -261,7 +260,7 @@ public class LoginHandler extends SimpleChannelUpstreamHandler
 	 *            Used to read the remote address of the client which is
 	 *            attempting to connect via udp.
 	 */
-	protected void loginUdp(PlayerSession playerSession, ChannelBuffer buffer)
+	protected void loginUdp(PlayerSession playerSession, ByteBuf buffer)
 	{
 		InetSocketAddress remoteAdress = NettyUtils.readSocketAddress(buffer);
 		if(null != remoteAdress)

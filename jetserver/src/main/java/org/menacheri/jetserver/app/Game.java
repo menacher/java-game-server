@@ -1,6 +1,7 @@
 package org.menacheri.jetserver.app;
 
-import org.jboss.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFuture;
+
 
 
 /**

@@ -1,34 +1,26 @@
 package org.menacheri.jetserver.handlers.netty;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandler.Sharable;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.handler.codec.oneone.OneToOneDecoder;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.MessageToMessageDecoder;
+
 import org.menacheri.jetserver.event.Events;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 @Sharable
-public class EventDecoder extends OneToOneDecoder
+public class EventDecoder extends MessageToMessageDecoder<ByteBuf>
 {
-	private static final Logger LOG = LoggerFactory.getLogger(EventDecoder.class);
-	
 	@Override
-	protected Object decode(ChannelHandlerContext ctx, Channel channel,
-			Object msg) throws Exception
-	{
-		if(null == msg)
+	protected Object decode(ChannelHandlerContext ctx,
+			ByteBuf msg) throws Exception {
+		int opcode = msg.readUnsignedByte();
+		if (Events.LOG_IN == opcode || Events.RECONNECT == opcode) 
 		{
-			LOG.error("Null msg received in EventDecoder");
-			return msg;
+			msg.readUnsignedByte();// To read-destroy the protocol version byte.
 		}
-		ChannelBuffer buffer = (ChannelBuffer)msg;
-		int opcode = buffer.readUnsignedByte();
-		if(Events.LOG_IN == opcode || Events.RECONNECT == opcode){
-			buffer.readUnsignedByte();// To read-destroy the protocol version byte.
-		}
+		ByteBuf buffer = Unpooled.buffer(msg.readableBytes()).writeBytes(msg);
 		return Events.event(buffer, opcode);
 	}
 	

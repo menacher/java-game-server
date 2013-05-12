@@ -1,17 +1,16 @@
 package org.menacheri.jetserver.handlers.netty;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelHandler.Sharable;
-import org.jboss.netty.handler.codec.oneone.OneToOneDecoder;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.MessageToMessageDecoder;
+
 import org.menacheri.jetserver.communication.NettyMessageBuffer;
 import org.menacheri.jetserver.event.Events;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
- * This decoder will convert a Netty {@link ChannelBuffer} to a
+ * This decoder will convert a Netty {@link ByteBuf} to a
  * {@link NettyMessageBuffer}. It will also convert
  * {@link Events#NETWORK_MESSAGE} events to {@link Events#SESSION_MESSAGE}
  * event.
@@ -19,26 +18,21 @@ import org.slf4j.LoggerFactory;
  * @author Abraham Menacherry
  * 
  */
+//TODO check if MessageToMessageDecoder can be replaced with MessageToByteDecoder
 @Sharable
-public class MessageBufferEventDecoder extends OneToOneDecoder
+public class MessageBufferEventDecoder extends MessageToMessageDecoder<ByteBuf>
 {
-	private static final Logger LOG = LoggerFactory.getLogger(MessageBufferEventDecoder.class);
-	
 	@Override
-	protected Object decode(ChannelHandlerContext ctx, Channel channel,
-			Object msg) throws Exception
+	public Object decode(ChannelHandlerContext ctx, ByteBuf buffer)
+			throws Exception 
 	{
-		if(null == msg)
-		{
-			LOG.error("Null message received in MessageBufferEventDecoder");
-			return msg;
-		}
-		ChannelBuffer buffer = (ChannelBuffer)msg;
 		byte opcode = buffer.readByte();
-		if (opcode == Events.NETWORK_MESSAGE)
+		if (opcode == Events.NETWORK_MESSAGE) 
 		{
 			opcode = Events.SESSION_MESSAGE;
 		}
-		return Events.event(new NettyMessageBuffer(buffer), opcode);
+		ByteBuf data = Unpooled.buffer(buffer.readableBytes()).writeBytes(
+				buffer);
+		return Events.event(new NettyMessageBuffer(data), opcode);
 	}
 }

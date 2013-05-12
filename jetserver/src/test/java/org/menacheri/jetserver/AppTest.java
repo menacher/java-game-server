@@ -1,11 +1,11 @@
 package org.menacheri.jetserver;
 
 import static org.junit.Assert.assertEquals;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 
 import java.net.InetSocketAddress;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.junit.Test;
 import org.menacheri.jetserver.util.NettyUtils;
 
@@ -19,7 +19,7 @@ public class AppTest
 	public void nettyUtilStringWriteRead()
 	{
 		String msg = "Hello World!";
-		ChannelBuffer stringBuffer = NettyUtils.writeString(msg);
+		ByteBuf stringBuffer = NettyUtils.writeString(msg);
 		String reply = NettyUtils.readString(stringBuffer);
 		assertEquals(msg, reply);
 	}
@@ -29,9 +29,9 @@ public class AppTest
 	{
 		String hello = "Hello ";
 		String world = "World!";
-		ChannelBuffer stringBuffer1 = NettyUtils.writeString(hello);
-		ChannelBuffer stringBuffer2 = NettyUtils.writeString(world);
-		ChannelBuffer stringBuffer = ChannelBuffers.wrappedBuffer(stringBuffer1,stringBuffer2);
+		ByteBuf stringBuffer1 = NettyUtils.writeString(hello);
+		ByteBuf stringBuffer2 = NettyUtils.writeString(world);
+		ByteBuf stringBuffer = Unpooled.wrappedBuffer(stringBuffer1,stringBuffer2);
 		String helloReply = NettyUtils.readString(stringBuffer);
 		String worldReply = NettyUtils.readString(stringBuffer);
 		assertEquals(hello, helloReply);
@@ -43,7 +43,7 @@ public class AppTest
 	{
 		String hello = "Hello ";
 		String world = "World!";
-		ChannelBuffer stringBuffer = NettyUtils.writeStrings(hello,world);
+		ByteBuf stringBuffer = NettyUtils.writeStrings(hello,world);
 		String helloReply = NettyUtils.readString(stringBuffer);
 		String worldReply = NettyUtils.readString(stringBuffer);
 		assertEquals(hello, helloReply);
@@ -54,7 +54,7 @@ public class AppTest
     public void readWriteSocketAddress()
     {
     	InetSocketAddress socketAddress = new InetSocketAddress("localhost", 18090);
-    	ChannelBuffer buffer = NettyUtils.writeSocketAddress(socketAddress);
+    	ByteBuf buffer = NettyUtils.writeSocketAddress(socketAddress);
     	InetSocketAddress readAddress = NettyUtils.readSocketAddress(buffer);
     	assertEquals(socketAddress,readAddress);
     }

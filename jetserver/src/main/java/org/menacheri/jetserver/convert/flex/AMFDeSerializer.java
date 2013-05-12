@@ -42,7 +42,9 @@ public class AMFDeSerializer {
 		Amf3Input amf3Input = new Amf3Input(context);
 		amf3Input.setInputStream(amf);
 		// Read object does the actual work of conversion.
-		return (T) amf3Input.readObject();
+		T object = (T) amf3Input.readObject();
+		amf3Input.close();
+		return object;
 	}
 
 	public SerializationContext getContext() {

@@ -1,30 +1,20 @@
 package org.menacheri.jetserver.handlers.netty;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelHandler.Sharable;
-import org.jboss.netty.handler.codec.oneone.OneToOneEncoder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.MessageToByteEncoder;
 
 @Sharable
-public class NulEncoder extends OneToOneEncoder {
+public class NulEncoder extends MessageToByteEncoder<ByteBuf> {
 
-	private static final Logger LOG = LoggerFactory.getLogger(NulEncoder.class);
+	private static final ByteBuf NULL_BUFFER = Unpooled.wrappedBuffer(new byte[] { 0 });
+	
 	@Override
-	protected Object encode(ChannelHandlerContext ctx, Channel channel,
-			Object msg) throws Exception {
-		if(!(msg instanceof ChannelBuffer))
-		{
-			LOG.error("Expected channel buffer but recieved: {}", msg
-					.getClass().getCanonicalName());
-			return msg;
-		}
-		ChannelBuffer nulBuffer = ChannelBuffers.wrappedBuffer(new byte[] { 0 });
-		ChannelBuffer buffer = ChannelBuffers.wrappedBuffer((ChannelBuffer)msg,nulBuffer);
-		return buffer;
+	protected void encode(ChannelHandlerContext ctx, ByteBuf msg, ByteBuf out)
+			throws Exception {
+		out.writeBytes(Unpooled.wrappedBuffer(msg,NULL_BUFFER));
 	}
 	
 }

@@ -1,11 +1,13 @@
 package org.menacheri.jetserver.handlers.netty;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundMessageHandlerAdapter;
+import io.netty.channel.socket.DatagramChannel;
+import io.netty.channel.socket.DatagramPacket;
+
 import java.net.SocketAddress;
 
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
-import org.jboss.netty.channel.socket.DatagramChannel;
 import org.menacheri.jetserver.app.Session;
 import org.menacheri.jetserver.communication.MessageSender.Fast;
 import org.menacheri.jetserver.communication.NettyUDPMessageSender;
@@ -15,50 +17,68 @@ import org.menacheri.jetserver.service.SessionRegistryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
-public class UDPUpstreamHandler extends SimpleChannelUpstreamHandler
+public class UDPUpstreamHandler extends ChannelInboundMessageHandlerAdapter<DatagramPacket>
 {
 	private static final Logger LOG = LoggerFactory.getLogger(UDPUpstreamHandler.class);
+	private static final String UDP_CONNECTING = "UDP_CONNECTING";
 	private SessionRegistryService<SocketAddress> udpSessionRegistry;
+	private MessageBufferEventDecoder messageBufferEventDecoder;
+	
 	public UDPUpstreamHandler()
 	{
 		super();
 	}
 	
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e)
-			throws Exception
-	{
+	public void messageReceived(ChannelHandlerContext ctx, DatagramPacket packet)
+			throws Exception 
+			{
 		// Get the session using the remoteAddress.
-		SocketAddress remoteAddress = e.getRemoteAddress();
+		SocketAddress remoteAddress = packet.remoteAddress();
 		Session session = udpSessionRegistry.getSession(remoteAddress);
-		if(null != session)
+		if (null != session) 
 		{
-			Event event = (Event) e.getMessage();
+			ByteBuf buffer = packet.data();
+			Event event = (Event) messageBufferEventDecoder
+					.decode(null, buffer);
+
 			// If the session's UDP has not been connected yet then send a
 			// CONNECT event.
-			if (!session.isUDPEnabled())
+			if (!session.isUDPEnabled()) 
 			{
-				event = getUDPConnectEvent(event, remoteAddress,
-						(DatagramChannel) e.getChannel());
-				// Pass the connect event on to the session
-				session.onEvent(event);
-			}
-			else if (event.getType() == Events.CONNECT)
+				if (null == session.getAttribute(UDP_CONNECTING)
+						|| (!(Boolean) session.getAttribute(UDP_CONNECTING))) 
+				{
+					session.setAttribute(UDP_CONNECTING, true);
+					event = getUDPConnectEvent(event, remoteAddress,
+							(DatagramChannel) ctx.channel());
+					// Pass the connect event on to the session
+					session.onEvent(event);
+				}
+				else
+				{
+					LOG.info("Going to discard UDP Message Event with type {} "
+							+ "the UDP MessageSender is not initialized fully",
+							event.getType());
+				}
+			} 
+			else if (event.getType() == Events.CONNECT) 
 			{
 				// Duplicate connect just discard.
 				LOG.trace("Duplicate CONNECT {} received in UDP channel, "
 						+ "for session: {} going to discard", event, session);
-			}
-			else
+			} 
+			else 
 			{
 				// Pass the original event on to the session
 				session.onEvent(event);
 			}
-		}
-		else
+		} 
+		else 
 		{
-			LOG.trace("Packet received from unknown source address: {}, going to discard",remoteAddress);
+			LOG.trace(
+					"Packet received from unknown source address: {}, going to discard",
+					remoteAddress);
 		}
 	}
 
@@ -90,6 +110,17 @@ public class UDPUpstreamHandler extends SimpleChannelUpstreamHandler
 			SessionRegistryService<SocketAddress> udpSessionRegistry)
 	{
 		this.udpSessionRegistry = udpSessionRegistry;
+	}
+	
+	public MessageBufferEventDecoder getMessageBufferEventDecoder() 
+	{
+		return messageBufferEventDecoder;
+	}
+
+	public void setMessageBufferEventDecoder(
+			MessageBufferEventDecoder messageBufferEventDecoder) 
+	{
+		this.messageBufferEventDecoder = messageBufferEventDecoder;
 	}
 	
 }

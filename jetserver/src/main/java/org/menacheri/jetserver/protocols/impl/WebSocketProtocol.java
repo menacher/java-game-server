@@ -1,6 +1,7 @@
 package org.menacheri.jetserver.protocols.impl;
 
-import org.jboss.netty.channel.ChannelPipeline;
+import io.netty.channel.ChannelPipeline;
+
 import org.menacheri.jetserver.app.PlayerSession;
 import org.menacheri.jetserver.app.Session;
 import org.menacheri.jetserver.event.Event;
@@ -73,7 +74,6 @@ public class WebSocketProtocol extends AbstractNettyProtocol
 		// Since the pipeline was not cleared for this protocol do some cleanup
 		// manually.
 		pipeline.remove(LoginProtocol.LOGIN_HANDLER_NAME);
-		pipeline.remove(AbstractNettyProtocol.IDLE_CHECK_HANDLER);
 		pipeline.remove(AbstractNettyProtocol.IDLE_STATE_CHECK_HANDLER);
 	}
 

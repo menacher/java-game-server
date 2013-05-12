@@ -1,11 +1,15 @@
 package org.menacheri.jetserver.communication;
 
+import io.netty.channel.socket.DatagramChannel;
+
+import java.net.InetSocketAddress;
 import java.net.SocketAddress;
 
-import org.jboss.netty.channel.socket.DatagramChannel;
 import org.menacheri.jetserver.app.Session;
 import org.menacheri.jetserver.communication.DeliveryGuaranty.DeliveryGuarantyOptions;
 import org.menacheri.jetserver.communication.MessageSender.Fast;
+import org.menacheri.jetserver.event.Event;
+import org.menacheri.jetserver.event.EventContext;
 import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.impl.DefaultNetworkEvent;
 import org.menacheri.jetserver.handlers.netty.UDPUpstreamHandler;
@@ -31,7 +35,7 @@ public class NettyUDPMessageSender implements Fast
 	private final SocketAddress remoteAddress;
 	private final DatagramChannel channel;
 	private final SessionRegistryService<SocketAddress> sessionRegistryService;
-
+	private final EventContext eventContext;
 	private static final DeliveryGuaranty DELIVERY_GUARANTY = DeliveryGuarantyOptions.FAST;
 
 	public NettyUDPMessageSender(SocketAddress remoteAddress,
@@ -41,12 +45,17 @@ public class NettyUDPMessageSender implements Fast
 		this.remoteAddress = remoteAddress;
 		this.channel = channel;
 		this.sessionRegistryService = sessionRegistryService;
+		this.eventContext = new EventContextImpl((InetSocketAddress)remoteAddress);
 	}
 
 	@Override
 	public Object sendMessage(Object message)
 	{
-		return channel.write(message, remoteAddress);
+		// TODO this might overwrite valid context, check for better design
+		if(message instanceof Event){
+			((Event)message).setEventContext(eventContext);
+		}
+		return channel.write(message);
 	}
 
 	@Override
@@ -86,7 +95,7 @@ public class NettyUDPMessageSender implements Fast
 		String channelId = "UDP Channel with id: ";
 		if (null != channel)
 		{
-			channelId += channel.getId();
+			channelId += channel.id();
 		}
 		else
 		{
@@ -100,5 +109,31 @@ public class NettyUDPMessageSender implements Fast
 	protected SessionRegistryService<SocketAddress> getSessionRegistryService()
 	{
 		return sessionRegistryService;
+	}
+	
+	protected static class EventContextImpl implements EventContext
+	{
+		final InetSocketAddress clientAddress;
+		public EventContextImpl(InetSocketAddress clientAddress){
+			this.clientAddress = clientAddress;
+		}
+		@Override
+		public Session getSession() {
+			return null;
+		}
+
+		@Override
+		public void setSession(Session session) {
+		}
+
+		@Override
+		public InetSocketAddress getAttachment() {
+			return clientAddress;
+		}
+
+		@Override
+		public void setAttachment(Object attachement) {
+		}
+		
 	}
 }

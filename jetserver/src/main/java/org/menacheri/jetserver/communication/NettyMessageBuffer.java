@@ -1,40 +1,40 @@
 package org.menacheri.jetserver.communication;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.buffer.DynamicChannelBuffer;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+
 import org.menacheri.jetserver.convert.Transform;
 import org.menacheri.jetserver.util.NettyUtils;
 
 
 /**
  * This class is an implementation of the {@link MessageBuffer} interface. It is a thin
- * wrapper over the the Netty {@link ChannelBuffer} with some additional methods
+ * wrapper over the the Netty {@link ByteBuf} with some additional methods
  * for string and object read write. It does not expose all methods of the
  * ChannelBuffer, instead it has a method {@link #getNativeBuffer()} which can
  * be used to retrieve the buffer and then call the appropriate method. For
- * writing to the buffer, this class uses {@link DynamicChannelBuffer}
+ * writing to the buffer, this class uses {@link ByteBuf}
  * implementation.
  * 
  * @author Abraham Menacherry
  * 
  */
-public class NettyMessageBuffer implements MessageBuffer<ChannelBuffer>
+public class NettyMessageBuffer implements MessageBuffer<ByteBuf>
 {
-	private final ChannelBuffer buffer;
+	private final ByteBuf buffer;
 
 	public NettyMessageBuffer()
 	{
-		buffer = ChannelBuffers.dynamicBuffer();
+		buffer = Unpooled.buffer();
 	}
 
 	/**
 	 * This constructor can be used when trying to read information from a
-	 * {@link ChannelBuffer}.
+	 * {@link ByteBuf}.
 	 * 
 	 * @param buffer
 	 */
-	public NettyMessageBuffer(ChannelBuffer buffer)
+	public NettyMessageBuffer(ByteBuf buffer)
 	{
 		this.buffer = buffer;
 	}
@@ -42,7 +42,7 @@ public class NettyMessageBuffer implements MessageBuffer<ChannelBuffer>
 	@Override
 	public boolean isReadable()
 	{
-		return buffer.readable();
+		return buffer.isReadable();
 	}
 
 	@Override
@@ -64,7 +64,7 @@ public class NettyMessageBuffer implements MessageBuffer<ChannelBuffer>
 	}
 
 	@Override
-	public ChannelBuffer getNativeBuffer()
+	public ByteBuf getNativeBuffer()
 	{
 		return buffer;
 	}
@@ -173,94 +173,94 @@ public class NettyMessageBuffer implements MessageBuffer<ChannelBuffer>
 		return NettyUtils.readStrings(buffer, numOfStrings);
 	}
 
-	public <V> V readObject(Transform<ChannelBuffer,V> converter)
+	public <V> V readObject(Transform<ByteBuf,V> converter)
 	{
 		return NettyUtils.readObject(buffer, converter);
 	}
 		
 	@Override
-	public MessageBuffer<ChannelBuffer> writeByte(byte b)
+	public MessageBuffer<ByteBuf> writeByte(byte b)
 	{
 		buffer.writeByte(b);
 		return this;
 	}
 
 	@Override
-	public MessageBuffer<ChannelBuffer> writeBytes(byte[] src)
+	public MessageBuffer<ByteBuf> writeBytes(byte[] src)
 	{
 		buffer.writeBytes(src);
 		return this;
 	}
 
 	@Override
-	public MessageBuffer<ChannelBuffer> writeChar(int value)
+	public MessageBuffer<ByteBuf> writeChar(int value)
 	{
 		buffer.writeChar(value);
 		return this;
 	}
 
 	@Override
-	public MessageBuffer<ChannelBuffer> writeShort(int value)
+	public MessageBuffer<ByteBuf> writeShort(int value)
 	{
 		buffer.writeShort(value);
 		return this;
 	}
 
 	@Override
-	public MessageBuffer<ChannelBuffer> writeMedium(int value)
+	public MessageBuffer<ByteBuf> writeMedium(int value)
 	{
 		buffer.writeMedium(value);
 		return this;
 	}
 
 	@Override
-	public MessageBuffer<ChannelBuffer> writeInt(int value)
+	public MessageBuffer<ByteBuf> writeInt(int value)
 	{
 		buffer.writeInt(value);
 		return this;
 	}
 
 	@Override
-	public MessageBuffer<ChannelBuffer> writeLong(long value)
+	public MessageBuffer<ByteBuf> writeLong(long value)
 	{
 		buffer.writeLong(value);
 		return this;
 	}
 
 	@Override
-	public MessageBuffer<ChannelBuffer> writeFloat(float value)
+	public MessageBuffer<ByteBuf> writeFloat(float value)
 	{
 		buffer.writeFloat(value);
 		return this;
 	}
 
 	@Override
-	public MessageBuffer<ChannelBuffer> writeDouble(double value)
+	public MessageBuffer<ByteBuf> writeDouble(double value)
 	{
 		buffer.writeDouble(value);
 		return this;
 	}
 
 	@Override
-	public MessageBuffer<ChannelBuffer> writeString(String message)
+	public MessageBuffer<ByteBuf> writeString(String message)
 	{
-		ChannelBuffer strBuf = NettyUtils.writeString(message);
+		ByteBuf strBuf = NettyUtils.writeString(message);
 		buffer.writeBytes(strBuf);
 		return this;
 	}
 
 	@Override
-	public MessageBuffer<ChannelBuffer> writeStrings(String... messages)
+	public MessageBuffer<ByteBuf> writeStrings(String... messages)
 	{
-		ChannelBuffer strMultiBuf = NettyUtils.writeStrings(messages);
+		ByteBuf strMultiBuf = NettyUtils.writeStrings(messages);
 		buffer.writeBytes(strMultiBuf);
 		return this;
 	}
 
 	@Override
-	public <V> MessageBuffer<ChannelBuffer> writeObject(
-			Transform<V, ChannelBuffer> converter, V object) {
-		ChannelBuffer objBuf = NettyUtils.writeObject(converter, object);
+	public <V> MessageBuffer<ByteBuf> writeObject(
+			Transform<V, ByteBuf> converter, V object) {
+		ByteBuf objBuf = NettyUtils.writeObject(converter, object);
 		buffer.writeBytes(objBuf);
 		return this;
 	}

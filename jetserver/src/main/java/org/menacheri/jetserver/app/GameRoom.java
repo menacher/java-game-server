@@ -1,8 +1,9 @@
 package org.menacheri.jetserver.app;
 
+import io.netty.channel.Channel;
+
 import java.util.Set;
 
-import org.jboss.netty.channel.Channel;
 import org.menacheri.jetserver.app.impl.DefaultPlayer;
 import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.event.NetworkEvent;

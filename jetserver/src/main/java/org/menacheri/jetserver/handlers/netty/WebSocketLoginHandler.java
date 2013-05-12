@@ -1,15 +1,15 @@
 package org.menacheri.jetserver.handlers.netty;
 
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelInboundMessageHandlerAdapter;
+import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+
 import java.util.List;
 
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
-import org.jboss.netty.channel.ChannelHandler.Sharable;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
-import org.jboss.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import org.menacheri.jetserver.app.GameRoom;
 import org.menacheri.jetserver.app.Player;
 import org.menacheri.jetserver.app.PlayerSession;
@@ -40,7 +40,7 @@ import com.google.gson.Gson;
  * 
  */
 @Sharable
-public class WebSocketLoginHandler extends SimpleChannelUpstreamHandler
+public class WebSocketLoginHandler extends ChannelInboundMessageHandlerAdapter<TextWebSocketFrame>
 {
 	private static final Logger LOG = LoggerFactory
 			.getLogger(WebSocketLoginHandler.class);
@@ -53,44 +53,36 @@ public class WebSocketLoginHandler extends SimpleChannelUpstreamHandler
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e)
+	public void messageReceived(ChannelHandlerContext ctx, TextWebSocketFrame frame)
 			throws Exception
 	{
-		Channel channel = ctx.getChannel();
-		if (e.getMessage() instanceof TextWebSocketFrame)
+		Channel channel = ctx.channel();
+		String data = frame.text();
+		LOG.trace("From websocket: " + data);
+		Event event = gson.fromJson(data, DefaultEvent.class);
+		int type = event.getType();
+		if (Events.LOG_IN == type)
 		{
-			TextWebSocketFrame frame = (TextWebSocketFrame) e.getMessage();
-			String data = frame.getText();
-			LOG.trace("From websocket: " + data);
-			Event event = gson.fromJson(data, DefaultEvent.class);
-			int type = event.getType();
-			if (Events.LOG_IN == type)
-			{
-				LOG.trace("Login attempt from {}", channel.getRemoteAddress());
-				List<String> credList = null;
-				credList = (List) event.getSource();
-				Player player = lookupPlayer(credList.get(0), credList.get(1));
-				handleLogin(player, channel);
-				handleGameRoomJoin(player, channel, credList.get(2));
-			}
-			else if (type == Events.RECONNECT)
-			{
-				LOG.debug("Reconnect attempt from {}", channel.getRemoteAddress());
-				PlayerSession playerSession = lookupSession((String)event.getSource());
-				handleReconnect(playerSession, channel);
-			}
-			else
-			{
-				LOG.error(
-						"Invalid event {} sent from remote address {}. "
-								+ "Going to close channel {}",
-						new Object[] { event.getType(),
-								channel.getRemoteAddress(), channel.getId() });
-				closeChannelWithLoginFailure(channel);
-			}
+			LOG.trace("Login attempt from {}", channel.remoteAddress());
+			List<String> credList = null;
+			credList = (List) event.getSource();
+			Player player = lookupPlayer(credList.get(0), credList.get(1));
+			handleLogin(player, channel);
+			handleGameRoomJoin(player, channel, credList.get(2));
+		}
+		else if (type == Events.RECONNECT)
+		{
+			LOG.debug("Reconnect attempt from {}", channel.remoteAddress());
+			PlayerSession playerSession = lookupSession((String)event.getSource());
+			handleReconnect(playerSession, channel);
 		}
 		else
 		{
+			LOG.error(
+					"Invalid event {} sent from remote address {}. "
+							+ "Going to close channel {}",
+					new Object[] { event.getType(),
+							channel.remoteAddress(), channel.id() });
 			closeChannelWithLoginFailure(channel);
 		}
 	}
@@ -192,7 +184,7 @@ public class WebSocketLoginHandler extends SimpleChannelUpstreamHandler
 			playerSession.setAttribute(JetConfig.RECONNECT_KEY, reconnectKey);
 			playerSession.setAttribute(JetConfig.RECONNECT_REGISTRY, reconnectRegistry);
 			LOG.trace("Sending GAME_ROOM_JOIN_SUCCESS to channel {}",
-					channel.getId());
+					channel.id());
 			ChannelFuture future = channel.write(eventToFrame(
 					Events.GAME_ROOM_JOIN_SUCCESS, reconnectKey));
 			connectToGameRoom(gameRoom, playerSession, future);
@@ -205,7 +197,7 @@ public class WebSocketLoginHandler extends SimpleChannelUpstreamHandler
 			future.addListener(ChannelFutureListener.CLOSE);
 			LOG.error(
 					"Invalid ref key provided by client: {}. Channel {} will be closed",
-					refKey, channel.getId());
+					refKey, channel.id());
 		}
 	}
 
@@ -218,10 +210,10 @@ public class WebSocketLoginHandler extends SimpleChannelUpstreamHandler
 			public void operationComplete(ChannelFuture future)
 					throws Exception
 			{
-				Channel channel = future.getChannel();
+				Channel channel = future.channel();
 				LOG.trace(
 						"Sending GAME_ROOM_JOIN_SUCCESS to channel {} completed",
-						channel.getId());
+						channel.id());
 				if (future.isSuccess())
 				{
 					// Set the tcp channel on the session.

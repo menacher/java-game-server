@@ -1,11 +1,10 @@
 package org.menacheri.jetserver.server.netty;
 
-import static org.jboss.netty.channel.Channels.pipeline;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.timeout.IdleStateHandler;
 
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.handler.timeout.ReadTimeoutHandler;
-import org.jboss.netty.util.Timer;
 import org.menacheri.jetserver.handlers.netty.FlashPolicyServerDecoder;
 import org.menacheri.jetserver.handlers.netty.FlashPolicyServerHandler;
 
@@ -13,19 +12,12 @@ import org.menacheri.jetserver.handlers.netty.FlashPolicyServerHandler;
 /**
  * @author <a href="http://www.waywardmonkeys.com/">Bruce Mitchener</a>
  */
-public class FlashPolicyServerPipelineFactory implements ChannelPipelineFactory
+public class FlashPolicyServerPipelineFactory extends ChannelInitializer<SocketChannel>
 {
-	private Timer timer;
 
-    public ChannelPipeline getPipeline() throws Exception {
-        // Create a default pipeline implementation.
-        ChannelPipeline pipeline = pipeline();
-        pipeline.addLast("timeout", new ReadTimeoutHandler(timer, 30));
-        pipeline.addLast("decoder", new FlashPolicyServerDecoder());
-        pipeline.addLast("handler", getFlashPolicyServerHandler());
-        return pipeline;
-    }
-
+	// TODO make this configurable from spring.
+	private static final int MAX_IDLE_SECONDS = 60;
+	
     /**
 	 * Spring will return the actual prototype bean from its context here. It
 	 * uses method lookup here.
@@ -37,13 +29,12 @@ public class FlashPolicyServerPipelineFactory implements ChannelPipelineFactory
     	return null;
     }
     
-	public Timer getTimer()
-	{
-		return timer;
-	}
-
-	public void setTimer(Timer timer)
-	{
-		this.timer = timer;
+	@Override
+	protected void initChannel(SocketChannel ch) throws Exception {
+		ChannelPipeline pipeline = ch.pipeline();
+		pipeline.addLast("idleStateCheck", new IdleStateHandler(
+				MAX_IDLE_SECONDS, MAX_IDLE_SECONDS, MAX_IDLE_SECONDS));
+        pipeline.addLast("decoder", new FlashPolicyServerDecoder());
+        pipeline.addLast("handler", getFlashPolicyServerHandler());
 	}
 }

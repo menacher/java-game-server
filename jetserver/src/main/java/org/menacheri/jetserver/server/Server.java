@@ -2,8 +2,6 @@ package org.menacheri.jetserver.server;
 
 import java.net.InetSocketAddress;
 
-import org.menacheri.jetserver.app.Session;
-
 public interface Server {
 
 	public interface TransmissionProtocol{
@@ -26,7 +24,4 @@ public interface Server {
 	
 	InetSocketAddress getSocketAddress();
 	
-	Session getSession();
-	
-	void setSession(Session session);
 }

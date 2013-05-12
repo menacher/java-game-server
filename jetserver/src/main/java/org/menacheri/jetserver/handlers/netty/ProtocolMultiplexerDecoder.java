@@ -1,10 +1,10 @@
 package org.menacheri.jetserver.handlers.netty;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.handler.codec.frame.FrameDecoder;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundByteHandlerAdapter;
+import io.netty.channel.ChannelPipeline;
+
 import org.menacheri.jetserver.util.BinaryUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
  * @author Abraham Menacherry
  * 
  */
-public class ProtocolMultiplexerDecoder extends FrameDecoder
+public class ProtocolMultiplexerDecoder extends ChannelInboundByteHandlerAdapter
 {
 
 	private static final Logger LOG = LoggerFactory
@@ -36,16 +36,16 @@ public class ProtocolMultiplexerDecoder extends FrameDecoder
 	}
 
 	@Override
-	protected Object decode(ChannelHandlerContext ctx, Channel channel,
-			ChannelBuffer buffer) throws Exception
+	protected void inboundBufferUpdated(ChannelHandlerContext ctx, 
+			ByteBuf buffer) throws Exception
 	{
 		// Will use the first bytes to detect a protocol.
 		if (buffer.readableBytes() < bytesForProtocolCheck)
 		{
-			return null;
+			return;
 		}
 
-		ChannelPipeline pipeline = ctx.getPipeline();
+		ChannelPipeline pipeline = ctx.pipeline();
 
 		if (!loginProtocol.applyProtocol(buffer, pipeline))
 		{
@@ -54,24 +54,21 @@ public class ProtocolMultiplexerDecoder extends FrameDecoder
 					bytesForProtocolCheck);
 			LOG.error(
 					"Unknown protocol, discard everything and close the connection {}. Incoming Bytes {}",
-					ctx.getChannel().getId(),
+					ctx.channel().id(),
 					BinaryUtils.getHexString(headerBytes));
-			close(buffer, channel);
-			return null;
+			close(buffer, ctx);
 		}
 		else
 		{
-			pipeline.remove(this);
+			pipeline.removeAndForward(this);
 		}
 
-		// Forward the current read buffer as is to the new handlers.
-		return buffer.readBytes(buffer.readableBytes());
 	}
 
-	protected void close(ChannelBuffer buffer, Channel channel)
+	protected void close(ByteBuf buffer, ChannelHandlerContext ctx)
 	{
-		buffer.skipBytes(buffer.readableBytes());
-		channel.close();
+		buffer.clear();
+		ctx.close();
 	}
 
 	public LoginProtocol getLoginProtocol()

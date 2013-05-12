@@ -30,7 +30,7 @@ public class SpringNettyServer
 		ServerManager manager = (ServerManager)context.getBean("serverManager");
 		try
 		{
-			manager.startServers(8090,843,8081);
+			manager.startServers(18090,843,18090);
 		}
 		catch (Exception e)
 		{

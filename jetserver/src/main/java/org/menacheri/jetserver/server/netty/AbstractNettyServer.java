@@ -1,122 +1,98 @@
 package org.menacheri.jetserver.server.netty;
 
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.ChannelGroupFuture;
+import io.netty.channel.group.DefaultChannelGroup;
+
 import java.net.InetSocketAddress;
 
-import org.jboss.netty.bootstrap.Bootstrap;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.group.ChannelGroup;
-import org.jboss.netty.channel.group.ChannelGroupFuture;
-import org.jboss.netty.channel.group.DefaultChannelGroup;
-import org.menacheri.jetserver.app.Session;
 import org.menacheri.jetserver.service.GameAdminService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Required;
 
 
 public abstract class AbstractNettyServer implements NettyServer
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractNettyServer.class);
 	public static final ChannelGroup ALL_CHANNELS = new DefaultChannelGroup("JETSERVER-CHANNELS");
-	protected Session session;
-	protected InetSocketAddress socketAddress;
-	protected int portNumber = 18090;
-	protected Bootstrap serverBootstrap;
-	protected ChannelPipelineFactory pipelineFactory;
 	protected GameAdminService gameAdminService;
+	protected final NettyConfig nettyConfig;
+	protected ChannelInitializer<? extends Channel> channelInitializer;
 	
-	public AbstractNettyServer()
+	public AbstractNettyServer(NettyConfig nettyConfig,
+			ChannelInitializer<? extends Channel> channelInitializer) 
 	{
-		super();
+		this.nettyConfig = nettyConfig;
+		this.channelInitializer = channelInitializer;
 	}
 
 	@Override
-	public void stopServer() throws Exception
+	public void startServer(int port) throws Exception 
 	{
-		LOG.debug("In stopServer method of class: {}",
-				this.getClass().getName());
+		nettyConfig.setPortNumber(port);
+		nettyConfig.setSocketAddress(new InetSocketAddress(port));
+		startServer();
+	}
+	
+	@Override
+	public void startServer(InetSocketAddress socketAddress) throws Exception
+	{
+		nettyConfig.setSocketAddress(socketAddress);
+		startServer();
+	}
+	
+	@Override
+	public void stopServer() throws Exception 
+	{
+		LOG.debug("In stopServer method of class: {}", this.getClass()
+				.getName());
 		ChannelGroupFuture future = ALL_CHANNELS.close();
-		try {
+		try 
+		{
 			future.await();
-		} catch (InterruptedException e) {
-			LOG.error("Execption occurred while waiting for channels to close: {}",e);
-		}
-		serverBootstrap.releaseExternalResources();
-		gameAdminService.shutdown();
-	}
-	
-	@Override
-	public void configureServerBootStrap(String[] optionsList)
-	{
-		// For clients who do not use spring.
-		if(null == serverBootstrap){
-			createServerBootstrap();
-		}
-		serverBootstrap.setPipelineFactory(pipelineFactory);
-		if (null != optionsList && optionsList.length > 0)
+		} 
+		catch (InterruptedException e) 
 		{
-			for (String option : optionsList)
+			LOG.error(
+					"Execption occurred while waiting for channels to close: {}",
+					e);
+		} 
+		finally 
+		{
+			if (null != nettyConfig.getBossGroup()) 
 			{
-				serverBootstrap.setOption(option, true);
+				nettyConfig.getBossGroup().shutdown();
 			}
-		}
-	}
-
-	public int getPortNumber(String[] args)
-	{
-		if (null == args || args.length < 1)
-		{
-			return portNumber;
-		}
-
-		try
-		{
-			return Integer.parseInt(args[0]);
-		}
-		catch (NumberFormatException e)
-		{
-			LOG.error("Exception occurred while "
-					+ "trying to parse the port number: {}", args[0]);
-			LOG.error("NumberFormatException: {}",e);
-			throw e;
+			if (null != nettyConfig.getWorkerGroup()) 
+			{
+				nettyConfig.getWorkerGroup().shutdown();
+			}
+			gameAdminService.shutdown();
 		}
 	}
 	
 	@Override
-	public Bootstrap getServerBootstrap()
+	public ChannelInitializer<? extends Channel> getChannelInitializer()
 	{
-		return serverBootstrap;
+		return channelInitializer;
 	}
 
 	@Override
-	public void setServerBootstrap(Bootstrap serverBootstrap)
-	{
-		this.serverBootstrap = serverBootstrap;
+	public NettyConfig getNettyConfig() {
+		return nettyConfig;
+	}
+
+	protected EventLoopGroup getBossGroup(){
+		return nettyConfig.getBossGroup();
 	}
 	
-	@Override
-	public ChannelPipelineFactory getPipelineFactory()
-	{
-		return pipelineFactory;
+	protected EventLoopGroup getWorkerGroup(){
+		return nettyConfig.getWorkerGroup();
 	}
-
-	@Override
-	@Required
-	public void setPipelineFactory(ChannelPipelineFactory factory)
-	{
-		pipelineFactory = factory;
-	}
-
-	public int getPortNumber()
-	{
-		return portNumber;
-	}
-
-	public void setPortNumber(int portNumber)
-	{
-		this.portNumber = portNumber;
-	}
-
+	
 	public GameAdminService getGameAdminService()
 	{
 		return gameAdminService;
@@ -130,31 +106,14 @@ public abstract class AbstractNettyServer implements NettyServer
 	@Override
 	public InetSocketAddress getSocketAddress()
 	{
-		return socketAddress;
-	}
-
-	public void setInetAddress(InetSocketAddress inetAddress)
-	{
-		this.socketAddress = inetAddress;
+		return nettyConfig.getSocketAddress();
 	}
 
 	@Override
-	public String toString()
+	public String toString() 
 	{
-		return "NettyServer [socketAddress=" + socketAddress + ", portNumber="
-				+ portNumber + "]";
+		return "NettyServer [socketAddress=" + nettyConfig.getSocketAddress()
+				+ ", portNumber=" + nettyConfig.getPortNumber() + "]";
 	}
-
-	@Override
-	public Session getSession()
-	{
-		return session;
-	}
-
-	@Override
-	public void setSession(Session session)
-	{
-		this.session = session;
-	}
-
+	
 }

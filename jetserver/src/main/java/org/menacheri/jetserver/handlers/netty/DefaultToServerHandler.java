@@ -1,14 +1,13 @@
 package org.menacheri.jetserver.handlers.netty;
 
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelStateEvent;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundMessageHandlerAdapter;
+import io.netty.handler.timeout.IdleStateEvent;
+
 import org.menacheri.jetserver.app.GameEvent;
 import org.menacheri.jetserver.app.PlayerSession;
-import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.Event;
+import org.menacheri.jetserver.event.Events;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,7 +19,7 @@ import org.slf4j.LoggerFactory;
  * @author Abraham Menacherry
  * 
  */
-public class DefaultToServerHandler extends SimpleChannelUpstreamHandler
+public class DefaultToServerHandler extends ChannelInboundMessageHandlerAdapter<Event>
 {
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultToServerHandler.class);
 	
@@ -36,35 +35,49 @@ public class DefaultToServerHandler extends SimpleChannelUpstreamHandler
 	}
 
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e)
-			throws Exception
-	{
-		playerSession.onEvent((Event) e.getMessage());
+	public void messageReceived(ChannelHandlerContext ctx,
+			Event msg) throws Exception {
+		playerSession.onEvent(msg);
 	}
+	
 
 	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e)
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
 			throws Exception
 	{
-		LOG.error("Exception during network communication: {}.", e);
-		Event event = Events.event(e, Events.EXCEPTION);
+		LOG.error("Exception during network communication: {}.", cause);
+		Event event = Events.event(cause, Events.EXCEPTION);
 		playerSession.onEvent(event);
 	}
 
 	@Override
-	public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e)
+	public void channelInactive(ChannelHandlerContext ctx)
 			throws Exception
 	{
-		LOG.debug("Netty Channel {} is closed.", e.getChannel().getId());
+		LOG.debug("Netty Channel {} is closed.", ctx.channel().id());
 		if (!playerSession.isShuttingDown())
 		{
 			// Should not send close to session, since reconnection/other
 			// business logic might be in place.
-			Event event = Events.event(e, Events.DISCONNECT);
+			Event event = Events.event(null, Events.DISCONNECT);
 			playerSession.onEvent(event);
 		}
 	}
 
+	@Override
+	public void userEventTriggered(ChannelHandlerContext ctx, Object evt) 
+	{
+		if (evt instanceof IdleStateEvent) 
+		{
+			LOG.warn(
+					"Channel {} has been idle, exception event will be raised now: ",
+					ctx.channel());
+			// TODO check if setting payload as non-throwable cause issue?
+			Event event = Events.event(evt, Events.EXCEPTION);
+			playerSession.onEvent(event);
+		}
+	}
+	
 	public PlayerSession getPlayerSession()
 	{
 		return playerSession;

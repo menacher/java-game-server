@@ -1,7 +1,8 @@
 package org.menacheri.jetserver.protocols.impl;
 
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.handler.codec.frame.LengthFieldPrepender;
+import io.netty.channel.ChannelPipeline;
+import io.netty.handler.codec.LengthFieldPrepender;
+
 import org.menacheri.jetserver.app.PlayerSession;
 import org.menacheri.jetserver.handlers.netty.DefaultToServerHandler;
 import org.menacheri.jetserver.handlers.netty.MessageBufferEventDecoder;

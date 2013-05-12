@@ -10,7 +10,7 @@
 	<bean id="taskManagerService"
 		class="org.menacheri.jetserver.service.impl.SimpleTaskManagerService"
 		destroy-method="shutdown">
-		<constructor-arg type="int" index="0" value="2"></constructor-arg>
+		<constructor-arg type="int" index="0" value="2" />
 	</bean>
 
 	<bean id="gameAdminService"
@@ -20,17 +20,16 @@
 		</property>
 	</bean>
 
-	<bean id="udpSessionRegistry" class="org.menacheri.jetserver.service.impl.SessionRegistry"></bean>
+	<bean id="udpSessionRegistry" class="org.menacheri.jetserver.service.impl.SessionRegistry" />
 
 	<bean id="reconnectSessionRegistry"
 		class="org.menacheri.jetserver.service.impl.ReconnectSessionRegistry">
-		<property name="taskManagerService" ref="taskManagerService"></property>
-		<property name="reconnectDelay" value="${reconnect.delay}"></property>
+		<property name="taskManagerService" ref="taskManagerService" />
+		<property name="reconnectDelay" value="${reconnect.delay}" />
 	</bean>
 
-	<bean id="simpleUniqueIdGenerator"
-		class="org.menacheri.jetserver.service.impl.SimpleUniqueIdGenerator"></bean>
+	<bean id="simpleUniqueIdGenerator" class="org.menacheri.jetserver.service.impl.SimpleUniqueIdGenerator" />
 
-	<bean id="gson" class="com.google.gson.Gson"></bean>
+	<bean id="gson" class="com.google.gson.Gson" />
 
 </beans>

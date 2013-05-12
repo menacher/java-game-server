@@ -1,12 +1,13 @@
 package org.menacheri.jetserver.protocols.impl;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.handler.codec.frame.DelimiterBasedFrameDecoder;
-import org.jboss.netty.handler.codec.frame.Delimiters;
-import org.jboss.netty.handler.codec.frame.TooLongFrameException;
-import org.jboss.netty.handler.codec.string.StringDecoder;
-import org.jboss.netty.handler.codec.string.StringEncoder;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelPipeline;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import io.netty.handler.codec.Delimiters;
+import io.netty.handler.codec.TooLongFrameException;
+import io.netty.handler.codec.string.StringDecoder;
+import io.netty.handler.codec.string.StringEncoder;
+
 import org.menacheri.jetserver.app.PlayerSession;
 import org.menacheri.jetserver.handlers.netty.NulEncoder;
 import org.menacheri.jetserver.protocols.AbstractNettyProtocol;
@@ -29,12 +30,12 @@ public class StringProtocol extends AbstractNettyProtocol
 	 */
 	private NulEncoder nulEncoder;
 	/**
-	 * Used to decode a netty {@link ChannelBuffer} (actually a byte array) to a
+	 * Used to decode a netty {@link ByteBuf} (actually a byte array) to a
 	 * string.
 	 */
 	private StringDecoder stringDecoder;
 	/**
-	 * Used to encode a normal java String to a netty {@link ChannelBuffer}
+	 * Used to encode a normal java String to a netty {@link ByteBuf}
 	 * (actually a byte array).
 	 */
 	private StringEncoder stringEncoder;

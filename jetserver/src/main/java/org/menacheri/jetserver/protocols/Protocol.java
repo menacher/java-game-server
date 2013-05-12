@@ -1,6 +1,7 @@
 package org.menacheri.jetserver.protocols;
 
-import org.jboss.netty.channel.ChannelPipeline;
+import io.netty.channel.ChannelPipeline;
+
 import org.menacheri.jetserver.app.PlayerSession;
 import org.menacheri.jetserver.handlers.netty.LoginHandler;
 
