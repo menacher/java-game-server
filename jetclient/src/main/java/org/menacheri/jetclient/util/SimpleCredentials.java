@@ -1,13 +1,13 @@
 package org.menacheri.jetclient.util;
 
-import org.jboss.netty.buffer.ChannelBuffer;
+import io.netty.buffer.ByteBuf;
 
 public class SimpleCredentials implements Credentials
 {
 	private final String username;
 	private final String password;
 	
-	public SimpleCredentials(ChannelBuffer buffer)
+	public SimpleCredentials(ByteBuf buffer)
 	{
 		this.username = NettyUtils.readString(buffer);
 		this.password = NettyUtils.readString(buffer);

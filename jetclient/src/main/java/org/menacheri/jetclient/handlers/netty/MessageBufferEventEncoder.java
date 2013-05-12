@@ -1,61 +1,48 @@
 package org.menacheri.jetclient.handlers.netty;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelHandler.Sharable;
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.handler.codec.oneone.OneToOneEncoder;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.handler.codec.MessageToMessageEncoder;
+
 import org.menacheri.jetclient.communication.MessageBuffer;
 import org.menacheri.jetclient.event.Event;
 import org.menacheri.jetclient.event.Events;
 
 /**
  * Converts an incoming {@link Event} which in turn has a
- * IMessageBuffer<ChannelBuffer> payload to a Netty {@link ChannelBuffer}.
+ * IMessageBuffer<ByteBuf> payload to a Netty {@link ByteBuf}.
  * <b>Note that {@link Event} instances containing other type of objects as its
  * payload will result in {@link ClassCastException}.
  * 
  * @author Abraham Menacherry.
  * 
  */
+// TODO check if MessageToMessageEncoder can be replaced with MessageToByteEncoder
 @Sharable
-public class MessageBufferEventEncoder extends OneToOneEncoder
+public class MessageBufferEventEncoder extends MessageToMessageEncoder<Event>
 {
 
 	@Override
-	protected Object encode(ChannelHandlerContext ctx, Channel channel,
-			Object msg) throws Exception
-	{
-		if (null == msg)
-		{
-			return msg;
-		}
-		Event event = (Event) msg;
-		ChannelBuffer opcode = ChannelBuffers.buffer(1);
-		opcode.writeByte(event.getType());
+	protected Object encode(ChannelHandlerContext ctx, Event event)
+			throws Exception {
+		ByteBuf out = ctx.alloc().buffer();
+		out.writeByte(event.getType());
 		if (Events.LOG_IN == event.getType() || Events.RECONNECT == event.getType())
 		{
 			// write protocol version also
-			ChannelBuffer protocolVersion = ChannelBuffers.buffer(1);
-			protocolVersion.writeByte(Events.PROTOCOL_VERSION);
-			opcode = ChannelBuffers.wrappedBuffer(opcode, protocolVersion);
+			out.writeByte(Events.PROTOCOL_VERSION);
 		}
 		
-		ChannelBuffer buffer = null;
 		if (null != event.getSource())
 		{
 			@SuppressWarnings("unchecked")
-			MessageBuffer<ChannelBuffer> msgBuffer = (MessageBuffer<ChannelBuffer>) event
+			MessageBuffer<ByteBuf> msgBuffer = (MessageBuffer<ByteBuf>) event
 					.getSource();
-			ChannelBuffer data = msgBuffer.getNativeBuffer();
-			buffer = ChannelBuffers.wrappedBuffer(opcode, data);
+			ByteBuf data = msgBuffer.getNativeBuffer();
+			out.writeBytes(data);
 		}
-		else
-		{
-			buffer = opcode;
-		}
-		return buffer;
+		return out;
 	}
 
 }

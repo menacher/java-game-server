@@ -1,27 +1,27 @@
 package org.menacheri.jetclient;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.bootstrap.ChannelFactory;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.DatagramChannel;
+import io.netty.channel.socket.nio.NioDatagramChannel;
+
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.jboss.netty.bootstrap.ConnectionlessBootstrap;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFactory;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.socket.DatagramChannel;
-import org.jboss.netty.channel.socket.DatagramChannelFactory;
-import org.jboss.netty.channel.socket.nio.NioDatagramChannelFactory;
 import org.menacheri.jetclient.app.Session;
-import org.menacheri.jetclient.event.Events;
 import org.menacheri.jetclient.event.Event;
+import org.menacheri.jetclient.event.Events;
 import org.menacheri.jetclient.handlers.netty.UDPUpstreamHandler;
 
 /**
@@ -40,23 +40,17 @@ public class NettyUDPClient
 	 */
 	private final InetSocketAddress serverAddress;
 	/**
-	 * The worker executor which will provide threads to Netty
-	 * {@link ChannelFactory} for decoding encoding done on the
-	 * {@link ChannelPipeline}.
+	 * The boss executor which will provide threads to Netty
+	 * {@link ChannelFactory} for reading from the NIO selectors.
 	 */
-	private final ExecutorService worker;
-	private final ConnectionlessBootstrap udpBootstrap;
-	/**
-	 * The instance of {@link NioDatagramChannelFactory} created by constructor,
-	 * or the one passed in to constructor.
-	 */
-	private final DatagramChannelFactory channelFactory;
+	private final EventLoopGroup boss;
 	/**
 	 * For UDP there can only be one pipelineFactory per
-	 * {@link ConnectionlessBootstrap}. This factory is hence part of the client
+	 * {@link Bootstrap}. This factory is hence part of the client
 	 * class.
 	 */
-	private final ChannelPipelineFactory pipelineFactory;
+	private final ChannelInitializer<DatagramChannel> pipelineFactory;
+	
 	/**
 	 * This map is used to store the local address to which a session has bound
 	 * itself using the {@link DatagramChannel#bind(java.net.SocketAddress)}
@@ -69,7 +63,7 @@ public class NettyUDPClient
 	/**
 	 * Creates an instance of a Netty UDP client which can then be used to
 	 * connect to a remote jet-server. This constructor delegates to
-	 * {@link #NettyUDPClient(InetSocketAddress, ChannelPipelineFactory)}
+	 * {@link #NettyUDPClient(InetSocketAddress, ChannelInitializer)
 	 * constructor after creating a {@link InetSocketAddress} instance based on
 	 * the host and port number passed in.
 	 * 
@@ -85,18 +79,39 @@ public class NettyUDPClient
 	 * @throws Exception
 	 */
 	public NettyUDPClient(String jetserverHost, int port,
-			final ChannelPipelineFactory pipelineFactory)
+			final ChannelInitializer<DatagramChannel> pipelineFactory)
 			throws UnknownHostException, Exception
 	{
-		this(new InetSocketAddress(jetserverHost, port), pipelineFactory);
+		this(new InetSocketAddress(jetserverHost, port), pipelineFactory, null);
 	}
 
+	/**
+	 * Creates a new instance of the {@link NettyUDPClient}. It actually
+	 * delegates to
+	 * {@link #NettyUDPClient(InetSocketAddress, ChannelInitializer, EventLoopGroup, String)}
+	 * . It will internally instantiate the {@link EventLoopGroup}.
+	 * 
+	 * @param serverAddress
+	 *            The remote servers address. This address will be used when any
+	 *            of the default write/connect methods are used.
+	 * @param pipelineFactory
+	 *            The Netty factory used for creating a pipeline. For UDP, this
+	 *            pipeline factory should not have any stateful i.e non
+	 *            share-able handlers in it. Since Netty only has one channel
+	 *            for <b>ALL</b> UPD traffic.
+	 * @param localhostName
+	 *            Name of the host to which this client is to be bound.
+	 *            Generally localhost. If null, then
+	 *            <code>InetAddress.getLocalHost().getHostAddress()</code> is
+	 *            used internally by default.
+	 * @throws UnknownHostException
+	 *             , Exception
+	 */
 	public NettyUDPClient(final InetSocketAddress serverAddress,
-			final ChannelPipelineFactory pipelineFactory)
+			final ChannelInitializer<DatagramChannel> pipelineFactory, String localhostName)
 			throws UnknownHostException, Exception
 	{
-		this(serverAddress, pipelineFactory, null, Executors
-				.newCachedThreadPool());
+		this(serverAddress, pipelineFactory, new NioEventLoopGroup(), localhostName);
 	}
 
 	/**
@@ -110,77 +125,32 @@ public class NettyUDPClient
 	 *            pipeline factory should not have any stateful i.e non
 	 *            share-able handlers in it. Since Netty only has one channel
 	 *            for <b>ALL</b> UPD traffic.
-	 * @param channelFactory
-	 *            <b>Can be provided as null</b>. If so, it will by default use
-	 *            {@link NioDatagramChannelFactory}. If not null, then the
-	 *            provided factory is set.
-	 * @param worker
-	 *            The executor used for creating worker threads. Can be null if
-	 *            channelFactory parameter is <b>Not</b> null.
+	 * @param boss
+	 *            The {@link EventLoopGroup} used for creating boss threads.
+	 * @param localhostName
+	 *            Name of the host to which this client is to be bound.
+	 *            Generally localhost. If null, then
+	 *            <code>InetAddress.getLocalHost().getHostAddress()</code> is
+	 *            used internally by default.
 	 * @throws UnknownHostException
 	 */
 	public NettyUDPClient(final InetSocketAddress serverAddress,
-			final ChannelPipelineFactory pipelineFactory,
-			final DatagramChannelFactory channelFactory,
-			final ExecutorService worker) throws UnknownHostException,
+			final ChannelInitializer<DatagramChannel> pipelineFactory,
+			final EventLoopGroup boss, String localhostName) throws UnknownHostException,
 			Exception
 	{
-		this.worker = worker;
+		this.boss = boss;
 		this.serverAddress = serverAddress;
-		if (channelFactory == null)
-		{
-			this.channelFactory = new NioDatagramChannelFactory(worker);
-		}
-		else
-		{
-			this.channelFactory = channelFactory;
-		}
-		this.udpBootstrap = new ConnectionlessBootstrap(this.channelFactory);
-		udpBootstrap.setOption("broadcast", "true");
 		this.pipelineFactory = pipelineFactory;
-		// The pipeline factory should not be set on the udpBootstrap since it
-		// invalidates the getPipeline.
-		udpBootstrap.setPipeline(pipelineFactory.getPipeline());
-		Runtime.getRuntime().addShutdownHook(new Thread()
+		if (null == localhostName) 
 		{
-			public void run()
-			{
-				udpBootstrap.releaseExternalResources();
+			localhostName = InetAddress.getLocalHost().getHostAddress();
+		}
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			public void run() {
+				boss.shutdown();
 			}
 		});
-	}
-
-	/**
-	 * Creates a new datagram channel instance using the {@link #udpBootstrap}
-	 * by binding to local host. This method delegates to
-	 * {@link #createDatagramChannel(String)} internally, by passing the
-	 * localhost's host name to it.
-	 * 
-	 * @return The newly created instance of the datagram channel.
-	 * @throws UnknownHostException
-	 */
-	public DatagramChannel createDatagramChannel() throws UnknownHostException
-	{
-		return createDatagramChannel(InetAddress.getLocalHost()
-				.getHostAddress());
-	}
-
-	/**
-	 * Creates a new datagram channel instance using the {@link #udpBootstrap}
-	 * by binding to local host.
-	 * 
-	 * @param localhostName
-	 *            The host machine (for e.g. 'localhost') to which it needs to
-	 *            bind to. This is <b>Not</b> the remote jet-server hostname.
-	 * @return The newly created instance of the datagram channel.
-	 * @throws UnknownHostException
-	 */
-	public DatagramChannel createDatagramChannel(String localhostName)
-			throws UnknownHostException
-	{
-		DatagramChannel datagramChannel = (DatagramChannel) udpBootstrap
-				.bind(new InetSocketAddress(localhostName, 0));
-		return datagramChannel;
 	}
 
 	/**
@@ -212,6 +182,42 @@ public class NettyUDPClient
 	}
 
 	/**
+	 * Creates a new datagram channel instance using the {@link #udpBootstrap}
+	 * by binding to local host. This method delegates to
+	 * {@link #createDatagramChannel(String)} internally, by passing the
+	 * localhost's host name to it.
+	 * 
+	 * @return The newly created instance of the datagram channel.
+	 * @throws UnknownHostException, InterruptedException
+	 */
+	public DatagramChannel createDatagramChannel() throws UnknownHostException, InterruptedException
+	{
+		return createDatagramChannel(InetAddress.getLocalHost()
+				.getHostAddress());
+	}
+
+	/**
+	 * Creates a new datagram channel instance using the {@link #udpBootstrap}
+	 * by binding to local host.
+	 * 
+	 * @param localhostName
+	 *            The host machine (for e.g. 'localhost') to which it needs to
+	 *            bind to. This is <b>Not</b> the remote jet-server hostname.
+	 * @return The newly created instance of the datagram channel.
+	 * @throws UnknownHostException
+	 */
+	public DatagramChannel createDatagramChannel(String localhostName)
+			throws UnknownHostException, InterruptedException {
+		Bootstrap udpBootstrap = new Bootstrap();
+		udpBootstrap.group(boss).channel(NioDatagramChannel.class)
+				.option(ChannelOption.SO_BROADCAST, true)
+				.handler(pipelineFactory);
+		DatagramChannel datagramChannel = (DatagramChannel) udpBootstrap
+				.bind(new InetSocketAddress(localhostName, 0)).sync().channel();
+		return datagramChannel;
+	}
+	
+	/**
 	 * This method will connect the datagram channel with the server and send
 	 * the {@link Events#CONNECT} message to server.
 	 * 
@@ -221,8 +227,7 @@ public class NettyUDPClient
 	 *            The channel on which the message is to be sent to remote
 	 *            server.
 	 * @param serverAddress
-	 *            The remote address of the server to which to send this
-	 *            message.
+	 *            The remote address of the server to which to connect.
 	 * @param timeout
 	 *            Amount of time to wait for the connection to happen.
 	 *            <b>NOTE</b> Since this is UDP there is actually no "real"
@@ -243,7 +248,7 @@ public class NettyUDPClient
 			throw new NullPointerException(
 					"DatagramChannel passed to connect method cannot be null");
 		}
-		if (!datagramChannel.isBound())
+		if (!datagramChannel.isActive())
 		{
 			throw new IllegalStateException("DatagramChannel: "
 					+ datagramChannel
@@ -251,7 +256,8 @@ public class NettyUDPClient
 		}
 
 		Event event = Events.event(null, Events.CONNECT);
-		ChannelFuture future = datagramChannel.write(event, serverAddress);
+		
+		ChannelFuture future = datagramChannel.write(event);
 		future.addListener(new ChannelFutureListener()
 		{
 			@Override
@@ -260,36 +266,12 @@ public class NettyUDPClient
 			{
 				if (!future.isSuccess())
 				{
-					throw new RuntimeException(future.getCause());
+					throw new RuntimeException(future.cause());
 				}
 			}
 		});
-		CLIENTS.put(datagramChannel.getLocalAddress(), session);
+		CLIENTS.put(datagramChannel.localAddress(), session);
 		return future;
-	}
-
-	/**
-	 * Utility method used to send a message to the server. Users can also use
-	 * datagramChannel.write(message, serverAddress) directly. This method
-	 * delegates to {@link #write(DatagramChannel, Object, InetSocketAddress)}
-	 * by passing in the InetSocketAddress stored in the class variable
-	 * {@link #serverAddress}
-	 * 
-	 * @param datagramChannel
-	 *            The channel on which the message is to be sent to remote
-	 *            server.
-	 * @param message
-	 *            The message to be sent. <b>NOTE</b> The message should be a
-	 *            valid and encode-able by the encoders in the ChannelPipeline
-	 *            of this server.
-	 * @return Returns a ChannelFuture which can be used to check the success of
-	 *         this operation. <b>NOTE</b> Success in case of UDP means message
-	 *         is sent to server. It does not mean that the server has received
-	 *         it.
-	 */
-	public ChannelFuture write(DatagramChannel datagramChannel, Object message)
-	{
-		return write(datagramChannel, message, serverAddress);
 	}
 
 	/**
@@ -308,10 +290,9 @@ public class NettyUDPClient
 	 *         is sent to server. It does not mean that the server has received
 	 *         it.
 	 */
-	public static ChannelFuture write(DatagramChannel datagramChannel, Object message,
-			InetSocketAddress serverAddress)
+	public static ChannelFuture write(DatagramChannel datagramChannel, Object message)
 	{
-		return datagramChannel.write(message, serverAddress);
+		return datagramChannel.write(message);
 	}
 
 	public InetSocketAddress getServerAddress()
@@ -319,23 +300,11 @@ public class NettyUDPClient
 		return serverAddress;
 	}
 
-	public ExecutorService getWorker()
-	{
-		return worker;
+	public EventLoopGroup getBoss() {
+		return boss;
 	}
 
-	public ConnectionlessBootstrap getUdpBootstrap()
-	{
-		return udpBootstrap;
-	}
-
-	public DatagramChannelFactory getChannelFactory()
-	{
-		return channelFactory;
-	}
-
-	public ChannelPipelineFactory getPipelineFactory()
-	{
+	public ChannelInitializer<DatagramChannel> getPipelineFactory() {
 		return pipelineFactory;
 	}
 

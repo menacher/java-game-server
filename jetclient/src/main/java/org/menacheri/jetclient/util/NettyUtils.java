@@ -1,19 +1,15 @@
 package org.menacheri.jetclient.util;
 
-import static org.jboss.netty.buffer.ChannelBuffers.copiedBuffer;
+import static io.netty.buffer.Unpooled.copiedBuffer;
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
+import io.netty.channel.ChannelPipeline;
+import io.netty.util.CharsetUtil;
 
 import java.net.InetSocketAddress;
-import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 import java.util.NoSuchElementException;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.handler.codec.serialization.ClassResolvers;
-import org.jboss.netty.handler.codec.serialization.ObjectDecoder;
-import org.jboss.netty.handler.codec.serialization.ObjectEncoder;
-import org.jboss.netty.util.CharsetUtil;
 import org.menacheri.convert.Transform;
 
 /**
@@ -24,8 +20,6 @@ import org.menacheri.convert.Transform;
  */
 public class NettyUtils
 {
-	private static final ObjectDecoderWrapper OBJECT_DECODER = new ObjectDecoderWrapper();
-
 	public static final String NETTY_CHANNEL = "NETTY_CHANNEL";
 
 	/**
@@ -36,22 +30,22 @@ public class NettyUtils
 	public static void clearPipeline(ChannelPipeline pipeline)
 			throws NoSuchElementException
 	{
-		while (pipeline.getFirst() != null)
+		while (pipeline.first() != null)
 		{
 			pipeline.removeFirst();
 		}
 	}
 
-	public static ChannelBuffer createBufferForOpcode(int opcode)
+	public static ByteBuf createBufferForOpcode(int opcode)
 	{
-		ChannelBuffer buffer = ChannelBuffers.buffer(1);
+		ByteBuf buffer = Unpooled.buffer(1);
 		buffer.writeByte(opcode);
 		return buffer;
 	}
 
 	/**
 	 * This method will read multiple strings of the buffer and return them as a
-	 * string array. It internally uses the readString(ChannelBuffer buffer) to
+	 * string array. It internally uses the readString(ByteBuf buffer) to
 	 * accomplish this task. The strings are read back in the order they are
 	 * written.
 	 * 
@@ -62,14 +56,14 @@ public class NettyUtils
 	 *            The number of strings to be read. Should not be negative or 0
 	 * @return the strings read from the buffer as an array.
 	 */
-	public static String[] readStrings(ChannelBuffer buffer, int numOfStrings)
+	public static String[] readStrings(ByteBuf buffer, int numOfStrings)
 	{
 		return readStrings(buffer,numOfStrings,CharsetUtil.UTF_8);
 	}
 
 	/**
 	 * This method will read multiple strings of the buffer and return them as a
-	 * string array. It internally uses the readString(ChannelBuffer buffer) to
+	 * string array. It internally uses the readString(ByteBuf buffer) to
 	 * accomplish this task. The strings are read back in the order they are
 	 * written.
 	 * 
@@ -84,7 +78,7 @@ public class NettyUtils
 	 * 
 	 * @return the strings read from the buffer as an array.
 	 */
-	public static String[] readStrings(ChannelBuffer buffer, int numOfStrings,
+	public static String[] readStrings(ByteBuf buffer, int numOfStrings,
 			Charset charset)
 	{
 		String[] strings = new String[numOfStrings]; 
@@ -108,7 +102,7 @@ public class NettyUtils
 	 * @return Returns the String or throws {@link IndexOutOfBoundsException} if
 	 *         the length is greater than expected.
 	 */
-	public static String readString(ChannelBuffer buffer)
+	public static String readString(ByteBuf buffer)
 	{
 		return readString(buffer, CharsetUtil.UTF_8);
 	}
@@ -127,7 +121,7 @@ public class NettyUtils
 	 * @return Returns the String or throws {@link IndexOutOfBoundsException} if
 	 *         the length is greater than expected.
 	 */
-	public static String readString(ChannelBuffer buffer, Charset charset)
+	public static String readString(ByteBuf buffer, Charset charset)
 	{
 		String readString = null;
 		if (null != buffer && buffer.readableBytes() > 2)
@@ -148,7 +142,7 @@ public class NettyUtils
 	 *            The number of bytes in the String.
 	 * @return Returns the read string.
 	 */
-	public static String readString(ChannelBuffer buffer, int length)
+	public static String readString(ByteBuf buffer, int length)
 	{
 		return readString(buffer, length, CharsetUtil.UTF_8);
 	}
@@ -167,7 +161,7 @@ public class NettyUtils
 	 *            done.
 	 * @return Returns the read string.
 	 */
-	public static String readString(ChannelBuffer buffer, int length,
+	public static String readString(ByteBuf buffer, int length,
 			Charset charset)
 	{
 		String str = null;
@@ -177,7 +171,7 @@ public class NettyUtils
 		}
 		try
 		{
-			ChannelBuffer stringBuffer = buffer.readSlice(length);
+			ByteBuf stringBuffer = buffer.readSlice(length);
 			str = stringBuffer.toString(charset);
 		}
 		catch (Exception e)
@@ -188,23 +182,23 @@ public class NettyUtils
 	}
 	
 	/**
-	 * Writes multiple strings to a channelBuffer with the length of the string
+	 * Writes multiple strings to a ByteBuf with the length of the string
 	 * preceding its content. So if there are two string <code>Hello</code> and
 	 * <code>World</code> then the channel buffer returned would contain <Length
 	 * of Hello><Hello as UTF-8 binary><Length of world><World as UTF-8 binary>
 	 * 
 	 * @param msgs
 	 *            The messages to be written.
-	 * @return {@link ChannelBuffer} with format
+	 * @return {@link ByteBuf} with format
 	 *         length-stringbinary-length-stringbinary
 	 */
-	public static ChannelBuffer writeStrings(String... msgs)
+	public static ByteBuf writeStrings(String... msgs)
 	{
 		return writeStrings(CharsetUtil.UTF_8, msgs);
 	}
 
 	/**
-	 * Writes multiple strings to a channelBuffer with the length of the string
+	 * Writes multiple strings to a ByteBuf with the length of the string
 	 * preceding its content. So if there are two string <code>Hello</code> and
 	 * <code>World</code> then the channel buffer returned would contain <Length
 	 * of Hello><Hello as appropriate charset binary><Length of world><World as
@@ -215,12 +209,12 @@ public class NettyUtils
 	 *            done.
 	 * @param msgs
 	 *            The messages to be written.
-	 * @return {@link ChannelBuffer} with format
+	 * @return {@link ByteBuf} with format
 	 *         length-stringbinary-length-stringbinary
 	 */
-	public static ChannelBuffer writeStrings(Charset charset, String... msgs)
+	public static ByteBuf writeStrings(Charset charset, String... msgs)
 	{
-		ChannelBuffer buffer = null;
+		ByteBuf buffer = null;
 		for (String msg : msgs)
 		{
 			if (null == buffer)
@@ -229,10 +223,10 @@ public class NettyUtils
 			}
 			else
 			{
-				ChannelBuffer theBuffer = writeString(msg,charset);
+				ByteBuf theBuffer = writeString(msg,charset);
 				if(null != theBuffer)
 				{
-					buffer = ChannelBuffers.wrappedBuffer(buffer,theBuffer);
+					buffer = Unpooled.wrappedBuffer(buffer,theBuffer);
 				}
 			}
 		}
@@ -245,9 +239,9 @@ public class NettyUtils
 	 * 
 	 * @param msg
 	 *            The string to be written.
-	 * @return Returns the ChannelBuffer instance containing the encoded string
+	 * @return Returns the ByteBuf instance containing the encoded string
 	 */
-	public static ChannelBuffer writeString(String msg)
+	public static ByteBuf writeString(String msg)
 	{
 		return writeString(msg, CharsetUtil.UTF_8);
 	}
@@ -267,21 +261,21 @@ public class NettyUtils
 	 *         in the provided charset. It will return <code>null</code> if the
 	 *         string parameter is null.
 	 */
-	public static ChannelBuffer writeString(String msg, Charset charset) 
+	public static ByteBuf writeString(String msg, Charset charset) 
 	{
-		ChannelBuffer buffer = null;
+		ByteBuf buffer = null;
 		try
 		{
-			ChannelBuffer stringBuffer = null;
+			ByteBuf stringBuffer = null;
 			if (null == charset)
 			{
 				charset = CharsetUtil.UTF_8;
 			}
-			stringBuffer = copiedBuffer(ByteOrder.BIG_ENDIAN, msg, charset);
+			stringBuffer = copiedBuffer(msg, charset);
 			int length = stringBuffer.readableBytes();
-			ChannelBuffer lengthBuffer = ChannelBuffers.buffer(2);
+			ByteBuf lengthBuffer = Unpooled.buffer(2);
 			lengthBuffer.writeShort(length);
-			buffer = ChannelBuffers.wrappedBuffer(lengthBuffer, stringBuffer);
+			buffer = Unpooled.wrappedBuffer(lengthBuffer, stringBuffer);
 		}
 		catch (Exception e)
 		{
@@ -291,85 +285,18 @@ public class NettyUtils
 	}
 	
 	/**
-	 * This method will read multiple objects of the buffer and return them as
-	 * an object array. It internally uses the readObject(ChannelBuffer buffer)
-	 * to accomplish this task. The objects are read back in the order they are
-	 * written.
-	 * 
-	 * @param buffer
-	 *            The buffer containing the objects, with each object being a
-	 *            objlength-objbytes combination.
-	 * @param numOfObjects
-	 *            The number of objects to be read. Should not be negative or 0
-	 * @return the objects read from the buffer as an array.
-	 */
-	public static Object[] readObjects(ChannelBuffer buffer, int numOfObjects)
-	{
-		Object[] objects = new String[numOfObjects];
-		for (int i = 0; i < numOfObjects; i++)
-		{
-			Object theObject = readObject(buffer);
-			if (null == theObject)
-				break;
-			objects[i] = theObject;
-		}
-		return objects;
-	}
-
-	/**
-	 * This method will first read an unsigned short to find the length of the
-	 * object and then read the actual object based on the length. It sets the
-	 * reader index of the buffer to current reader index + 2(length bytes) +
-	 * actual length.
-	 * 
-	 * @param buffer
-	 *            The Netty buffer containing at least one unsigned short
-	 *            followed by an Object of that length.
-	 * @return Returns the String or throws {@link IndexOutOfBoundsException} if
-	 *         the length is greater than expected.
-	 */
-	public static Object readObject(ChannelBuffer buffer)
-	{
-		Object readObj = null;
-		if (null != buffer && buffer.readableBytes() > 2)
-		{
-			int length = buffer.readUnsignedShort();
-			readObj = readObject(buffer, length);
-		}
-		return readObj;
-	}
-
-	/**
 	 * Read an object from a channel buffer with the specified length. It sets
 	 * the reader index of the buffer to current reader index + 2(length bytes)
 	 * + actual length.
 	 * 
 	 * @param buffer
 	 *            The Netty buffer containing the Object.
-	 * @param length
-	 *            The number of bytes in the Object.
 	 * @return Returns the read object.
 	 */
-	public static Object readObject(ChannelBuffer buffer, int length)
-	{
-		ChannelBuffer objBuffer = buffer.readSlice(length);
-		Object obj;
-		try
-		{
-			obj = OBJECT_DECODER.decode(objBuffer);
-		}
-		catch (Exception e)
-		{
-			throw new RuntimeException(e);
-		}
-		return obj;
-	}
-
-	public static <T, V> V readObject(ChannelBuffer buffer,
-			Transform<ChannelBuffer, V> decoder)
+	public static <T,V> V readObject(ByteBuf buffer, Transform<ByteBuf, V> decoder)
 	{
 		int length = 0;
-		if (null != buffer && buffer.readableBytes() > 2)
+		if(null != buffer && buffer.readableBytes() > 2)
 		{
 			length = buffer.readUnsignedShort();
 		}
@@ -377,37 +304,31 @@ public class NettyUtils
 		{
 			return null;
 		}
-		ChannelBuffer objBuffer = buffer.readSlice(length);
-		V obj;
-		try
-		{
+		ByteBuf objBuffer = buffer.readSlice(length);
+		V obj = null;
+		try{
 			obj = decoder.convert(objBuffer);
-		}
-		catch (Exception e)
-		{
+		}catch(Exception e){
 			throw new RuntimeException(e);
 		}
-		;
 		return obj;
 	}
-
-	public static <V> ChannelBuffer writeObject(
-			Transform<V, ChannelBuffer> converter, V object)
+	
+	public static <V> ByteBuf writeObject(
+			Transform<V, ByteBuf> converter, V object) 
 	{
-		ChannelBuffer buffer = null;
-		ChannelBuffer objectBuffer;
-		try
+		ByteBuf buffer = null;
+		try 
 		{
-			objectBuffer = converter.convert(object);
-		}
-		catch (Exception e)
-		{
+			ByteBuf objectBuffer = converter.convert(object);
+			int length = objectBuffer.readableBytes();
+			ByteBuf lengthBuffer = Unpooled.buffer(2);
+			lengthBuffer.writeShort(length);
+			buffer = Unpooled.wrappedBuffer(lengthBuffer,
+					objectBuffer);
+		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
-		int length = objectBuffer.readableBytes();
-		ChannelBuffer lengthBuffer = ChannelBuffers.buffer(2);
-		lengthBuffer.writeShort(length);
-		buffer = ChannelBuffers.wrappedBuffer(lengthBuffer, objectBuffer);
 		return buffer;
 	}
 
@@ -420,7 +341,7 @@ public class NettyUtils
 	 * @return The InetSocketAddress object created from host and port or null
 	 *         in case the strings are not there.
 	 */
-	public static InetSocketAddress readSocketAddress(ChannelBuffer buffer)
+	public static InetSocketAddress readSocketAddress(ByteBuf buffer)
 			throws Exception
 	{
 		String remoteHost = NettyUtils.readString(buffer);
@@ -441,39 +362,17 @@ public class NettyUtils
 		return remoteAddress;
 	}
 
-	public static ChannelBuffer writeSocketAddress(
+	public static ByteBuf writeSocketAddress(
 			InetSocketAddress socketAddress)
 	{
 		String host = socketAddress.getHostName();
 		int port = socketAddress.getPort();
-		ChannelBuffer hostName = writeString(host);
-		ChannelBuffer portNum = ChannelBuffers.buffer(4);
+		ByteBuf hostName = writeString(host);
+		ByteBuf portNum = Unpooled.buffer(4);
 		portNum.writeInt(port);
-		ChannelBuffer socketAddressBuffer = ChannelBuffers.wrappedBuffer(
+		ByteBuf socketAddressBuffer = Unpooled.wrappedBuffer(
 				hostName, portNum);
 		return socketAddressBuffer;
 	}
 
-	public static class ObjectDecoderWrapper extends ObjectDecoder
-	{
-		public ObjectDecoderWrapper()
-		{
-			super(ClassResolvers.weakCachingResolver(null));
-		}
-
-		public Object decode(ChannelBuffer buffer) throws Exception
-		{
-			return super.decode(null, null, buffer);
-		}
-	}
-
-	public static class ObjectEncoderWrapper extends ObjectEncoder
-	{
-		protected ChannelBuffer encode(Object msg) throws Exception
-		{
-			ChannelBuffer objBuffer = (ChannelBuffer) super.encode(null, null,
-					msg);
-			return objBuffer;
-		}
-	}
 }

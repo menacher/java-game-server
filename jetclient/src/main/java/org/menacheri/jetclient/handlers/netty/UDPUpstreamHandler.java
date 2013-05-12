@@ -1,14 +1,12 @@
 package org.menacheri.jetclient.handlers.netty;
 
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelStateEvent;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
-import org.jboss.netty.channel.socket.DatagramChannel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundMessageHandlerAdapter;
+import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.socket.DatagramPacket;
+
 import org.menacheri.jetclient.NettyUDPClient;
 import org.menacheri.jetclient.app.Session;
-import org.menacheri.jetclient.event.Events;
 import org.menacheri.jetclient.event.Event;
 
 /**
@@ -21,75 +19,25 @@ import org.menacheri.jetclient.event.Event;
  * @author Abraham Menacherry.
  * 
  */
-public class UDPUpstreamHandler extends SimpleChannelUpstreamHandler
+@Sharable
+public class UDPUpstreamHandler extends ChannelInboundMessageHandlerAdapter<DatagramPacket>
 {
+	private final MessageBufferEventDecoder decoder;
+	
 	public UDPUpstreamHandler()
 	{
 		super();
+		decoder = new MessageBufferEventDecoder();
 	}
 
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e)
-			throws Exception
-	{
-		// Lookup the session from the local address.
-		DatagramChannel datagramChannel = (DatagramChannel) e.getChannel();
-		Session session = NettyUDPClient.CLIENTS.get(datagramChannel
-				.getLocalAddress());
+	public void messageReceived(ChannelHandlerContext ctx, DatagramPacket msg)
+			throws Exception {
+		Session session = NettyUDPClient.CLIENTS.get(ctx.channel().localAddress());
 		if (null != session)
 		{
-			Event event = (Event) e.getMessage();
+			Event event = (Event)decoder.decode(null, msg.data());
 			// Pass the event on to the session
-			session.onEvent(event);
-		}
-	}
-
-	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e)
-			throws Exception
-	{
-		System.err.println(e.getCause());
-		DatagramChannel datagramChannel = (DatagramChannel) e.getChannel();
-		Session session = NettyUDPClient.CLIENTS.get(datagramChannel
-				.getLocalAddress());
-		if (null != session)
-		{
-			Event event = Events.event(e, Events.EXCEPTION);
-			session.onEvent(event);
-		}
-	}
-
-	@Override
-	public void channelDisconnected(ChannelHandlerContext ctx,
-			ChannelStateEvent e) throws Exception
-	{
-		DatagramChannel datagramChannel = (DatagramChannel) e.getChannel();
-		Session session = NettyUDPClient.CLIENTS.get(datagramChannel
-				.getLocalAddress());
-		if ((null != session) && !session.isShuttingDown())
-		{
-			Event event = Events.event(e, Events.DISCONNECT);
-			session.onEvent(event);
-		}
-		else if (null != session)
-		{
-			System.out.println("Session is already shutting down. "
-					+ "Disconnect event will be discarded for channel {}"
-					+ datagramChannel.getId());
-		}
-
-	}
-
-	@Override
-	public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e)
-			throws Exception
-	{
-		DatagramChannel datagramChannel = (DatagramChannel) e.getChannel();
-		Session session = NettyUDPClient.CLIENTS.get(datagramChannel
-				.getLocalAddress());
-		if ((null != session) && !session.isShuttingDown())
-		{
-			Event event = Events.event(e, Events.DISCONNECT);
 			session.onEvent(event);
 		}
 	}

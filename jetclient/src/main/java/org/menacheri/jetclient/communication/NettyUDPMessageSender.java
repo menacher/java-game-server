@@ -1,8 +1,9 @@
 package org.menacheri.jetclient.communication;
 
+import io.netty.channel.socket.DatagramChannel;
+
 import java.net.SocketAddress;
 
-import org.jboss.netty.channel.socket.DatagramChannel;
 import org.menacheri.jetclient.NettyUDPClient;
 import org.menacheri.jetclient.app.Session;
 import org.menacheri.jetclient.communication.MessageSender.Fast;
@@ -33,7 +34,7 @@ public class NettyUDPMessageSender implements Fast
 	@Override
 	public Object sendMessage(Object message)
 	{
-		return channel.write(message, remoteAddress);
+		return channel.write(message);
 	}
 
 	@Override
@@ -47,13 +48,12 @@ public class NettyUDPMessageSender implements Fast
 	{
 		if (isClosed)
 			return;
-		Session session = NettyUDPClient.CLIENTS.remove(channel
-				.getLocalAddress());
+		Session session = NettyUDPClient.CLIENTS.remove(channel.localAddress());
 		if (null == session)
 		{
 			System.err.println("Possible memory leak occurred. "
 					+ "The session associated with udp localaddress: "
-					+ channel.getLocalAddress()
+					+ channel.localAddress()
 					+ " could not be removed from NettyUDPClient.CLIENTS map");
 		}
 		isClosed = true;
@@ -75,7 +75,7 @@ public class NettyUDPMessageSender implements Fast
 		String channelId = "UDP Channel with id: ";
 		if (null != channel)
 		{
-			channelId += channel.getId();
+			channelId += channel.id();
 		}
 		else
 		{

@@ -1,8 +1,9 @@
 package org.menacheri.jetclient.communication;
 
+import io.netty.buffer.ByteBuf;
+
 import java.nio.ByteBuffer;
 
-import org.jboss.netty.buffer.ChannelBuffer;
 import org.menacheri.convert.Transform;
 
 /**
@@ -14,7 +15,7 @@ import org.menacheri.convert.Transform;
  * other native types, <code>byte[]</code> of serialized objects and so on. It
  * contains helper methods for writing and reading back the data. If a Netty
  * implementation is used, then it would be a wrapper over the
- * {@link ChannelBuffer}. For Java api, it would be probably be wrapper over a
+ * {@link ByteBuf}. For Java api, it would be probably be wrapper over a
  * nio {@link ByteBuffer}.
  * 
  * @author Abraham Menacherry
@@ -299,7 +300,7 @@ public interface MessageBuffer<T>
 	 * MessageBuffer instance.
 	 * 
 	 * @return This method will return the underlying buffer. For Netty that
-	 *         would be a {@link ChannelBuffer}, for a core java implementation
+	 *         would be a {@link ByteBuf}, for a core java implementation
 	 *         it could be {@link ByteBuffer}
 	 */
 	T getNativeBuffer();

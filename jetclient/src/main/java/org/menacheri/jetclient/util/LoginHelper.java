@@ -1,9 +1,8 @@
 package org.menacheri.jetclient.util;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import java.net.InetSocketAddress;
-
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.buffer.ChannelBuffers;
 import org.menacheri.jetclient.app.impl.SessionFactory;
 import org.menacheri.jetclient.communication.MessageBuffer;
 import org.menacheri.jetclient.communication.NettyMessageBuffer;
@@ -206,21 +205,21 @@ public class LoginHelper
 	 *            <b>optional</b> If passed in, then this address is passed on
 	 *            to jetserver, so that it can associate this address with its
 	 *            session.
-	 * @return Returns the ChannelBuffer representation of username, password,
+	 * @return Returns the ByteBuf representation of username, password,
 	 *         connection key, udp local bind address etc.
 	 * @throws Exception
 	 */
-	public MessageBuffer<ChannelBuffer> getLoginBuffer(
+	public MessageBuffer<ByteBuf> getLoginBuffer(
 			InetSocketAddress localUDPAddress) throws Exception
 	{
-		ChannelBuffer loginBuffer;
-		ChannelBuffer credentials = NettyUtils.writeStrings(username, password,
+		ByteBuf loginBuffer;
+		ByteBuf credentials = NettyUtils.writeStrings(username, password,
 				connectionKey);
 		if (null != localUDPAddress)
 		{
-			ChannelBuffer udpAddressBuffer = NettyUtils
+			ByteBuf udpAddressBuffer = NettyUtils
 					.writeSocketAddress(localUDPAddress);
-			loginBuffer = ChannelBuffers.wrappedBuffer(credentials,
+			loginBuffer = Unpooled.wrappedBuffer(credentials,
 					udpAddressBuffer);
 		}
 		else
@@ -243,14 +242,14 @@ public class LoginHelper
 	 * @return Returns the channel buffer containing reconnect key and udp
 	 *         address in binary format.
 	 */
-	public MessageBuffer<ChannelBuffer> getReconnectBuffer(String reconnectKey,
+	public MessageBuffer<ByteBuf> getReconnectBuffer(String reconnectKey,
 			InetSocketAddress udpAddress)
 	{
-		ChannelBuffer reconnectBuffer = null;
-		ChannelBuffer buffer = NettyUtils.writeString(reconnectKey);
+		ByteBuf reconnectBuffer = null;
+		ByteBuf buffer = NettyUtils.writeString(reconnectKey);
 		if (null != udpAddress)
 		{
-			reconnectBuffer = ChannelBuffers.wrappedBuffer(buffer,
+			reconnectBuffer = Unpooled.wrappedBuffer(buffer,
 					NettyUtils.writeSocketAddress(udpAddress));
 		}
 		else

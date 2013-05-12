@@ -1,23 +1,24 @@
 package org.menacheri.jetclient;
 
+import io.netty.bootstrap.Bootstrap;
+import io.netty.bootstrap.ChannelFactory;
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.EventLoopGroup;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.ChannelGroupFuture;
+import io.netty.channel.group.DefaultChannelGroup;
+import io.netty.channel.nio.NioEventLoopGroup;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
+
 import java.net.InetSocketAddress;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
-import org.jboss.netty.bootstrap.ClientBootstrap;
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFactory;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.group.ChannelGroup;
-import org.jboss.netty.channel.group.ChannelGroupFuture;
-import org.jboss.netty.channel.group.DefaultChannelGroup;
-import org.jboss.netty.channel.socket.nio.NioClientSocketChannelFactory;
 import org.menacheri.jetclient.event.Event;
 
 /**
@@ -36,22 +37,11 @@ public class NettyTCPClient
 	 */
 	private final InetSocketAddress serverAddress;
 	/**
-	 * The instance of {@link NioClientSocketChannelFactory} created by
-	 * constructor, or the one passed in to constructor.
-	 */
-	private final ChannelFactory channelFactory;
-	/**
 	 * The boss executor which will provide threads to Netty
 	 * {@link ChannelFactory} for reading from the NIO selectors.
 	 */
-	private final ExecutorService boss;
-	/**
-	 * The worker executor which will provide threads to Netty
-	 * {@link ChannelFactory} for decoding encoding done on the
-	 * {@link ChannelPipeline}.
-	 */
-	private final ExecutorService worker;
-	private final ClientBootstrap bootstrap;
+	private final EventLoopGroup boss;
+	private final Bootstrap bootstrap;
 	/**
 	 * The amount of time in seconds to wait for this client to close all
 	 * {@link Channel}s and shutdown gracefully.
@@ -85,8 +75,7 @@ public class NettyTCPClient
 
 	public NettyTCPClient(final InetSocketAddress serverAddress)
 	{
-		this(serverAddress, Executors.newCachedThreadPool(), Executors
-				.newCachedThreadPool(), null, 5000);
+		this(serverAddress, new NioEventLoopGroup(), 5000);
 	}
 
 	/**
@@ -99,41 +88,21 @@ public class NettyTCPClient
 	 *            The remote servers address. This address will be used when any
 	 *            of the default write/connect methods are used.
 	 * @param boss
-	 *            {@link Executor} used for creating the {@link #channelFactory}
-	 *            instance. Can be <b>null</b> if {@link #channelFactory} is not
-	 *            null.
-	 * @param worker
-	 *            {@link Executor} used for creating the {@link #channelFactory}
-	 *            instance. Can be <b>null</b> if {@link #channelFactory} is not
-	 *            null.
-	 * @param channelFactory
-	 *            <b>Can be provided as null</b>. If so, it will by default use
-	 *            {@link NioClientSocketChannelFactory}. If not null, then the
-	 *            provided factory is set.
+	 *            {@link EventLoopGroup} used for client.
 	 * @param maxShutdownWaitTime
 	 *            The amount of time in seconds to wait for this client to close
 	 *            all {@link Channel}s and shutdown gracefully.
 	 */
 	public NettyTCPClient(final InetSocketAddress serverAddress,
-			final ExecutorService boss, final ExecutorService worker,
-			final ChannelFactory channelFactory, final int maxShutdownWaitTime)
+			final EventLoopGroup boss, 
+			final int maxShutdownWaitTime)
 	{
 		this.serverAddress = serverAddress;
 		this.boss = boss;
-		this.worker = worker;
-		if (null != channelFactory)
-		{
-			this.channelFactory = channelFactory;
-		}
-		else
-		{
-			this.channelFactory = new NioClientSocketChannelFactory(boss,
-					worker);
-		}
-		this.bootstrap = new ClientBootstrap(this.channelFactory);
-		// At client side option is tcpNoDelay and at server child.tcpNoDelay
-		this.bootstrap.setOption("tcpNoDelay", true);
-		this.bootstrap.setOption("keepAlive", true);
+		this.bootstrap = new Bootstrap();
+		bootstrap.group(boss).channel(NioSocketChannel.class)
+				.option(ChannelOption.TCP_NODELAY, true)
+				.option(ChannelOption.SO_KEEPALIVE, true);
 		this.maxShutdownWaitTime = maxShutdownWaitTime;
 		Runtime.getRuntime().addShutdownHook(new Thread()
 		{
@@ -148,14 +117,14 @@ public class NettyTCPClient
 				{
 					e.printStackTrace();
 				}
-				bootstrap.releaseExternalResources();
+				boss.shutdown();
 			}
 		});
 	}
 
 	/**
 	 * This method delegates to the
-	 * {@link #connect(ChannelPipelineFactory, Event, int, TimeUnit)} method
+	 * {@link #connect(ChannelInitializer, Event, int, TimeUnit)} method
 	 * internally. It will pass in a default of 5 seconds wait time to the
 	 * delegated method.
 	 * 
@@ -163,7 +132,7 @@ public class NettyTCPClient
 	 *            The factory used to create a pipeline of decoders and encoders
 	 *            for each {@link Channel} that it creates on connection.
 	 * @param loginEvent
-	 *            The event contains the {@link ChannelBuffer} to be transmitted
+	 *            The event contains the {@link ByteBuf} to be transmitted
 	 *            to jetserver for logging in. Values inside this buffer include
 	 *            username, password, connection key, <b>optional</b> local
 	 *            address of the UDP channel used by this session.
@@ -171,7 +140,7 @@ public class NettyTCPClient
 	 *         remote jetserver.
 	 * @throws InterruptedException
 	 */
-	public Channel connect(final ChannelPipelineFactory pipelineFactory,
+	public Channel connect(final ChannelInitializer<SocketChannel> pipelineFactory,
 			final Event loginEvent) throws InterruptedException
 	{
 		return connect(pipelineFactory, loginEvent, 5, TimeUnit.SECONDS);
@@ -185,7 +154,7 @@ public class NettyTCPClient
 	 *            The factory used to create a pipeline of decoders and encoders
 	 *            for each {@link Channel} that it creates on connection.
 	 * @param loginEvent
-	 *            The event contains the {@link ChannelBuffer} to be transmitted
+	 *            The event contains the {@link ByteBuf} to be transmitted
 	 *            to jetserver for logging in. Values inside this buffer include
 	 *            username, password, connection key, <b>optional</b> local
 	 *            address of the UDP channel used by this session.
@@ -199,14 +168,14 @@ public class NettyTCPClient
 	 *         remote jetserver.
 	 * @throws InterruptedException
 	 */
-	public Channel connect(final ChannelPipelineFactory pipelineFactory,
+	public Channel connect(final ChannelInitializer<SocketChannel> pipelineFactory,
 			final Event loginEvent, int timeout, TimeUnit unit)
 			throws InterruptedException
 	{
 		ChannelFuture future;
 		synchronized (bootstrap)
 		{
-			bootstrap.setPipelineFactory(pipelineFactory);
+			bootstrap.handler(pipelineFactory);
 			future = bootstrap.connect(serverAddress);
 			future.addListener(new ChannelFutureListener()
 			{
@@ -216,17 +185,17 @@ public class NettyTCPClient
 				{
 					if (future.isSuccess())
 					{
-						future.getChannel().write(loginEvent);
+						future.channel().write(loginEvent);
 					}
 					else
 					{
-						throw new RuntimeException(future.getCause()
+						throw new RuntimeException(future.cause()
 								.getMessage());
 					}
 				}
 			});
 		}
-		return future.getChannel();
+		return future.channel();
 	}
 
 	public InetSocketAddress getServerAddress()
@@ -234,22 +203,13 @@ public class NettyTCPClient
 		return serverAddress;
 	}
 
-	public ChannelFactory getChannelFactory()
-	{
-		return channelFactory;
-	}
-
-	public ExecutorService getBoss()
+	public EventLoopGroup getBoss()
 	{
 		return boss;
 	}
 
-	public ExecutorService getWorker()
-	{
-		return worker;
-	}
 
-	public ClientBootstrap getBootstrap()
+	public Bootstrap getBootstrap()
 	{
 		return bootstrap;
 	}

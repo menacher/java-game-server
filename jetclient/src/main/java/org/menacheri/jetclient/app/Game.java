@@ -1,6 +1,6 @@
 package org.menacheri.jetclient.app;
 
-import org.jboss.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFuture;
 
 /**
  * This interface abstracts a game domain object. Each game deployed in the

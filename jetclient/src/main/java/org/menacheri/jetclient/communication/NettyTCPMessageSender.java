@@ -1,11 +1,12 @@
 package org.menacheri.jetclient.communication;
 
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.ChannelFuture;
-import org.jboss.netty.channel.ChannelFutureListener;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
+import io.netty.channel.ChannelFutureListener;
+
 import org.menacheri.jetclient.communication.MessageSender.Reliable;
-import org.menacheri.jetclient.event.Events;
 import org.menacheri.jetclient.event.Event;
+import org.menacheri.jetclient.event.Events;
 
 /**
  * A class that transmits messages reliably to remote machines/vm's. Internally
@@ -51,7 +52,7 @@ public class NettyTCPMessageSender implements Reliable
 		closeFuture.awaitUninterruptibly();
 		if (!closeFuture.isSuccess())
 		{
-			System.err.println("TCP channel " + channel.getId()
+			System.err.println("TCP channel " + channel.id()
 					+ " did not close successfully");
 		}
 		isClosed = true;
@@ -77,7 +78,7 @@ public class NettyTCPMessageSender implements Reliable
 	 */
 	public void closeAfterFlushingPendingWrites(Channel channel, Event event)
 	{
-		if (channel.isConnected())
+		if (channel.isActive())
 		{
 			channel.write(event).addListener(ChannelFutureListener.CLOSE);
 		}
@@ -94,7 +95,7 @@ public class NettyTCPMessageSender implements Reliable
 		String channelId = "TCP channel with Id: ";
 		if (null != channel)
 		{
-			channelId += channel.getId().toString();
+			channelId += channel.id().toString();
 		}
 		else
 		{

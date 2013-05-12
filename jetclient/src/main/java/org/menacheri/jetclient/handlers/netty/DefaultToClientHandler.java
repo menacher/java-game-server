@@ -1,15 +1,13 @@
 package org.menacheri.jetclient.handlers.netty;
 
-import org.jboss.netty.channel.ChannelHandlerContext;
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelStateEvent;
-import org.jboss.netty.channel.ExceptionEvent;
-import org.jboss.netty.channel.MessageEvent;
-import org.jboss.netty.channel.SimpleChannelUpstreamHandler;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundMessageHandlerAdapter;
+import io.netty.channel.ChannelPipeline;
+
 import org.menacheri.jetclient.NettyTCPClient;
 import org.menacheri.jetclient.app.Session;
-import org.menacheri.jetclient.event.Events;
 import org.menacheri.jetclient.event.Event;
+import org.menacheri.jetclient.event.Events;
 
 /**
  * A stateful handler whose job is to transmit messages coming on the Netty
@@ -18,7 +16,7 @@ import org.menacheri.jetclient.event.Event;
  * @author Abraham Menacherry.
  * 
  */
-public class DefaultToClientHandler extends SimpleChannelUpstreamHandler
+public class DefaultToClientHandler extends ChannelInboundMessageHandlerAdapter<Event>
 {
 	static final String NAME = "defaultHandler";
 	private final Session session;
@@ -29,62 +27,46 @@ public class DefaultToClientHandler extends SimpleChannelUpstreamHandler
 	}
 
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx, MessageEvent e)
-			throws Exception
-	{
-		Event event = (Event) e.getMessage();
+	public void messageReceived(ChannelHandlerContext ctx, Event event)
+			throws Exception {
 		session.onEvent(event);
 	}
-
+	
+	// TODO check what other methods need to be caught.
+	
 	@Override
-	public void channelConnected(ChannelHandlerContext ctx, ChannelStateEvent e)
-			throws Exception
-	{
-		NettyTCPClient.ALL_CHANNELS.add(e.getChannel());
-		super.channelConnected(ctx, e);
+	public void channelActive(ChannelHandlerContext ctx) throws Exception {
+		NettyTCPClient.ALL_CHANNELS.add(ctx.channel());
+		super.channelActive(ctx);
 	}
-
+	
 	@Override
-	public void exceptionCaught(ChannelHandlerContext ctx, ExceptionEvent e)
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
 			throws Exception
 	{
 		System.err.println("Class:DefaultToClientHandler"
-				+ " Exception occurred in tcp channel: " + e.getCause());
-		Event event = Events.event(e, Events.EXCEPTION);
+				+ " Exception occurred in tcp channel: " + cause);
+		Event event = Events.event(cause, Events.EXCEPTION);
 		session.onEvent(event);
 	}
 
-//	@Override
-//	public void channelDisconnected(ChannelHandlerContext ctx,
-//			ChannelStateEvent e) throws Exception
-//	{
-//		if (!session.isShuttingDown())
-//		{
-//			Event event = Events.event(e, Events.DISCONNECT);
-//			session.onEvent(event);
-//		}
-//		else
-//		{
-//			System.err.println("Session is already shutting down. "
-//					+ "Disconnect event will be discarded for channel {}"
-//					+ e.getChannel().getId());
-//		}
-//
-//	}
-
-//	@Override
-//	public void channelClosed(ChannelHandlerContext ctx, ChannelStateEvent e)
-//			throws Exception
-//	{
-//		if (!session.isShuttingDown())
-//		{
-//			Event event = Events.event(e, Events.DISCONNECT);
-//			session.onEvent(event);
-//		}
-//	}
-
+	// TODO see if this causes reconnection failure
+	@Override
+	public void channelInactive(ChannelHandlerContext ctx)
+			throws Exception
+	{
+		if (!session.isShuttingDown())
+		{
+			// Should not send close to session, since reconnection/other
+			// business logic might be in place.
+			Event event = Events.event(null, Events.DISCONNECT);
+			session.onEvent(event);
+		}
+	}
+	
 	public static String getName()
 	{
 		return NAME;
 	}
+	
 }

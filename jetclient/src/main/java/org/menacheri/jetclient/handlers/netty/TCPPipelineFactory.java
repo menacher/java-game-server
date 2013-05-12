@@ -1,10 +1,11 @@
 package org.menacheri.jetclient.handlers.netty;
 
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.Channels;
-import org.jboss.netty.handler.codec.frame.LengthFieldBasedFrameDecoder;
-import org.jboss.netty.handler.codec.frame.LengthFieldPrepender;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
+import io.netty.handler.codec.LengthFieldPrepender;
+
 import org.menacheri.jetclient.app.Session;
 import org.menacheri.jetclient.communication.MessageBuffer;
 import org.menacheri.jetclient.event.Event;
@@ -12,13 +13,13 @@ import org.menacheri.jetclient.event.Event;
 /**
  * This pipeline factory can be considered the default 'protocol' for client
  * side communication with jetserver. For other protocols, different
- * {@link ChannelPipelineFactory}, with different encoders and decoders in its
+ * {@link ChannelInitializer}s, with different encoders and decoders in its
  * pipeline should be used to connect to remote jetserver.
  * 
  * @author Abraham Menacherry.
  * 
  */
-public class TCPPipelineFactory implements ChannelPipelineFactory
+public class TCPPipelineFactory extends ChannelInitializer<SocketChannel>
 {
 	/**
 	 * Prepends the length of transmitted message before sending to remote
@@ -49,9 +50,8 @@ public class TCPPipelineFactory implements ChannelPipelineFactory
 	}
 
 	@Override
-	public ChannelPipeline getPipeline() throws Exception
-	{
-		ChannelPipeline pipeline = Channels.pipeline();
+	protected void initChannel(SocketChannel ch) throws Exception {
+		ChannelPipeline pipeline = ch.pipeline();
 		pipeline.addLast("lengthDecoder", new LengthFieldBasedFrameDecoder(
 				Integer.MAX_VALUE, 0, 2, 0, 2));
 		pipeline.addLast("eventDecoder", EVENT_DECODER);
@@ -63,6 +63,5 @@ public class TCPPipelineFactory implements ChannelPipelineFactory
 		pipeline.addLast("lengthFieldPrepender", LENGTH_FIELD_PREPENDER);
 		pipeline.addLast("eventEncoder", EVENT_ENCODER);
 		
-		return pipeline;
 	}
 }

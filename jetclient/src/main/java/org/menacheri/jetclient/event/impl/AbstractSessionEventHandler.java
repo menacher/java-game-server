@@ -1,6 +1,7 @@
 package org.menacheri.jetclient.event.impl;
 
-import org.jboss.netty.buffer.ChannelBuffer;
+import io.netty.buffer.ByteBuf;
+
 import org.menacheri.jetclient.app.Session;
 import org.menacheri.jetclient.communication.DeliveryGuaranty.DeliveryGuarantyOptions;
 import org.menacheri.jetclient.communication.MessageBuffer;
@@ -126,7 +127,7 @@ public abstract class AbstractSessionEventHandler implements
 				&& (event.getSource() instanceof MessageBuffer))
 		{
 			@SuppressWarnings("unchecked")
-			String reconnectKey = ((MessageBuffer<ChannelBuffer>) event
+			String reconnectKey = ((MessageBuffer<ByteBuf>) event
 					.getSource()).readString();
 			if (null != reconnectKey)
 				getSession().setAttribute(Config.RECONNECT_KEY, reconnectKey);

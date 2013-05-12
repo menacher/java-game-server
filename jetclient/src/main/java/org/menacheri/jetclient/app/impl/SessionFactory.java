@@ -1,12 +1,13 @@
 package org.menacheri.jetclient.app.impl;
 
+import io.netty.buffer.ByteBuf;
+import io.netty.channel.Channel;
+import io.netty.channel.socket.DatagramChannel;
+
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.jboss.netty.buffer.ChannelBuffer;
-import org.jboss.netty.channel.Channel;
-import org.jboss.netty.channel.socket.DatagramChannel;
 import org.menacheri.jetclient.NettyTCPClient;
 import org.menacheri.jetclient.NettyUDPClient;
 import org.menacheri.jetclient.app.Player;
@@ -41,7 +42,7 @@ public class SessionFactory
 	 * This class holds a number of variables like username, password etc which
 	 * are necessary for creating connections to remote jetserver.
 	 */
-	private final LoginHelper loginHelper;
+	private LoginHelper loginHelper;
 	private final NettyTCPClient tcpClient;
 	private final NettyUDPClient udpClient;
 	private static final AtomicInteger sessionId = new AtomicInteger(0);
@@ -69,7 +70,7 @@ public class SessionFactory
 		else
 		{
 			udpClient = new NettyUDPClient(udpAddress,
-					UDPPipelineFactory.getInstance());
+					UDPPipelineFactory.getInstance(udpAddress), null);
 		}
 	}
 
@@ -166,7 +167,7 @@ public class SessionFactory
 			}
 		}
 
-		MessageBuffer<ChannelBuffer> buffer = loginHelper
+		MessageBuffer<ByteBuf> buffer = loginHelper
 				.getLoginBuffer(udpAddress);
 		Event loginEvent = Events.event(buffer, Events.LOG_IN);
 		doTcpConnection(session, loginEvent);
@@ -228,12 +229,12 @@ public class SessionFactory
 	}
 
 	protected InetSocketAddress doUdpConnection(final Session session)
-			throws UnknownHostException
+			throws UnknownHostException, InterruptedException
 	{
 		InetSocketAddress localAddress;
 		final DatagramChannel datagramChannel = udpClient
 				.createDatagramChannel();
-		localAddress = datagramChannel.getLocalAddress();
+		localAddress = datagramChannel.localAddress();
 		// Add a start event handler to the session which will send the udp
 		// connect on server START signal.
 		final EventHandler startEventHandler = new EventHandler()
@@ -291,6 +292,10 @@ public class SessionFactory
 	public NettyUDPClient getUdpClient()
 	{
 		return udpClient;
+	}
+
+	public void setLoginHelper(LoginHelper loginHelper) {
+		this.loginHelper = loginHelper;
 	}
 
 }

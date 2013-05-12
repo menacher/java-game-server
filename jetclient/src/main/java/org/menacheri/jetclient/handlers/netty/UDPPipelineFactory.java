@@ -1,49 +1,49 @@
 package org.menacheri.jetclient.handlers.netty;
 
-import org.jboss.netty.channel.ChannelPipeline;
-import org.jboss.netty.channel.ChannelPipelineFactory;
-import org.jboss.netty.channel.Channels;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelInitializer;
+import io.netty.channel.ChannelPipeline;
+import io.netty.channel.socket.DatagramChannel;
 
-public class UDPPipelineFactory implements ChannelPipelineFactory
+import java.net.InetSocketAddress;
+
+public class UDPPipelineFactory extends ChannelInitializer<DatagramChannel>
 {
-	/**
-	 * This pipeline will be shared across all the channels. In Netty UDP
-	 * implementation it does not make sense to have different pipelines for
-	 * different channels as the protocol is essentials "connection-less" for a
-	 * bootstrap.
-	 */
-	private static final ChannelPipeline pipeline;
-	
-	private static final MessageBufferEventDecoder EVENT_DECODER;
-	private static final MessageBufferEventEncoder EVENT_ENCODER;
-	private static final UDPUpstreamHandler UDP_UPSTREAM_HANDLER;
-	
-	private static final UDPPipelineFactory INSTANCE;
+	public static final String EVENT_ENCODER_NAME = "eventEncoder";
+	private static UDPUpstreamHandler UDP_UPSTREAM_HANDLER;
+	private static UDPPipelineFactory INSTANCE;
+	private static UDPEventEncoder udpEventEncoder;
 	static {
-		EVENT_DECODER = new MessageBufferEventDecoder();
-		EVENT_ENCODER = new MessageBufferEventEncoder();
 		UDP_UPSTREAM_HANDLER = new UDPUpstreamHandler();
-		pipeline = init();
-		INSTANCE = new UDPPipelineFactory();
 	}
 	
-	static ChannelPipeline init()
+	private InetSocketAddress udpServerAddress;
+	public UDPPipelineFactory(InetSocketAddress udpServerAddress)
 	{
-		ChannelPipeline pipeline = Channels.pipeline();
-		pipeline.addLast("eventDecoder", EVENT_DECODER);
-		pipeline.addLast("eventEncoder", EVENT_ENCODER);
-		pipeline.addLast("UDPUpstreamHandler",UDP_UPSTREAM_HANDLER);
-		return pipeline;
+		this.udpServerAddress = udpServerAddress;
 	}
 	
 	@Override
-	public ChannelPipeline getPipeline() throws Exception
+	protected void initChannel(DatagramChannel ch) throws Exception 
 	{
-		return pipeline;
+		ChannelPipeline pipeline = ch.pipeline();
+		pipeline.addLast(EVENT_ENCODER_NAME, getEventEncoder(udpServerAddress));
+		pipeline.addLast("UDPUpstreamHandler",UDP_UPSTREAM_HANDLER);
+	}
+	
+	public synchronized static UDPPipelineFactory getInstance(InetSocketAddress udpServerAddress)
+	{
+		if(null == INSTANCE)
+		{
+			INSTANCE = new UDPPipelineFactory(udpServerAddress);
+		}
+		return INSTANCE;
 	}
 
-	public static UDPPipelineFactory getInstance()
-	{
-		return INSTANCE;
+	public synchronized static ChannelHandler getEventEncoder(InetSocketAddress udpServerAddress){
+		if(null == udpEventEncoder){
+			udpEventEncoder = new UDPEventEncoder(udpServerAddress);
+		}
+		return udpEventEncoder;
 	}
 }
