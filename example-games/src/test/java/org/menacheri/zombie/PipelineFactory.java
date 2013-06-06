@@ -1,5 +1,6 @@
 package org.menacheri.zombie;
 
+import io.netty.buffer.MessageBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
@@ -46,9 +47,11 @@ public class PipelineFactory extends ChannelInitializer<SocketChannel>
 	public static class StartEventCounter extends MessageToMessageDecoder<Event>
 	{
 		private final AtomicInteger counter = new AtomicInteger(0);
+		
 		@Override
-		protected Object decode(ChannelHandlerContext ctx, Event event)
-				throws Exception {
+		protected void decode(ChannelHandlerContext ctx, Event event,
+				MessageBuf<Object> out) throws Exception
+		{
 			if(Events.START == event.getType())
 			{
 				int started = counter.incrementAndGet();
@@ -62,8 +65,9 @@ public class PipelineFactory extends ChannelInitializer<SocketChannel>
 			{
 				System.out.println("Recieved eventType: " + event.getType());
 			}
-			return event;
+			out.add(event);
 		}
+		
 	}
 	
 }

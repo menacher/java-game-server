@@ -106,10 +106,10 @@ public class SessionHandler extends DefaultSessionEventHandler implements GameCo
 				throw new InvalidCommandException("Received invalid command" + cmd);
 		}
 		
-		if((cmdCount % 10000) == 0)
+		//if((cmdCount % 10000) == 0)
 		{
 			NettyMessageBuffer buffer = new NettyMessageBuffer();
-			System.out.println("Command No: " + cmdCount);
+			//System.out.println("Command No: " + cmdCount);
 			buffer.writeInt(cmdCount);
 //			Event tcpEvent = Events.dataOutTcpEvent(buffer);
 //			getSession().onEvent(tcpEvent);

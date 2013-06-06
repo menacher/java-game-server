@@ -1,6 +1,7 @@
 package org.menacheri.jetserver.handlers.netty;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.MessageBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ReplayingDecoder;
@@ -13,16 +14,13 @@ public class FlashPolicyServerDecoder extends ReplayingDecoder<ByteBuf> {
     // We don't check for the trailing NULL to make telnet-based debugging easier.
     private final ByteBuf requestBuffer = Unpooled.copiedBuffer("<policy-file-request/>", CharsetUtil.US_ASCII);
 
-    @Override
-    protected Object decode(
-            ChannelHandlerContext ctx, 
-            ByteBuf buffer) {
-
-    	ByteBuf data = buffer.readBytes(requestBuffer.readableBytes());
+	@Override
+	protected void decode(ChannelHandlerContext ctx, ByteBuf buffer,
+			MessageBuf<Object> out) throws Exception
+	{
+		ByteBuf data = buffer.readBytes(requestBuffer.readableBytes());
         if (data.equals(requestBuffer)) {
-            return data;
+        	out.add(data);
         }
-        ctx.close();
-        return null;
-    }
+	}
 }

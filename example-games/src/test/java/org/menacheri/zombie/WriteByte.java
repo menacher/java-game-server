@@ -44,7 +44,7 @@ public class WriteByte extends TimerTask
 		ByteBuf buf = null;
 		if(null == remoteAddress){
 			//TCP
-			for(int i =0; i < 10;i++){
+			for(int i =0; i < 1;i++){
 				buf = Unpooled.buffer(1 + 8);
 				buf.writeByte(Events.SESSION_MESSAGE);
 				buf.writeInt(type);
@@ -60,7 +60,7 @@ public class WriteByte extends TimerTask
 			buf.writeByte(Events.SESSION_MESSAGE);
 			buf.writeInt(type);
 			buf.writeInt(operation);
-			for(int i =0; i < 10;i++){
+			for(int i =0; i < 1;i++){
 				udpChannel.write(buf);
 			}
 		}

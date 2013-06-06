@@ -60,7 +60,7 @@ public class ProtocolMultiplexerDecoder extends ChannelInboundByteHandlerAdapter
 		}
 		else
 		{
-			pipeline.removeAndForward(this);
+			pipeline.remove(this);
 		}
 
 	}

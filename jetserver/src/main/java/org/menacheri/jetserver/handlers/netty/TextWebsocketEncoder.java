@@ -1,5 +1,6 @@
 package org.menacheri.jetserver.handlers.netty;
 
+import io.netty.buffer.MessageBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.handler.codec.MessageToMessageEncoder;
@@ -24,13 +25,13 @@ public class TextWebsocketEncoder extends MessageToMessageEncoder<Event>
 	private Gson gson;
 
 	@Override
-	protected Object encode(ChannelHandlerContext ctx, 
-			Event msg) throws Exception
+	protected void encode(ChannelHandlerContext ctx, Event msg,
+			MessageBuf<Object> out) throws Exception
 	{
 		String json = gson.toJson(msg);
-		return new TextWebSocketFrame(json);
+		out.add(new TextWebSocketFrame(json));
 	}
-
+	
 	public Gson getGson()
 	{
 		return gson;
@@ -40,4 +41,5 @@ public class TextWebsocketEncoder extends MessageToMessageEncoder<Event>
 	{
 		this.gson = gson;
 	}
+
 }

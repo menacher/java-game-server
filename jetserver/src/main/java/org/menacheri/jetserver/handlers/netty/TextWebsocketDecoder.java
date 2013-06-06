@@ -1,15 +1,14 @@
 package org.menacheri.jetserver.handlers.netty;
 
-import io.netty.channel.ChannelHandlerContext;
+import io.netty.buffer.MessageBuf;
 import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 
 import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.impl.DefaultEvent;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 
@@ -28,30 +27,20 @@ import com.google.gson.Gson;
 public class TextWebsocketDecoder extends MessageToMessageDecoder<TextWebSocketFrame>
 {
 
-	private static final Logger LOG = LoggerFactory
-			.getLogger(TextWebsocketDecoder.class);
 	private Gson gson;
 
 	@Override
-	protected Object decode(ChannelHandlerContext ctx,
-			TextWebSocketFrame frame) throws Exception
+	protected void decode(ChannelHandlerContext ctx, TextWebSocketFrame frame,
+			MessageBuf<Object> out) throws Exception
 	{
-		Event event = null;
-		try
+		Event event = gson.fromJson(frame.text(), DefaultEvent.class);
+		if (event.getType() == Events.NETWORK_MESSAGE)
 		{
-			event = gson.fromJson(frame.text(), DefaultEvent.class);
-			if (event.getType() == Events.NETWORK_MESSAGE)
-			{
-				event.setType(Events.SESSION_MESSAGE);
-			}
+			event.setType(Events.SESSION_MESSAGE);
 		}
-		catch (Exception e)
-		{
-			LOG.error("Exception occurred while decoding json: ", e);
-		}
-		return event;
+		out.add(event);
 	}
-
+	
 	public Gson getGson()
 	{
 		return gson;

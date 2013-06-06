@@ -63,7 +63,7 @@ public class NettyUDPClient
 	/**
 	 * Creates an instance of a Netty UDP client which can then be used to
 	 * connect to a remote jet-server. This constructor delegates to
-	 * {@link #NettyUDPClient(InetSocketAddress, ChannelInitializer)
+	 * {@link #NettyUDPClient(InetSocketAddress, ChannelInitializer, String)}
 	 * constructor after creating a {@link InetSocketAddress} instance based on
 	 * the host and port number passed in.
 	 * 
@@ -182,13 +182,12 @@ public class NettyUDPClient
 	}
 
 	/**
-	 * Creates a new datagram channel instance using the {@link #udpBootstrap}
-	 * by binding to local host. This method delegates to
-	 * {@link #createDatagramChannel(String)} internally, by passing the
-	 * localhost's host name to it.
+	 * This method delegates to {@link #createDatagramChannel(String)}
+	 * internally, by passing the localhost's host name to it.
 	 * 
 	 * @return The newly created instance of the datagram channel.
-	 * @throws UnknownHostException, InterruptedException
+	 * @throws UnknownHostException
+	 *             , InterruptedException
 	 */
 	public DatagramChannel createDatagramChannel() throws UnknownHostException, InterruptedException
 	{
@@ -197,8 +196,8 @@ public class NettyUDPClient
 	}
 
 	/**
-	 * Creates a new datagram channel instance using the {@link #udpBootstrap}
-	 * by binding to local host.
+	 * Creates a new datagram channel instance using the
+	 * {@link NioDatagramChannel} by binding to local host.
 	 * 
 	 * @param localhostName
 	 *            The host machine (for e.g. 'localhost') to which it needs to

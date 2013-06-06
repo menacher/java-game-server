@@ -2,6 +2,7 @@ package org.menacheri.jetserver.handlers.netty;
 
 import flex.messaging.io.SerializationContext;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.MessageBuf;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.ByteToMessageDecoder;
@@ -27,18 +28,18 @@ public class AMF3ToJavaObjectDecoder extends ByteToMessageDecoder implements Tra
 	private static final Logger LOG = LoggerFactory.getLogger(AMF3ToJavaObjectDecoder.class);
 	
 	@Override
-	protected Object decode(ChannelHandlerContext ctx, ByteBuf in)
-			throws Exception {
+	protected void decode(ChannelHandlerContext ctx, ByteBuf in,
+			MessageBuf<Object> out) throws Exception
+	{
 		if(null == in)
 		{
-			LOG.warn("Incoming message is null");
-			return in;
+			return;
 		}
 		// buffer.array() will ignore the readerIndex. Hence readBytes is used
 		// and then .array is called
 		ByteArrayInputStream bis = new ByteArrayInputStream(in.readBytes(
 				in.readableBytes()).array());
-		return deSerializeObjectFromStream(bis);
+		out.add(deSerializeObjectFromStream(bis));
 	}
 	
 	@Override

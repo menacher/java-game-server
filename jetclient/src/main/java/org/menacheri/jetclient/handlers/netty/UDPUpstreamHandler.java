@@ -36,7 +36,7 @@ public class UDPUpstreamHandler extends ChannelInboundMessageHandlerAdapter<Data
 		Session session = NettyUDPClient.CLIENTS.get(ctx.channel().localAddress());
 		if (null != session)
 		{
-			Event event = (Event)decoder.decode(null, msg.data());
+			Event event = (Event)decoder.decode(null, msg.content());
 			// Pass the event on to the session
 			session.onEvent(event);
 		}

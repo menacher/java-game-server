@@ -1,12 +1,14 @@
 package org.menacheri.jetserver.handlers.netty;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.MessageBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 
 import org.menacheri.jetserver.communication.NettyMessageBuffer;
+import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.event.Events;
 
 /**
@@ -22,10 +24,15 @@ import org.menacheri.jetserver.event.Events;
 @Sharable
 public class MessageBufferEventDecoder extends MessageToMessageDecoder<ByteBuf>
 {
+
 	@Override
-	public Object decode(ChannelHandlerContext ctx, ByteBuf buffer)
-			throws Exception 
+	protected void decode(ChannelHandlerContext ctx, ByteBuf buffer,
+			MessageBuf<Object> out) throws Exception
 	{
+		out.add(decode(ctx, buffer));
+	}
+	
+	public Event decode(ChannelHandlerContext ctx, ByteBuf buffer){
 		byte opcode = buffer.readByte();
 		if (opcode == Events.NETWORK_MESSAGE) 
 		{

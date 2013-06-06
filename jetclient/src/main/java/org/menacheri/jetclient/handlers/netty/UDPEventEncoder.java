@@ -1,6 +1,7 @@
 package org.menacheri.jetclient.handlers.netty;
 
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.MessageBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.socket.DatagramPacket;
 
@@ -18,11 +19,11 @@ public class UDPEventEncoder extends MessageBufferEventEncoder
 	}
 	
 	@Override
-	protected Object encode(ChannelHandlerContext ctx, Event event)
-			throws Exception 
+	protected void encode(ChannelHandlerContext ctx, Event event,
+			MessageBuf<Object> out) throws Exception
 	{
 		ByteBuf data = (ByteBuf)super.encode(ctx, event);
-		return new DatagramPacket(data, udpServerAddress);
+		out.add(new DatagramPacket(data, udpServerAddress));
 	}
 	
 	public InetSocketAddress getUdpServerAddress() 

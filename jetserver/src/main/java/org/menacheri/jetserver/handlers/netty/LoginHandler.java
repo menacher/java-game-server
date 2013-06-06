@@ -79,6 +79,18 @@ public class LoginHandler extends ChannelInboundMessageHandlerAdapter<Event>
 			closeChannelWithLoginFailure(channel);
 		}
 	}
+	
+	@Override
+	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)
+			throws Exception
+	{
+		Channel channel = ctx.channel();
+		LOG.error(
+				"Exception {} occurred during log in process, going to close channel {}",
+				cause, channel.id());
+		channel.close();
+	}
+	
 
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception 
@@ -187,7 +199,9 @@ public class LoginHandler extends ChannelInboundMessageHandlerAdapter<Event>
 			playerSession.setAttribute(JetConfig.RECONNECT_REGISTRY, reconnectRegistry);
 			LOG.trace("Sending GAME_ROOM_JOIN_SUCCESS to channel {}", channel.id());
 			CompositeByteBuf compositeBuffer = ctx.alloc().compositeBuffer();
-			ByteBuf reconnectKeyBuffer = compositeBuffer.addComponents(NettyUtils.createBufferForOpcode(Events.GAME_ROOM_JOIN_SUCCESS), NettyUtils.writeString(reconnectKey));
+			ByteBuf reconnectKeyBuffer = compositeBuffer
+					.addComponents(NettyUtils.createBufferForOpcode(Events.GAME_ROOM_JOIN_SUCCESS),
+							NettyUtils.writeString(reconnectKey));
 			ChannelFuture future = channel.write(reconnectKeyBuffer);
 			connectToGameRoom(gameRoom, playerSession, future);
 			loginUdp(playerSession, buffer);

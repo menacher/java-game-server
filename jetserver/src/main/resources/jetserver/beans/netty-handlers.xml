@@ -11,12 +11,7 @@
 
 	<!-- Netty and decoders encoders and handlers -->
 	<bean id="stringDecoder" class="io.netty.handler.codec.string.StringDecoder" />
-	<bean id="stringMessageEncoder" class="io.netty.handler.codec.string.StringEncoder">
-		<constructor-arg value="MESSAGE" />
-	</bean>
-	<bean id="stringByteEncoder" class="io.netty.handler.codec.string.StringEncoder">
-		<constructor-arg value="BYTE" />
-	</bean>
+	<bean id="stringMessageEncoder" class="io.netty.handler.codec.string.StringEncoder" />
 	<bean id="base64Decoder" class="io.netty.handler.codec.base64.Base64Decoder" />
 	<bean id="base64Encoder" class="io.netty.handler.codec.base64.Base64Encoder" />
 	<bean id="nulEncoder" class="org.menacheri.jetserver.handlers.netty.NulEncoder" />

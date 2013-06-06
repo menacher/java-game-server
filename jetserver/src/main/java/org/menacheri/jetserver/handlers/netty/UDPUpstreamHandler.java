@@ -34,11 +34,11 @@ public class UDPUpstreamHandler extends ChannelInboundMessageHandlerAdapter<Data
 			throws Exception 
 			{
 		// Get the session using the remoteAddress.
-		SocketAddress remoteAddress = packet.remoteAddress();
+		SocketAddress remoteAddress = packet.sender();
 		Session session = udpSessionRegistry.getSession(remoteAddress);
 		if (null != session) 
 		{
-			ByteBuf buffer = packet.data();
+			ByteBuf buffer = packet.content();
 			Event event = (Event) messageBufferEventDecoder
 					.decode(null, buffer);
 
