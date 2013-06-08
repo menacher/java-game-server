@@ -1,7 +1,7 @@
 package org.menacheri.jetserver.handlers.netty;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.CompositeByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
@@ -136,7 +136,7 @@ public class LoginHandler extends ChannelInboundMessageHandlerAdapter<Event>
 	{
 		if (null != player)
 		{
-			ctx.write(NettyUtils
+			ctx.channel().write(NettyUtils
 					.createBufferForOpcode(Events.LOG_IN_SUCCESS));
 			handleGameRoomJoin(player, ctx, buffer);
 		}
@@ -198,9 +198,7 @@ public class LoginHandler extends ChannelInboundMessageHandlerAdapter<Event>
 			playerSession.setAttribute(JetConfig.RECONNECT_KEY, reconnectKey);
 			playerSession.setAttribute(JetConfig.RECONNECT_REGISTRY, reconnectRegistry);
 			LOG.trace("Sending GAME_ROOM_JOIN_SUCCESS to channel {}", channel.id());
-			CompositeByteBuf compositeBuffer = ctx.alloc().compositeBuffer();
-			ByteBuf reconnectKeyBuffer = compositeBuffer
-					.addComponents(NettyUtils.createBufferForOpcode(Events.GAME_ROOM_JOIN_SUCCESS),
+			ByteBuf reconnectKeyBuffer = Unpooled.wrappedBuffer(NettyUtils.createBufferForOpcode(Events.GAME_ROOM_JOIN_SUCCESS),
 							NettyUtils.writeString(reconnectKey));
 			ChannelFuture future = channel.write(reconnectKeyBuffer);
 			connectToGameRoom(gameRoom, playerSession, future);

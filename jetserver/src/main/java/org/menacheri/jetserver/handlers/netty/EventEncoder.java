@@ -1,8 +1,8 @@
 package org.menacheri.jetserver.handlers.netty;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.CompositeByteBuf;
 import io.netty.buffer.MessageBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
@@ -33,8 +33,7 @@ public class EventEncoder extends MessageToMessageEncoder<Event>
 		if(null != event.getSource())
 		{
 			ByteBuf data = (ByteBuf)event.getSource();
-			CompositeByteBuf compositeBuffer = ctx.alloc().compositeBuffer(2);
-			compositeBuffer.addComponents(opcode,data);
+			ByteBuf compositeBuffer = Unpooled.wrappedBuffer(opcode,data);
 			out.add(compositeBuffer);
 		}
 		else 

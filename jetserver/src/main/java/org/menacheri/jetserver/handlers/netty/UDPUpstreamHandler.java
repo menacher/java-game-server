@@ -90,9 +90,8 @@ public class UDPUpstreamHandler extends ChannelInboundMessageHandlerAdapter<Data
 		
 		if (event.getType() != Events.CONNECT)
 		{
-			LOG.warn("Going to discard UDP Message Event with type {} "
-					+ "It will get converted to a CONNECT event since "
-					+ "the UDP MessageSender is not initialized till now",
+			LOG.info("UDP Event with type {} will get converted to a CONNECT "
+					+ "event since the UDP MessageSender is not initialized till now",
 					event.getType());
 		}
 		Fast messageSender = new NettyUDPMessageSender(remoteAddress, udpChannel, udpSessionRegistry);
