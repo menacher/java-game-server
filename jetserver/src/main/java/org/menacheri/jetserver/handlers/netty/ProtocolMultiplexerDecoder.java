@@ -2,8 +2,9 @@ package org.menacheri.jetserver.handlers.netty;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundByteHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
+import io.netty.channel.MessageList;
+import io.netty.handler.codec.ByteToMessageDecoder;
 
 import org.menacheri.jetserver.util.BinaryUtils;
 import org.slf4j.Logger;
@@ -19,7 +20,7 @@ import org.slf4j.LoggerFactory;
  * @author Abraham Menacherry
  * 
  */
-public class ProtocolMultiplexerDecoder extends ChannelInboundByteHandlerAdapter
+public class ProtocolMultiplexerDecoder extends ByteToMessageDecoder
 {
 
 	private static final Logger LOG = LoggerFactory
@@ -36,35 +37,34 @@ public class ProtocolMultiplexerDecoder extends ChannelInboundByteHandlerAdapter
 	}
 
 	@Override
-	protected void inboundBufferUpdated(ChannelHandlerContext ctx, 
-			ByteBuf buffer) throws Exception
+	protected void decode(ChannelHandlerContext ctx, ByteBuf in,
+			MessageList<Object> out) throws Exception
 	{
 		// Will use the first bytes to detect a protocol.
-		if (buffer.readableBytes() < bytesForProtocolCheck)
+		if (in.readableBytes() < bytesForProtocolCheck)
 		{
 			return;
 		}
 
 		ChannelPipeline pipeline = ctx.pipeline();
 
-		if (!loginProtocol.applyProtocol(buffer, pipeline))
+		if (!loginProtocol.applyProtocol(in, pipeline))
 		{
 			byte[] headerBytes = new byte[bytesForProtocolCheck];
-			buffer.getBytes(buffer.readerIndex(), headerBytes, 0,
+			in.getBytes(in.readerIndex(), headerBytes, 0,
 					bytesForProtocolCheck);
 			LOG.error(
 					"Unknown protocol, discard everything and close the connection {}. Incoming Bytes {}",
 					ctx.channel().id(),
 					BinaryUtils.getHexString(headerBytes));
-			close(buffer, ctx);
+			close(in, ctx);
 		}
 		else
 		{
 			pipeline.remove(this);
 		}
-
 	}
-
+	
 	protected void close(ByteBuf buffer, ChannelHandlerContext ctx)
 	{
 		buffer.clear();

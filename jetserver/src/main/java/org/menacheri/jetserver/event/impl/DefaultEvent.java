@@ -17,6 +17,7 @@ public class DefaultEvent implements Event, Serializable
 	protected int type;
 	protected Object source;
 	protected long timeStamp;
+	private String cName;
 	
 	@Override
 	public EventContext getEventContext()
@@ -71,6 +72,16 @@ public class DefaultEvent implements Event, Serializable
 	public String toString() {
 		return "Event [type=" + type + ", source=" + source + ", timeStamp="
 				+ timeStamp + "]";
+	}
+
+	public String getcName()
+	{
+		return cName;
+	}
+
+	public void setcName(String cName)
+	{
+		this.cName = cName;
 	}
 	
 }

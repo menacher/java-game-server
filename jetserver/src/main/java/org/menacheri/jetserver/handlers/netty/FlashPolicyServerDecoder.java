@@ -1,9 +1,9 @@
 package org.menacheri.jetserver.handlers.netty;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.MessageBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.MessageList;
 import io.netty.handler.codec.ReplayingDecoder;
 import io.netty.util.CharsetUtil;
 
@@ -16,7 +16,7 @@ public class FlashPolicyServerDecoder extends ReplayingDecoder<ByteBuf> {
 
 	@Override
 	protected void decode(ChannelHandlerContext ctx, ByteBuf buffer,
-			MessageBuf<Object> out) throws Exception
+			MessageList<Object> out) throws Exception
 	{
 		ByteBuf data = buffer.readBytes(requestBuffer.readableBytes());
         if (data.equals(requestBuffer)) {

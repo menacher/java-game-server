@@ -15,6 +15,7 @@ import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.util.concurrent.GlobalEventExecutor;
 
 import java.net.InetSocketAddress;
 import java.util.concurrent.TimeUnit;
@@ -53,7 +54,7 @@ public class NettyTCPClient
 	 * the client gracefully.
 	 */
 	public static final ChannelGroup ALL_CHANNELS = new DefaultChannelGroup(
-			"JET-CLIENT-CONNECTIONS");
+			"JET-CLIENT-CONNECTIONS", GlobalEventExecutor.INSTANCE);
 
 	/**
 	 * Creates an instance of a Netty TCP client which can then be used to
@@ -117,7 +118,7 @@ public class NettyTCPClient
 				{
 					e.printStackTrace();
 				}
-				boss.shutdown();
+				boss.shutdownGracefully();
 			}
 		});
 	}

@@ -9,6 +9,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.menacheri.jetserver.app.Game;
 import org.menacheri.jetserver.app.GameRoom;
 import org.menacheri.jetserver.app.PlayerSession;
@@ -21,6 +22,7 @@ import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.event.NetworkEvent;
 import org.menacheri.jetserver.event.impl.DefaultSessionEventHandler;
 import org.menacheri.jetserver.event.impl.ExecutorEventDispatcher;
+import org.menacheri.jetserver.junitcategories.Performance;
 import org.menacheri.jetserver.protocols.Protocol;
 import org.menacheri.jetserver.protocols.impl.DummyProtocol;
 
@@ -69,7 +71,8 @@ public class PlayerSessionWithEventDispatcherTest
 		}
 	}
 
-	//@Test
+	@Test
+	@Category(Performance.class)
 	public void eventHandlingPerformance() throws InterruptedException
 	{
 		long start = System.nanoTime();

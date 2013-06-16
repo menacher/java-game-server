@@ -2,9 +2,9 @@ package org.menacheri.jetserver.handlers.netty;
 
 import flex.messaging.io.SerializationContext;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.MessageBuf;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.MessageList;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
 import java.io.ByteArrayInputStream;
@@ -29,7 +29,7 @@ public class AMF3ToJavaObjectDecoder extends ByteToMessageDecoder implements Tra
 	
 	@Override
 	protected void decode(ChannelHandlerContext ctx, ByteBuf in,
-			MessageBuf<Object> out) throws Exception
+			MessageList<Object> out) throws Exception
 	{
 		if(null == in)
 		{

@@ -1,10 +1,10 @@
 package org.menacheri.zombie;
 
-import io.netty.buffer.MessageBuf;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
+import io.netty.channel.MessageList;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
@@ -50,7 +50,7 @@ public class PipelineFactory extends ChannelInitializer<SocketChannel>
 		
 		@Override
 		protected void decode(ChannelHandlerContext ctx, Event event,
-				MessageBuf<Object> out) throws Exception
+				MessageList<Object> out) throws Exception
 		{
 			if(Events.START == event.getType())
 			{

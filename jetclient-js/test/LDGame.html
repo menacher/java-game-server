@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+		<meta charset="utf-8">
+		<title>Simple Canvas Game</title>
+	</head>
+	<body>
+		<script src="LDGame.js"></script>
+		<script>
+			function startGame(){
+				jet.sessionFactory("ws://localhost:18090/jetsocket", config, sessionCB);
+			}
+		</script>
+		<button type="button" onclick="startGame()">Start Game!</button>
+	</body>
+</html>

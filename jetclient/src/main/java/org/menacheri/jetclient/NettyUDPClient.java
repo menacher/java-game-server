@@ -148,7 +148,7 @@ public class NettyUDPClient
 		}
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
-				boss.shutdown();
+				boss.shutdownGracefully();
 			}
 		});
 	}

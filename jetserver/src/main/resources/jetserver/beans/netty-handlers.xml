@@ -55,13 +55,13 @@
 		<property name="lookupService" ref="lookupService" />
 		<property name="idGeneratorService" ref="simpleUniqueIdGenerator" />
 		<property name="reconnectRegistry" ref="reconnectSessionRegistry" />
-		<property name="gson" ref="gson" />
+		<property name="jackson" ref="jackson" />
 	</bean>
 	<bean id="textWebsocketEncoder" class="org.menacheri.jetserver.handlers.netty.TextWebsocketEncoder">
-		<property name="gson" ref="gson" />
+		<property name="jackson" ref="jackson" />
 	</bean>
 	<bean id="textWebsocketDecoder" class="org.menacheri.jetserver.handlers.netty.TextWebsocketDecoder">
-		<property name="gson" ref="gson" />
+		<property name="jackson" ref="jackson" />
 	</bean>
 
 	<bean id="bossGroup" class="io.netty.channel.nio.NioEventLoopGroup">
@@ -83,9 +83,6 @@
 		<constructor-arg type="String" index="0" value="Server-Worker" />
 	</bean>
 
-	<!-- Netty channelgroup -->
-	<bean id="defaultChannelGroup" class="io.netty.channel.group.DefaultChannelGroup" scope="prototype"/>
-	
 	<!-- Netty options for server bootstrap -->
 	<util:map id="tcpChannelOptions" map-class="java.util.HashMap">
 		<entry>

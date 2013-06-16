@@ -49,7 +49,7 @@ public class ZombieJetclient
 				{
 					task = new GamePlay(IAM.ZOMBIE, session);
 				}
-				taskExecutor.scheduleAtFixedRate(task, 2000, 2000,
+				taskExecutor.scheduleAtFixedRate(task, 2000, 200,
 						TimeUnit.MILLISECONDS);
 			}
 		}

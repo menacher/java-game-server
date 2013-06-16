@@ -5,7 +5,8 @@ import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundMessageHandlerAdapter;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.MessageList;
 import io.netty.handler.timeout.ReadTimeoutException;
 import io.netty.util.CharsetUtil;
 
@@ -19,7 +20,7 @@ import org.slf4j.LoggerFactory;
 /**
  * @author <a href="http://www.waywardmonkeys.com/">Bruce Mitchener</a>
  */
-public class FlashPolicyServerHandler extends ChannelInboundMessageHandlerAdapter<ByteBuf> {
+public class FlashPolicyServerHandler extends ChannelInboundHandlerAdapter {
 
 	private static final Logger LOG = LoggerFactory.getLogger(FlashPolicyServerHandler.class);
 	
@@ -57,8 +58,8 @@ public class FlashPolicyServerHandler extends ChannelInboundMessageHandlerAdapte
 	}
 
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx, ByteBuf e)
-			throws Exception
+	public void messageReceived(ChannelHandlerContext ctx,
+			MessageList<Object> msgs) throws Exception
 	{
 		ChannelFuture f = null;
 
@@ -71,8 +72,9 @@ public class FlashPolicyServerHandler extends ChannelInboundMessageHandlerAdapte
 			f = ctx.channel().write(this.getPolicyFileContents());
 		}
 		f.addListener(ChannelFutureListener.CLOSE);
+		msgs.releaseAll();
 	}
-
+	
     public ByteBuf getPolicyFileContents() throws Exception {
     	
         return Unpooled.copiedBuffer(

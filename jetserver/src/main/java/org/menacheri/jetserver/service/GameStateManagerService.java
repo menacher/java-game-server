@@ -15,6 +15,13 @@ public interface GameStateManagerService
 	 *         objects etc. This will be used to manage the state of the game.
 	 */
 	public Object getState();
+	
+	/**
+	 * Set's current state object. This could be any object like a byte array,
+	 * an object reference that holds a hierarchy of other objects etc. This
+	 * will be used to manage the state of the game.
+	 */
+	public void setState(Object state);
 
 	/**
 	 * Method used to achieve synchronization while doing state management.
@@ -26,17 +33,6 @@ public interface GameStateManagerService
 	 *         otherwise.
 	 */
 	public boolean compareAndSetSyncKey(Object key);
-
-	/**
-	 * Set the state of the object. This is a very simplistic form of state
-	 * management where the latest state broadcast by a client replaces the
-	 * existing state.
-	 * 
-	 * @param state
-	 * @return Returns the state. If synchronized it returns the same state,
-	 *         else another thread might have over written in mean time.
-	 */
-	public Object getAndSetState(Object state);
 
 	/**
 	 * This method is actually a combination of compareAndSetSyncKey and

@@ -30,6 +30,6 @@
 
 	<bean id="simpleUniqueIdGenerator" class="org.menacheri.jetserver.service.impl.SimpleUniqueIdGenerator" />
 
-	<bean id="gson" class="com.google.gson.Gson" />
+	<bean id="jackson" class="org.codehaus.jackson.map.ObjectMapper" />
 
 </beans>

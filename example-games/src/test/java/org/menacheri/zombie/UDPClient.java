@@ -5,7 +5,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelInboundMessageHandlerAdapter;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
 import io.netty.channel.ChannelPipeline;
@@ -19,7 +19,6 @@ import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
-import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.handlers.netty.EventDecoder;
 import org.menacheri.jetserver.util.NettyUtils;
@@ -34,7 +33,7 @@ public class UDPClient
 	private final SocketAddress serverAddress;
 	
 	public UDPClient(
-			final ChannelInboundMessageHandlerAdapter<Event> businessHandler,
+			final ChannelInboundHandlerAdapter businessHandler,
 			IAM iam, String remoteHost, int remotePort, EventLoopGroup boss)
 			throws UnknownHostException, InterruptedException
 	{

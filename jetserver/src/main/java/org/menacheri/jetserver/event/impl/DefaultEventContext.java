@@ -3,12 +3,22 @@ package org.menacheri.jetserver.event.impl;
 import org.menacheri.jetserver.app.Session;
 import org.menacheri.jetserver.event.EventContext;
 
-
 public class DefaultEventContext implements EventContext
 {
 
 	private Object attachement;
 	private Session session;
+
+	public DefaultEventContext()
+	{
+
+	}
+
+	public DefaultEventContext(Session session, Object attachement)
+	{
+		this.session = session;
+		this.attachement = attachement;
+	}
 
 	@Override
 	public Object getAttachment()

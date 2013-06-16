@@ -3,13 +3,15 @@ package org.menacheri.jetserver.handlers.netty;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
-import io.netty.channel.ChannelInboundMessageHandlerAdapter;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.MessageList;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 
 import java.util.List;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.menacheri.jetserver.app.GameRoom;
 import org.menacheri.jetserver.app.Player;
 import org.menacheri.jetserver.app.PlayerSession;
@@ -28,8 +30,6 @@ import org.menacheri.jetserver.util.SimpleCredentials;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-
 /**
  * This login handler will parse incoming login events to get the
  * {@link Credentials} and lookup {@link Player} and {@link GameRoom} objects.
@@ -40,7 +40,7 @@ import com.google.gson.Gson;
  * 
  */
 @Sharable
-public class WebSocketLoginHandler extends ChannelInboundMessageHandlerAdapter<TextWebSocketFrame>
+public class WebSocketLoginHandler extends ChannelInboundHandlerAdapter
 {
 	private static final Logger LOG = LoggerFactory
 			.getLogger(WebSocketLoginHandler.class);
@@ -49,44 +49,48 @@ public class WebSocketLoginHandler extends ChannelInboundMessageHandlerAdapter<T
 	protected ReconnectSessionRegistry reconnectRegistry;
 	protected UniqueIDGeneratorService idGeneratorService;
 	
-	private Gson gson;
+	private ObjectMapper jackson;
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx, TextWebSocketFrame frame)
-			throws Exception
+	public void messageReceived(ChannelHandlerContext ctx,
+			MessageList<Object> msgs) throws Exception
 	{
-		Channel channel = ctx.channel();
-		String data = frame.text();
-		LOG.trace("From websocket: " + data);
-		Event event = gson.fromJson(data, DefaultEvent.class);
-		int type = event.getType();
-		if (Events.LOG_IN == type)
-		{
-			LOG.trace("Login attempt from {}", channel.remoteAddress());
-			List<String> credList = null;
-			credList = (List) event.getSource();
-			Player player = lookupPlayer(credList.get(0), credList.get(1));
-			handleLogin(player, channel);
-			handleGameRoomJoin(player, channel, credList.get(2));
+		if(msgs.size() > 0){
+			TextWebSocketFrame frame = (TextWebSocketFrame)msgs.get(0);
+			Channel channel = ctx.channel();
+			String data = frame.text();
+			LOG.trace("From websocket: " + data);
+			Event event = jackson.readValue(data, DefaultEvent.class);
+			int type = event.getType();
+			if (Events.LOG_IN == type)
+			{
+				LOG.trace("Login attempt from {}", channel.remoteAddress());
+				List<String> credList = null;
+				credList = (List) event.getSource();
+				Player player = lookupPlayer(credList.get(0), credList.get(1));
+				handleLogin(player, channel);
+				handleGameRoomJoin(player, channel, credList.get(2));
+			}
+			else if (type == Events.RECONNECT)
+			{
+				LOG.debug("Reconnect attempt from {}", channel.remoteAddress());
+				PlayerSession playerSession = lookupSession((String)event.getSource());
+				handleReconnect(playerSession, channel);
+			}
+			else
+			{
+				LOG.error(
+						"Invalid event {} sent from remote address {}. "
+								+ "Going to close channel {}",
+						new Object[] { event.getType(),
+								channel.remoteAddress(), channel.id() });
+				closeChannelWithLoginFailure(channel);
+			}
 		}
-		else if (type == Events.RECONNECT)
-		{
-			LOG.debug("Reconnect attempt from {}", channel.remoteAddress());
-			PlayerSession playerSession = lookupSession((String)event.getSource());
-			handleReconnect(playerSession, channel);
-		}
-		else
-		{
-			LOG.error(
-					"Invalid event {} sent from remote address {}. "
-							+ "Going to close channel {}",
-					new Object[] { event.getType(),
-							channel.remoteAddress(), channel.id() });
-			closeChannelWithLoginFailure(channel);
-		}
+		msgs.releaseAll();
 	}
-
+	
 	public PlayerSession lookupSession(final String reconnectKey)
 	{
 		PlayerSession playerSession = (PlayerSession)reconnectRegistry.getSession(reconnectKey);
@@ -109,7 +113,7 @@ public class WebSocketLoginHandler extends ChannelInboundMessageHandlerAdapter<T
 		return playerSession;
 	}
 	
-	protected void handleReconnect(PlayerSession playerSession, Channel channel)
+	protected void handleReconnect(PlayerSession playerSession, Channel channel) throws Exception
 	{
 		if (null != playerSession)
 		{
@@ -141,7 +145,7 @@ public class WebSocketLoginHandler extends ChannelInboundMessageHandlerAdapter<T
 		playerSession.onEvent(new ReconnetEvent(sender));
 	}
 	
-	public Player lookupPlayer(String username, String password)
+	public Player lookupPlayer(String username, String password) throws Exception
 	{
 		Credentials credentials = new SimpleCredentials(username, password);
 		Player player = lookupService.playerLookup(credentials);
@@ -152,7 +156,7 @@ public class WebSocketLoginHandler extends ChannelInboundMessageHandlerAdapter<T
 		return player;
 	}
 
-	public void handleLogin(Player player, Channel channel)
+	public void handleLogin(Player player, Channel channel) throws Exception
 	{
 		if (null != player)
 		{
@@ -165,20 +169,20 @@ public class WebSocketLoginHandler extends ChannelInboundMessageHandlerAdapter<T
 		}
 	}
 
-	protected void closeChannelWithLoginFailure(Channel channel)
+	protected void closeChannelWithLoginFailure(Channel channel) throws Exception
 	{
 		// Close the connection as soon as the error message is sent.
 		channel.write(eventToFrame(Events.LOG_IN_FAILURE, null)).addListener(
 				ChannelFutureListener.CLOSE);
 	}
 
-	public void handleGameRoomJoin(Player player, Channel channel, String refKey)
+	public void handleGameRoomJoin(Player player, Channel channel, String refKey) throws Exception
 	{
 		GameRoom gameRoom = lookupService.gameRoomLookup(refKey);
 		if (null != gameRoom)
 		{
 			PlayerSession playerSession = gameRoom.createPlayerSession(player);
-			gameRoom.onLogin(playerSession);
+			gameRoom.onLogin(playerSession);// TODO should be moved to START event handler?
 			String reconnectKey = (String)idGeneratorService
 					.generateFor(playerSession.getClass());
 			playerSession.setAttribute(JetConfig.RECONNECT_KEY, reconnectKey);
@@ -235,10 +239,10 @@ public class WebSocketLoginHandler extends ChannelInboundMessageHandlerAdapter<T
 		});
 	}
 
-	protected TextWebSocketFrame eventToFrame(byte opcode, Object payload)
+	protected TextWebSocketFrame eventToFrame(byte opcode, Object payload) throws Exception
 	{
 		Event event = Events.event(payload, opcode);
-		return new TextWebSocketFrame(gson.toJson(event));
+		return new TextWebSocketFrame(jackson.writeValueAsString(event));
 	}
 
 	public LookupService getLookupService()
@@ -249,16 +253,6 @@ public class WebSocketLoginHandler extends ChannelInboundMessageHandlerAdapter<T
 	public void setLookupService(LookupService lookupService)
 	{
 		this.lookupService = lookupService;
-	}
-
-	public Gson getGson()
-	{
-		return gson;
-	}
-
-	public void setGson(Gson gson)
-	{
-		this.gson = gson;
 	}
 
 	public ReconnectSessionRegistry getReconnectRegistry()
@@ -279,6 +273,16 @@ public class WebSocketLoginHandler extends ChannelInboundMessageHandlerAdapter<T
 	public void setIdGeneratorService(UniqueIDGeneratorService idGeneratorService)
 	{
 		this.idGeneratorService = idGeneratorService;
+	}
+
+	public ObjectMapper getJackson()
+	{
+		return jackson;
+	}
+
+	public void setJackson(ObjectMapper jackson)
+	{
+		this.jackson = jackson;
 	}
 
 }

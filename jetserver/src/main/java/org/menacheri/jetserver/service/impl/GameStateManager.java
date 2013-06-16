@@ -35,10 +35,9 @@ public class GameStateManager implements GameStateManagerService
 	}
 
 	@Override
-	public Object getAndSetState(Object state)
+	public void setState(Object state)
 	{
 		this.state = state;
-		return state;
 	}
 	
 	@Override

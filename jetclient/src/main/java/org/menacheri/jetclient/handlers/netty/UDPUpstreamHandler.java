@@ -1,8 +1,9 @@
 package org.menacheri.jetclient.handlers.netty;
 
-import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundMessageHandlerAdapter;
 import io.netty.channel.ChannelHandler.Sharable;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.MessageList;
 import io.netty.channel.socket.DatagramPacket;
 
 import org.menacheri.jetclient.NettyUDPClient;
@@ -20,7 +21,7 @@ import org.menacheri.jetclient.event.Event;
  * 
  */
 @Sharable
-public class UDPUpstreamHandler extends ChannelInboundMessageHandlerAdapter<DatagramPacket>
+public class UDPUpstreamHandler extends ChannelInboundHandlerAdapter
 {
 	private final MessageBufferEventDecoder decoder;
 	
@@ -31,15 +32,20 @@ public class UDPUpstreamHandler extends ChannelInboundMessageHandlerAdapter<Data
 	}
 
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx, DatagramPacket msg)
-			throws Exception {
-		Session session = NettyUDPClient.CLIENTS.get(ctx.channel().localAddress());
-		if (null != session)
-		{
-			Event event = (Event)decoder.decode(null, msg.content());
-			// Pass the event on to the session
-			session.onEvent(event);
+	public void messageReceived(ChannelHandlerContext ctx,
+			MessageList<Object> msgs) throws Exception
+	{
+		MessageList<DatagramPacket> packets = msgs.cast();
+		for(DatagramPacket msg: packets){
+			Session session = NettyUDPClient.CLIENTS.get(ctx.channel().localAddress());
+			if (null != session)
+			{
+				Event event = (Event)decoder.decode(null, msg.content());
+				// Pass the event on to the session
+				session.onEvent(event);
+			}
 		}
+		msgs.releaseAll();
 	}
-
+	
 }

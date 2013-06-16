@@ -1,8 +1,9 @@
 package org.menacheri.jetclient.handlers.netty;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundMessageHandlerAdapter;
+import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
+import io.netty.channel.MessageList;
 
 import org.menacheri.jetclient.NettyTCPClient;
 import org.menacheri.jetclient.app.Session;
@@ -16,7 +17,7 @@ import org.menacheri.jetclient.event.Events;
  * @author Abraham Menacherry.
  * 
  */
-public class DefaultToClientHandler extends ChannelInboundMessageHandlerAdapter<Event>
+public class DefaultToClientHandler extends ChannelInboundHandlerAdapter
 {
 	static final String NAME = "defaultHandler";
 	private final Session session;
@@ -27,9 +28,14 @@ public class DefaultToClientHandler extends ChannelInboundMessageHandlerAdapter<
 	}
 
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx, Event event)
-			throws Exception {
-		session.onEvent(event);
+	public void messageReceived(ChannelHandlerContext ctx,
+			MessageList<Object> msgs) throws Exception
+	{
+		MessageList<Event> events = msgs.cast();
+		for(Event event : events){
+			session.onEvent(event);
+		}
+		msgs.releaseAll();
 	}
 	
 	// TODO check what other methods need to be caught.

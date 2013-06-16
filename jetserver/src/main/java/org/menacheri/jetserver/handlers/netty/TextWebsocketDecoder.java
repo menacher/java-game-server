@@ -1,22 +1,23 @@
 package org.menacheri.jetserver.handlers.netty;
 
-import io.netty.buffer.MessageBuf;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.MessageList;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.util.Attribute;
+import io.netty.util.AttributeKey;
 
+import org.codehaus.jackson.map.ObjectMapper;
 import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.impl.DefaultEvent;
 
-import com.google.gson.Gson;
-
 /**
  * This class will convert an incoming {@link TextWebSocketFrame} to an
  * {@link Event}. The incoming data is expected to be a JSon string
- * representation of an Event object. This class uses {@link Gson} to do the
- * decoding to {@link DefaultEvent}. If the incoming event is of type
+ * representation of an Event object. This class uses {@link ObjectMapper} to do
+ * the decoding to {@link DefaultEvent}. If the incoming event is of type
  * {@link Events#NETWORK_MESSAGE} then it will be converted to
  * {@link Events#SESSION_MESSAGE}.
  * 
@@ -24,31 +25,76 @@ import com.google.gson.Gson;
  * 
  */
 @Sharable
-public class TextWebsocketDecoder extends MessageToMessageDecoder<TextWebSocketFrame>
+public class TextWebsocketDecoder extends
+		MessageToMessageDecoder<TextWebSocketFrame>
 {
 
-	private Gson gson;
+	private ObjectMapper jackson;
+
+	/**
+	 * This will be put into the {@link ChannelHandlerContext} the first time
+	 * attr method is invoed on it. The get is also a set.
+	 */
+	private final AttributeKey<Class<? extends Event>> eventClass = new AttributeKey<Class<? extends Event>>(
+			"eventClass");
 
 	@Override
 	protected void decode(ChannelHandlerContext ctx, TextWebSocketFrame frame,
-			MessageBuf<Object> out) throws Exception
+			MessageList<Object> out) throws Exception
 	{
-		Event event = gson.fromJson(frame.text(), DefaultEvent.class);
+		// Get the existing class from the context. If not available, then
+		// default to DefaultEvent.class
+		Attribute<Class<? extends Event>> attr = ctx.attr(eventClass);
+		Class<? extends Event> theClass = attr.get();
+		boolean unknownClass = false;
+		if (null == theClass)
+		{
+			unknownClass = true;
+			theClass = DefaultEvent.class;
+		}
+		else
+		{
+			theClass = attr.get();
+		}
+
+		Event event = jackson.readValue(frame.text(), theClass);
+
+		// If the class is unknown then either check if its the default event or
+		// a different class. Put the right one in the context.
+		if (unknownClass)
+		{
+			String cName = ((DefaultEvent) event).getcName();
+			if (null == cName)
+			{
+				attr.set(DefaultEvent.class);
+			}
+			else
+			{
+				// Get the class from the string and de-serialize again. Since
+				// thats the right class type.
+				@SuppressWarnings("unchecked")
+				Class<? extends Event> newClass = (Class<? extends Event>) Class
+						.forName(cName);
+				event = jackson.readValue(frame.text(), newClass);
+				attr.set(newClass);
+			}
+		}
+
 		if (event.getType() == Events.NETWORK_MESSAGE)
 		{
 			event.setType(Events.SESSION_MESSAGE);
 		}
 		out.add(event);
 	}
-	
-	public Gson getGson()
+
+	public ObjectMapper getJackson()
 	{
-		return gson;
+		return jackson;
 	}
 
-	public void setGson(Gson gson)
+	public void setJackson(ObjectMapper jackson)
 	{
-		this.gson = gson;
+		this.jackson = jackson;
 	}
 
 }

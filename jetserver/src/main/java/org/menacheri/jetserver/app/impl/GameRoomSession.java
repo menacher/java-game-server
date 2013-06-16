@@ -14,11 +14,13 @@ import org.menacheri.jetserver.concurrent.LaneStrategy;
 import org.menacheri.jetserver.concurrent.LaneStrategy.LaneStrategies;
 import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.event.EventHandler;
+import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.NetworkEvent;
 import org.menacheri.jetserver.event.impl.EventDispatchers;
 import org.menacheri.jetserver.event.impl.NetworkEventListener;
 import org.menacheri.jetserver.protocols.Protocol;
 import org.menacheri.jetserver.service.GameStateManagerService;
+import org.menacheri.jetserver.service.impl.GameStateManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +60,8 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
 		this.parentGame = gameRoomSessionBuilder.parentGame;
 		this.gameRoomName = gameRoomSessionBuilder.gameRoomName;
 		this.protocol = gameRoomSessionBuilder.protocol;
+		this.stateManager = gameRoomSessionBuilder.stateManager;
+		
 		if(null == gameRoomSessionBuilder.eventDispatcher)
 		{
 			this.eventDispatcher = EventDispatchers.newJetlangEventDispatcher(
@@ -72,6 +76,7 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
 		protected String gameRoomName;
 		protected Protocol protocol;
 		protected LaneStrategy<String, ExecutorService, GameRoom> laneStrategy;
+		protected GameStateManagerService stateManager;
 		
 		@Override
 		protected void validateAndSetValues()
@@ -91,6 +96,10 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
 			if (null == laneStrategy)
 			{
 				laneStrategy = LaneStrategies.GROUP_BY_ROOM;
+			}
+			if(null == stateManager)
+			{
+				stateManager = new GameStateManager();
 			}
 			creationTime = System.currentTimeMillis();
 		}
@@ -123,6 +132,13 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
 				LaneStrategy<String, ExecutorService, GameRoom> laneStrategy)
 		{
 			this.laneStrategy = laneStrategy;
+			return this;
+		}
+
+		public GameRoomSessionBuilder stateManager(
+				GameStateManagerService gameStateManagerService)
+		{
+			this.stateManager = gameStateManagerService;
 			return this;
 		}
 	}
@@ -164,7 +180,13 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
 	@Override
 	public void afterSessionConnect(PlayerSession playerSession)
 	{
-			
+		GameStateManagerService manager = getStateManager();
+		if(null != manager){
+			Object state = manager.getState();
+			if(null != state){
+				playerSession.onEvent(Events.networkEvent(state));
+			}
+		}
 	}
 	
 	public synchronized boolean disconnectSession(PlayerSession playerSession)

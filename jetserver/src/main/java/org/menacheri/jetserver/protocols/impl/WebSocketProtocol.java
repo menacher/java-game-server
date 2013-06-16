@@ -14,14 +14,11 @@ import org.menacheri.jetserver.util.NettyUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-
 /**
  * This protocol can be used for websocket clients which pass JSon objects as
  * text over the wire. The incoming text will be converted to {@link Event}
  * objects and sent to the {@link Session}. The outgoing messages will be
- * converted from Events to JSon string representation using {@link Gson}
- * library.
+ * converted from Events to JSon string representation using Jackson library.
  * 
  * @author Abraham Menacherry
  * 

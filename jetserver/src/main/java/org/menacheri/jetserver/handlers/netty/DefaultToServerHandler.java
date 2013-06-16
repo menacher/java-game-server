@@ -1,7 +1,8 @@
 package org.menacheri.jetserver.handlers.netty;
 
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundMessageHandlerAdapter;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.MessageList;
 import io.netty.handler.timeout.IdleStateEvent;
 
 import org.menacheri.jetserver.app.GameEvent;
@@ -19,7 +20,7 @@ import org.slf4j.LoggerFactory;
  * @author Abraham Menacherry
  * 
  */
-public class DefaultToServerHandler extends ChannelInboundMessageHandlerAdapter<Event>
+public class DefaultToServerHandler extends ChannelInboundHandlerAdapter
 {
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultToServerHandler.class);
 	
@@ -36,10 +37,14 @@ public class DefaultToServerHandler extends ChannelInboundMessageHandlerAdapter<
 
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx,
-			Event msg) throws Exception {
-		playerSession.onEvent(msg);
+			MessageList<Object> msgs) throws Exception
+	{
+		MessageList<Event> events = msgs.cast();
+		for(Event event:events){
+			playerSession.onEvent(event);
+		}
+		msgs.releaseAll();
 	}
-	
 
 	@Override
 	public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause)

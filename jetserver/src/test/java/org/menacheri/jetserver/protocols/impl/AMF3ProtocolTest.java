@@ -1,12 +1,9 @@
 package org.menacheri.jetserver.protocols.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
-import io.netty.channel.embedded.EmbeddedByteChannel;
+import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 
@@ -41,15 +38,15 @@ public class AMF3ProtocolTest
 	public void verifyAMF3BinaryEncodingAndDecoding()
 			throws InterruptedException
 	{
-		EmbeddedByteChannel outChannel = new EmbeddedByteChannel(
+		EmbeddedChannel outChannel = new EmbeddedChannel(
 				amf3Protocol.getLengthFieldPrepender(),
 				amf3Protocol.getJavaObjectToAMF3Encoder());
-		EmbeddedByteChannel inChannel = new EmbeddedByteChannel(frameDecoder,
+		EmbeddedChannel inChannel = new EmbeddedChannel(frameDecoder,
 				amf3Protocol.getAmf3ToJavaObjectDecoder());
 		Event event = Events.event(playerStats,Events.SESSION_MESSAGE);
 		outChannel.writeOutbound(event);
 		assertTrue(outChannel.finish());
-		ByteBuf buffer = outChannel.readOutbound();
+		ByteBuf buffer = (ByteBuf)outChannel.readOutbound();
 		assertNotNull(buffer);
 		inChannel.writeInbound(buffer);
 		//assertTrue(inChannel.finish());

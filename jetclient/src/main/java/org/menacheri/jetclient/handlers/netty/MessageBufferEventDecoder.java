@@ -1,10 +1,10 @@
 package org.menacheri.jetclient.handlers.netty;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.MessageBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.MessageList;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
 import org.menacheri.jetclient.communication.NettyMessageBuffer;
@@ -25,7 +25,7 @@ public class MessageBufferEventDecoder extends ByteToMessageDecoder
 {
 	@Override
 	protected void decode(ChannelHandlerContext ctx, ByteBuf in,
-			MessageBuf<Object> out) throws Exception
+			MessageList<Object> out) throws Exception
 	{
 		if (in.readableBytes() > 0) 
 		{

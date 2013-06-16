@@ -1,9 +1,9 @@
 package org.menacheri.jetserver.handlers.netty;
 
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.MessageBuf;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.MessageList;
 import io.netty.handler.codec.MessageToMessageEncoder;
 
 import org.menacheri.jetserver.communication.MessageBuffer;
@@ -16,7 +16,7 @@ public class MessageBufferEventEncoder extends MessageToMessageEncoder<Event>
 
 	@Override
 	protected void encode(ChannelHandlerContext ctx, Event event,
-			MessageBuf<Object> out) throws Exception
+			MessageList<Object> out) throws Exception
 	{
 		out.add(encode(ctx, event));
 	}

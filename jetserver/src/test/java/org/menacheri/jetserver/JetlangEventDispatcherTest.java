@@ -1,8 +1,8 @@
 package org.menacheri.jetserver;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertEquals;
 
 import java.util.Collection;
 import java.util.List;
@@ -13,6 +13,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.jetlang.core.Disposable;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.menacheri.jetserver.app.Game;
 import org.menacheri.jetserver.app.GameRoom;
 import org.menacheri.jetserver.app.PlayerSession;
@@ -25,6 +26,7 @@ import org.menacheri.jetserver.event.EventHandler;
 import org.menacheri.jetserver.event.Events;
 import org.menacheri.jetserver.event.impl.EventDispatchers;
 import org.menacheri.jetserver.event.impl.JetlangEventDispatcher;
+import org.menacheri.jetserver.junitcategories.Performance;
 import org.menacheri.jetserver.protocols.Protocol;
 import org.menacheri.jetserver.protocols.impl.DummyProtocol;
 import org.menacheri.jetserver.util.SessionHandlerLatchCounter;
@@ -112,6 +114,7 @@ public class JetlangEventDispatcherTest {
 	}
 
 	@Test
+	@Category(Performance.class)
 	public void eventPublishingPerformance() throws InterruptedException {
 		EventDispatcher dispatcher = EventDispatchers
 				.newJetlangEventDispatcher(null, null);

@@ -58,18 +58,18 @@ public class SessionHandler extends DefaultSessionEventHandler implements GameCo
 		cmdCount++;
 		int type;
 		int operation;
-		boolean isDefaultProtocol = true;
+		boolean isWebSocketProtocol = false;
 		if(command instanceof MessageBuffer) {
 			MessageBuffer buf = (MessageBuffer) command;
 			type = buf.readInt();
 			operation = buf.readInt();
 		}else{
 			// websocket
-			isDefaultProtocol = false;
-			List<Double> data = (List)command;
+			isWebSocketProtocol = true;
+			List<Integer> data = (List)command;
 			
-			type = data.get(0).intValue();
-			operation = data.get(1).intValue();
+			type = data.get(0);
+			operation = data.get(1);
 		}
 		IAM iam = IAM.getWho(type);
 		ZombieCommands cmd = ZombieCommands.CommandsEnum.fromInt(operation);
@@ -106,7 +106,10 @@ public class SessionHandler extends DefaultSessionEventHandler implements GameCo
 				throw new InvalidCommandException("Received invalid command" + cmd);
 		}
 		
-		if((cmdCount % 10000) == 0)
+		if(isWebSocketProtocol){
+			getSession().onEvent(Events.networkEvent(cmdCount));
+		}
+		else if((cmdCount % 10000) == 0)
 		{
 			NettyMessageBuffer buffer = new NettyMessageBuffer();
 			//System.out.println("Command No: " + cmdCount);
@@ -114,11 +117,7 @@ public class SessionHandler extends DefaultSessionEventHandler implements GameCo
 //			Event tcpEvent = Events.dataOutTcpEvent(buffer);
 //			getSession().onEvent(tcpEvent);
 			NetworkEvent udpEvent = null;
-			if(isDefaultProtocol){
-				udpEvent = Events.networkEvent(buffer, DeliveryGuarantyOptions.FAST);
-			}else{
-				udpEvent = Events.networkEvent(cmdCount);// for websocket protocol.
-			}
+			udpEvent = Events.networkEvent(buffer, DeliveryGuarantyOptions.FAST);
 			getSession().onEvent(udpEvent);
 		}
 	}

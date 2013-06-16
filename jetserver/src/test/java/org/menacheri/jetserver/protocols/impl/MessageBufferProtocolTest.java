@@ -2,7 +2,6 @@ package org.menacheri.jetserver.protocols.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import io.netty.channel.embedded.EmbeddedMessageChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 

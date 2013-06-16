@@ -3,7 +3,8 @@ package org.menacheri.zombie;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundMessageHandlerAdapter;
+import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.MessageList;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramChannel;
 
@@ -17,7 +18,7 @@ import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.event.Events;
 import org.menacheri.zombie.domain.IAM;
 
-public class ZombieHandler extends ChannelInboundMessageHandlerAdapter<Event>
+public class ZombieHandler extends ChannelInboundHandlerAdapter
 {
 	private static final IAM I_AM = IAM.ZOMBIE;
 	private static final Map<InetSocketAddress, DatagramChannel> CLIENTS = new HashMap<InetSocketAddress, DatagramChannel>();
@@ -67,37 +68,37 @@ public class ZombieHandler extends ChannelInboundMessageHandlerAdapter<Event>
 	}
 
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx, Event event)
-			throws Exception {
-		if (Events.START == event.getType())
-		{
-			// TCP write to server
-			WriteByte write = new WriteByte(ctx.channel(), null,
-					IAM.ZOMBIE);
-			ZombieClient.SERVICE.scheduleAtFixedRate(write, 2000l,
-					500l, TimeUnit.MILLISECONDS);
-			// For UDP write to server
-			connectUDP(ctx.channel());
-		}
-		else if (Events.LOG_IN_SUCCESS == event.getType())
-		{
-			
-		}
-		else if (Events.NETWORK_MESSAGE == event.getType())
-		{
-			ByteBuf buffer = (ByteBuf) event.getSource();
-			if (buffer.readableBytes() >= 4)
+	public void messageReceived(ChannelHandlerContext ctx,
+			MessageList<Object> msgs) throws Exception
+	{
+		MessageList<Event> events = msgs.cast();
+		for(Event event: events){
+			if (Events.START == event.getType())
 			{
-				System.out
-						.println("UDP event from server in ZombieHandler: "
-								+ buffer.readInt());
+				// TCP write to server
+				WriteByte write = new WriteByte(ctx.channel(), null,
+						IAM.DEFENDER);
+				ZombieClient.SERVICE.scheduleAtFixedRate(write, 10000l, 500,
+						TimeUnit.MILLISECONDS);
+				// For UDP write to server
+				connectUDP(ctx.channel());
 			}
-			else
+			else if (Events.NETWORK_MESSAGE == event.getType())
 			{
-				System.out
-						.println("UDP Event does not have expected data in ZombieHandler");
+				ByteBuf buffer = (ByteBuf) event.getSource();
+				if (buffer.readableBytes() >= 4)
+				{
+					System.out
+							.println("UDP event from server in DefenderHandler: "
+									+ buffer.readInt());
+				}
+				else
+				{
+					System.out
+							.println("UDP Event does not have expected data in DefenderHandler");
+				}
 			}
 		}
-		
+		msgs.releaseAll();
 	}
 }

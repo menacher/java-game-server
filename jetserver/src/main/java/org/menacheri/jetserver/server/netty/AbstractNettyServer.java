@@ -6,6 +6,7 @@ import io.netty.channel.EventLoopGroup;
 import io.netty.channel.group.ChannelGroup;
 import io.netty.channel.group.ChannelGroupFuture;
 import io.netty.channel.group.DefaultChannelGroup;
+import io.netty.util.concurrent.GlobalEventExecutor;
 
 import java.net.InetSocketAddress;
 
@@ -17,7 +18,7 @@ import org.slf4j.LoggerFactory;
 public abstract class AbstractNettyServer implements NettyServer
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractNettyServer.class);
-	public static final ChannelGroup ALL_CHANNELS = new DefaultChannelGroup("JETSERVER-CHANNELS");
+	public static final ChannelGroup ALL_CHANNELS = new DefaultChannelGroup("JETSERVER-CHANNELS", GlobalEventExecutor.INSTANCE);
 	protected GameAdminService gameAdminService;
 	protected final NettyConfig nettyConfig;
 	protected ChannelInitializer<? extends Channel> channelInitializer;
@@ -62,13 +63,14 @@ public abstract class AbstractNettyServer implements NettyServer
 		} 
 		finally 
 		{
+			// TODO move this part to spring.
 			if (null != nettyConfig.getBossGroup()) 
 			{
-				nettyConfig.getBossGroup().shutdown();
+				nettyConfig.getBossGroup().shutdownGracefully();
 			}
 			if (null != nettyConfig.getWorkerGroup()) 
 			{
-				nettyConfig.getWorkerGroup().shutdown();
+				nettyConfig.getWorkerGroup().shutdownGracefully();
 			}
 			gameAdminService.shutdown();
 		}
