@@ -118,6 +118,7 @@ public class LDRoom extends GameRoomSession
 					&& (monster.getY() <= hero.getY() + 32);
 			
 			LDGameState state = (LDGameState) room.getStateManager().getState();
+			hero.setId((String) session.getId());
 			if (isTouching)
 			{
 				hero.score += 1;
@@ -129,7 +130,6 @@ public class LDRoom extends GameRoomSession
 				state.addEntitiy(hero);
 			}
 			
-			hero.setId((String) session.getId());
 			// The state of only one hero is updated, no need to send every hero's state.
 			room.sendBroadcast(Events.networkEvent(new LDGameState(null,
 					monster, hero)));

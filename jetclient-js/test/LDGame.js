@@ -438,7 +438,7 @@ var render = function (e) {
     // load all other players
     if (heroCompeterReady) {
         for (var k = 0; k < players.length; k++) {
-            ctx.drawImage(heroCompeterImage, players[k].x ,players[k].y);
+            ctx.drawImage(heroCompeterImage, players[k].entity.x ,players[k].entity.y);
         }
     }
     
