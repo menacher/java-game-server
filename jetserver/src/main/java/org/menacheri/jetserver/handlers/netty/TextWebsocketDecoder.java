@@ -52,10 +52,6 @@ public class TextWebsocketDecoder extends
 			unknownClass = true;
 			theClass = DefaultEvent.class;
 		}
-		else
-		{
-			theClass = attr.get();
-		}
 
 		Event event = jackson.readValue(frame.text(), theClass);
 

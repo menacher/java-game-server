@@ -182,4 +182,8 @@ public interface GameRoom
 	 */
 	public abstract void close();
 
+	public abstract void setFactory(SessionFactory factory);
+
+	public abstract SessionFactory getFactory();
+
 }

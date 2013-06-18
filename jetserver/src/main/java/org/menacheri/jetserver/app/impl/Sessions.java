@@ -4,6 +4,7 @@ import org.menacheri.jetserver.app.GameRoom;
 import org.menacheri.jetserver.app.Player;
 import org.menacheri.jetserver.app.PlayerSession;
 import org.menacheri.jetserver.app.Session;
+import org.menacheri.jetserver.app.SessionFactory;
 import org.menacheri.jetserver.app.impl.DefaultPlayerSession.PlayerSessionBuilder;
 import org.menacheri.jetserver.app.impl.DefaultSession.SessionBuilder;
 
@@ -16,15 +17,19 @@ import org.menacheri.jetserver.app.impl.DefaultSession.SessionBuilder;
  * @author Abraham Menacherry
  * 
  */
-public class Sessions
+public class Sessions implements SessionFactory
 {
 
-	public static Session newSession()
+	public static final SessionFactory INSTANCE = new Sessions();
+	
+	@Override
+	public Session newSession()
 	{
 		return new SessionBuilder().build();
 	}
 	
-	public static PlayerSession newPlayerSession(GameRoom gameRoom, Player player)
+	@Override
+	public PlayerSession newPlayerSession(GameRoom gameRoom, Player player)
 	{
 		return new PlayerSessionBuilder().parentGameRoom(gameRoom).player(player).build();
 	}

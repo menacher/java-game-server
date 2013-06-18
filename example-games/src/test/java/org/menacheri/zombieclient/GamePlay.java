@@ -37,7 +37,7 @@ public class GamePlay implements Runnable
 			break;
 		}
 		
-		for(int i = 1; i<2; i++){
+		for(int i = 1; i<10; i++){
 			MessageBuffer<ByteBuf> messageBuffer = new NettyMessageBuffer();
 			messageBuffer.writeInt(type);
 			messageBuffer.writeInt(operation);

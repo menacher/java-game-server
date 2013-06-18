@@ -46,7 +46,7 @@
     };
 
     jet.CNameEvent = function (className) {
-    	return {
+        return {
     	    type : jet.NETWORK_MESSAGE,
     	    cName : className,
     	    timeStamp : new Date().getTime()
@@ -376,6 +376,7 @@ var update = function (modifier, session) {
 };
 
 var players = [];
+var myId;
 
 // Draw everything
 var render = function (e) {
@@ -383,20 +384,24 @@ var render = function (e) {
         reset();
     }
     var entities =  e.source.entities;
-    if(typeof entities instanceof Array){
+    if((null != entities) && (typeof entities != 'undefined')){
         players = [];
-        for(var i=0; i< entities.length() ; i++){
+        for(var i=0; i< entities.length ; i++){
+            if((typeof myId != 'undefined') && (entities.id === myId)){
+                e.source.hero = entities[i];
+            }
             players.push({entity:entities[i],id:entities[i].id});
         }
     }
     var theHero = e.source.hero;
-    if(typeof theHero != 'undefined'){
+    if((null != theHero) && (typeof theHero != 'undefined')){
+        myId = theHero.id;
         hero.x = theHero.x;
         hero.y = theHero.y;
     }
     
     var theMonster = e.source.monster;
-    if(typeof theMonster != 'undefined'){
+    if((null != theMonster) && (typeof theMonster != 'undefined')){
         monster.x = theMonster.x;
         monster.y = theMonster.y;
     }
@@ -424,6 +429,7 @@ var render = function (e) {
     if(score != 'undefined'){
         monstersCaught = score;
     }
+    
 	// Score
 	ctx.fillStyle = "rgb(250, 250, 250)";
 	ctx.font = "24px Helvetica";
@@ -458,6 +464,5 @@ function sessionCB(session){
     // Send the java event class name for Jackson to work properly.
     session.send(jet.CNameEvent("org.menacheri.lostdecade.LDEvent"));
     then = Date.now();
-    setInterval(main.bind(null, session), 50000); // Execute as fast as possible
+    setInterval(main.bind(null, session), 30000); // Gives around 33 fps.
 }
-

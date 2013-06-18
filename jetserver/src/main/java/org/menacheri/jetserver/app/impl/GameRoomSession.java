@@ -10,6 +10,7 @@ import org.menacheri.jetserver.app.GameRoom;
 import org.menacheri.jetserver.app.Player;
 import org.menacheri.jetserver.app.PlayerSession;
 import org.menacheri.jetserver.app.Session;
+import org.menacheri.jetserver.app.SessionFactory;
 import org.menacheri.jetserver.concurrent.LaneStrategy;
 import org.menacheri.jetserver.concurrent.LaneStrategy.LaneStrategies;
 import org.menacheri.jetserver.event.Event;
@@ -53,6 +54,8 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
 	 */
 	protected Protocol protocol;
 	
+	protected SessionFactory sessionFactory;
+	
 	protected GameRoomSession(GameRoomSessionBuilder gameRoomSessionBuilder)
 	{
 		super(gameRoomSessionBuilder);
@@ -61,6 +64,7 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
 		this.gameRoomName = gameRoomSessionBuilder.gameRoomName;
 		this.protocol = gameRoomSessionBuilder.protocol;
 		this.stateManager = gameRoomSessionBuilder.stateManager;
+		this.sessionFactory = gameRoomSessionBuilder.sessionFactory;
 		
 		if(null == gameRoomSessionBuilder.eventDispatcher)
 		{
@@ -77,6 +81,7 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
 		protected Protocol protocol;
 		protected LaneStrategy<String, ExecutorService, GameRoom> laneStrategy;
 		protected GameStateManagerService stateManager;
+		protected SessionFactory sessionFactory;
 		
 		@Override
 		protected void validateAndSetValues()
@@ -100,6 +105,10 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
 			if(null == stateManager)
 			{
 				stateManager = new GameStateManager();
+			}
+			if(null == sessionFactory)
+			{
+				sessionFactory = Sessions.INSTANCE;
 			}
 			creationTime = System.currentTimeMillis();
 		}
@@ -139,6 +148,12 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
 				GameStateManagerService gameStateManagerService)
 		{
 			this.stateManager = gameStateManagerService;
+			return this;
+		}
+		
+		public GameRoomSessionBuilder sessionFactory(SessionFactory sessionFactory)
+		{
+			this.sessionFactory = sessionFactory;
 			return this;
 		}
 	}
@@ -219,7 +234,7 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
 	
 	public PlayerSession getSessionInstance(Player player)
 	{
-		PlayerSession playerSession = Sessions.newPlayerSession(this,player);
+		PlayerSession playerSession = sessionFactory.newPlayerSession(this,player);
 		return playerSession;
 	}
 	
@@ -281,6 +296,18 @@ public abstract class GameRoomSession extends DefaultSession implements GameRoom
 	public void setProtocol(Protocol protocol)
 	{
 		this.protocol = protocol;
+	}
+	
+	@Override
+	public SessionFactory getFactory() 
+	{
+		return sessionFactory;
+	}
+
+	@Override
+	public void setFactory(SessionFactory factory) 
+	{
+		this.sessionFactory = factory;
 	}
 	
 	@Override

@@ -200,7 +200,6 @@ public class LoginHandler extends ChannelInboundHandlerAdapter
 		if(null != gameRoom)
 		{
 			PlayerSession playerSession = gameRoom.createPlayerSession(player);
-			gameRoom.onLogin(playerSession);
 			String reconnectKey = (String)idGeneratorService
 					.generateFor(playerSession.getClass());
 			playerSession.setAttribute(JetConfig.RECONNECT_KEY, reconnectKey);
@@ -254,12 +253,13 @@ public class LoginHandler extends ChannelInboundHandlerAdapter
 					// Clear the existing pipeline
 					NettyUtils.clearPipeline(channel.pipeline());
 					// Set the tcp channel on the session. 
-					NettyTCPMessageSender sender = new NettyTCPMessageSender(channel);
-					playerSession.setTcpSender(sender);
+					NettyTCPMessageSender tcpSender = new NettyTCPMessageSender(channel);
+					playerSession.setTcpSender(tcpSender);
 					// Connect the pipeline to the game room.
 					gameRoom.connectSession(playerSession);
-					// Send the connect event so that it will in turn send the START event.
-					playerSession.onEvent(Events.connectEvent(sender));
+					// send the start event to remote client.
+					tcpSender.sendMessage(Events.event(null, Events.START));
+					gameRoom.onLogin(playerSession);
 				}
 				else
 				{

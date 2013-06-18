@@ -156,8 +156,6 @@ public class DefaultSessionEventHandler implements SessionEventHandler
 		if (null != event.getTcpSender())
 		{
 			session.setTcpSender(event.getTcpSender());
-			// Now send the start event to session
-			session.onEvent(Events.event(null, Events.START));
 		}
 		else
 		{
