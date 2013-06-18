@@ -47,10 +47,10 @@
 
     jet.CNameEvent = function (className) {
         return {
-    	    type : jet.NETWORK_MESSAGE,
-    	    cName : className,
-    	    timeStamp : new Date().getTime()
-    	};
+            type : jet.NETWORK_MESSAGE,
+            cName : className,
+            timeStamp : new Date().getTime()
+        };
     };
 
     // Creates a login event object to login to remote jetserver
@@ -376,7 +376,7 @@ var update = function (modifier, session) {
 };
 
 var players = [];
-var myId;
+var myId = null;
 
 // Draw everything
 var render = function (e) {
@@ -384,24 +384,41 @@ var render = function (e) {
         reset();
     }
     var entities =  e.source.entities;
-    if((null != entities) && (typeof entities != 'undefined')){
+    if((null !== entities) && (typeof entities != 'undefined')){
         players = [];
         for(var i=0; i< entities.length ; i++){
-            if((typeof myId != 'undefined') && (entities.id === myId)){
+            if((null !== myId) && (entities[i].id === myId)){
                 e.source.hero = entities[i];
+            } else{
+            	players.push({entity:entities[i],id:entities[i].id});
             }
-            players.push({entity:entities[i],id:entities[i].id});
         }
     }
     var theHero = e.source.hero;
-    if((null != theHero) && (typeof theHero != 'undefined')){
-        myId = theHero.id;
-        hero.x = theHero.x;
-        hero.y = theHero.y;
+    if((null !== theHero) && (typeof theHero != 'undefined')){
+        if(null !== myId){
+            if(myId === theHero.id){
+                hero.x = theHero.x;
+                hero.y = theHero.y;
+                hero.score = monstersCaught = theHero.score;
+            } else {
+                for (var j = 0; j < players.length; j++) {
+                    if(players[j].id === theHero.id){
+                       players[j].entity.x = theHero.x;
+                       players[j].entity.y = theHero.y;
+                    }
+                }
+            }
+        }else{
+            myId = theHero.id;
+            hero.x = theHero.x;
+	    hero.y = theHero.y;
+            hero.score = monstersCaught = theHero.score;
+        }
     }
     
     var theMonster = e.source.monster;
-    if((null != theMonster) && (typeof theMonster != 'undefined')){
+    if((null !== theMonster) && (typeof theMonster != 'undefined')){
         monster.x = theMonster.x;
         monster.y = theMonster.y;
     }
@@ -420,16 +437,12 @@ var render = function (e) {
 
     // load all other players
     if (heroCompeterReady) {
-        for (var j = 0; j < players.length; j++) {
-            ctx.drawImage(heroCompeterImage, players[j].x ,players[j].y);
+        for (var k = 0; k < players.length; k++) {
+            ctx.drawImage(heroCompeterImage, players[k].x ,players[k].y);
         }
     }
     
-    var score = e.source.score;
-    if(score != 'undefined'){
-        monstersCaught = score;
-    }
-    
+       
 	// Score
 	ctx.fillStyle = "rgb(250, 250, 250)";
 	ctx.font = "24px Helvetica";
@@ -464,5 +477,5 @@ function sessionCB(session){
     // Send the java event class name for Jackson to work properly.
     session.send(jet.CNameEvent("org.menacheri.lostdecade.LDEvent"));
     then = Date.now();
-    setInterval(main.bind(null, session), 30000); // Gives around 33 fps.
+    setInterval(main.bind(null, session), 30); // Gives around 33 fps.
 }

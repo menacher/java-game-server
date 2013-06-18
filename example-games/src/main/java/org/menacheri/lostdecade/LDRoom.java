@@ -9,9 +9,9 @@ import org.menacheri.jetserver.app.Session;
 import org.menacheri.jetserver.app.impl.GameRoomSession;
 import org.menacheri.jetserver.event.Event;
 import org.menacheri.jetserver.event.Events;
-import org.menacheri.jetserver.event.SessionEventHandler;
 import org.menacheri.jetserver.event.impl.DefaultEventContext;
 import org.menacheri.jetserver.event.impl.DefaultSessionEventHandler;
+import org.menacheri.jetserver.event.impl.SessionMessageHandler;
 import org.menacheri.jetserver.service.GameStateManagerService;
 
 public class LDRoom extends GameRoomSession
@@ -82,7 +82,7 @@ public class LDRoom extends GameRoomSession
 		return (int) round;
 	}
 	
-	public static class GameSessionHandler implements SessionEventHandler
+	public static class GameSessionHandler extends SessionMessageHandler
 	{
 		Entity monster;
 		GameRoom room;// not really required. It can be accessed as getSession()
@@ -90,6 +90,7 @@ public class LDRoom extends GameRoomSession
 		
 		public GameSessionHandler(GameRoomSession session)
 		{
+			super(session);
 			this.room = session;
 			GameStateManagerService manager = room.getStateManager();
 			LDGameState state = (LDGameState) manager.getState();
@@ -105,29 +106,10 @@ public class LDRoom extends GameRoomSession
 		public void onEvent(Event event)
 		{
 			Entity hero = ((LDGameState) event.getSource()).getHero();
-			Session session = event.getEventContext()
-			.getSession();
+			Session session = event.getEventContext().getSession();
 			update(hero, session);
 		}
 
-		@Override
-		public int getEventType()
-		{
-			return Events.SESSION_MESSAGE;
-		}
-
-		@Override
-		public Session getSession()
-		{
-			return (Session)room;
-		}
-
-		@Override
-		public void setSession(Session session)
-				throws UnsupportedOperationException
-		{
-		}
-		
 		private void update(Entity hero, Session session)
 		{
 			boolean isTouching = (hero.getX() <= monster.getX() + 32)
