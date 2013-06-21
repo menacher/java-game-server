@@ -45,6 +45,15 @@
         };
     };
 
+    //Special event creation function to send the json class name to jetserver.
+    jet.CNameEvent = function (className) {
+        return {
+            type : jet.NETWORK_MESSAGE,
+            cName : className,
+            timeStamp : new Date().getTime()
+        };
+    };
+    
     // Creates a login event object to login to remote jetserver
     jet.LoginEvent = function (config) {
         return jet.NEvent(jet.LOG_IN, [config.user, config.pass, config.connectionKey]);

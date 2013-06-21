@@ -2,7 +2,16 @@ package org.menacheri.lostdecade;
 
 import java.util.Set;
 
+import org.menacheri.jetserver.app.GameRoom;
 
+
+/**
+ * The state of a game room is held in this object. Multiple remote client
+ * connections to a {@link GameRoom} will share this state.
+ * 
+ * @author Abraham Menacherry
+ * 
+ */
 public class LDGameState
 {
 	private Set<Entity> entities;
@@ -69,7 +78,6 @@ public class LDGameState
 	{
 		this.entities = entities;
 	}
-
 
 }
  
