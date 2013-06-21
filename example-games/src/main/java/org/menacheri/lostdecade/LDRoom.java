@@ -64,6 +64,7 @@ public class LDRoom extends GameRoomSession
 		hero.setType(Entity.HERO);
 		hero.setY(canvasHeight / 2);
 		hero.setX(canvasWidth / 2);
+		hero.setSpeed(256);// speed in pixels per second
 		return hero;
 	}
 
@@ -143,9 +144,9 @@ public class LDRoom extends GameRoomSession
 			{
 				entity.setY(canvasHeight / 2);
 				entity.setX(canvasWidth / 2);
-				monster.setX(getRandomPos(canvasWidth));
-				monster.setY(getRandomPos(canvasHeight));
 			}
+			monster.setX(getRandomPos(canvasWidth));
+			monster.setY(getRandomPos(canvasHeight));
 			// no need to send the entities here since client will do resetting.
 			LDGameState ldGameState = new LDGameState(null, monster, null);
 			ldGameState.setReset(true);

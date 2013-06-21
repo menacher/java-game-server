@@ -52,8 +52,8 @@ public class TextWebsocketDecoder extends
 			unknownClass = true;
 			theClass = DefaultEvent.class;
 		}
-
-		Event event = jackson.readValue(frame.text(), theClass);
+		String json = frame.text();
+		Event event = jackson.readValue(json, theClass);
 
 		// If the class is unknown then either check if its the default event or
 		// a different class. Put the right one in the context.
@@ -71,7 +71,7 @@ public class TextWebsocketDecoder extends
 				@SuppressWarnings("unchecked")
 				Class<? extends Event> newClass = (Class<? extends Event>) Class
 						.forName(cName);
-				event = jackson.readValue(frame.text(), newClass);
+				event = jackson.readValue(json, newClass);
 				attr.set(newClass);
 			}
 		}

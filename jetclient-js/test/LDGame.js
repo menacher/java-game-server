@@ -303,7 +303,7 @@ bgImage.src = "images/background.png";
 var heroReady = false;
 var heroImage = new Image();
 heroImage.onload = function () {
-	heroReady = true;
+    heroReady = true;
 };
 heroImage.src = "images/hero.png";
 
@@ -341,18 +341,28 @@ addEventListener("keyup", function (e) {
 	delete keysDown[e.keyCode];
 }, false);
 
-// Reset the game when the player catches a monster
-var reset = function () {
+// Reset the game when the player catches a monster, invoked by server.
+var reset = function (theMonster) {
 	hero.x = canvas.width / 2;
 	hero.y = canvas.height / 2;
 
-	// Throw the monster somewhere on the screen randomly
-	monster.x = 32 + (Math.random() * (canvas.width - 64));
-	monster.y = 32 + (Math.random() * (canvas.height - 64));
+	monster = theMonster
+	for (var k = 0; k < players.length; k++) {
+        players[k].entity.x = hero.x;
+        players[k].entity.y = hero.y;
+        drawEntity(heroCompeterImage, players[k].entity);
+    }
+    ctx.drawImage(bgImage, 0, 0);
+    drawEntity(heroImage, hero);
+    drawEntity(monsterImage, monster);
 };
 
 // Update game objects
 var update = function (modifier, session) {
+	if(null === myId){
+		console.log("Not yet initialized");
+		return;
+	}
 	if (38 in keysDown) { // Player holding up
 		hero.y -= hero.speed * modifier;
 	}
@@ -369,7 +379,6 @@ var update = function (modifier, session) {
     var message = {
       "hero": hero
     };
-    
     // send new position to gameroom
     session.send(jet.NEvent(jet.NETWORK_MESSAGE, message));
 	
@@ -380,47 +389,48 @@ var myId = null;
 
 // Draw everything
 var render = function (e) {
-    if(e.source.reset === true){
-        reset();
+    var ldState = e.source;
+    if(ldState.reset === true){
+        reset(ldState.monster);
+        return;
     }
-    var entities =  e.source.entities;
+    
+    // check if app is initalized.
+    if(null === myId){
+        if(initHero(e) !== true){
+            return;
+        }
+    }
+    var entities =  ldState.entities;
     if((null !== entities) && (typeof entities != 'undefined')){
         players = [];
         for(var i=0; i< entities.length ; i++){
             if((null !== myId) && (entities[i].id === myId)){
-                e.source.hero = entities[i];
+                hero = entities[i];
+                monstersCaught = entities[i].score;
             } else{
-            	players.push({entity:entities[i],id:entities[i].id});
+                players.push({entity:entities[i],id:entities[i].id});
             }
         }
     }
-    var theHero = e.source.hero;
-    if((null !== theHero) && (typeof theHero != 'undefined')){
-        if(null !== myId){
-            if(myId === theHero.id){
-                hero.x = theHero.x;
-                hero.y = theHero.y;
-                hero.score = monstersCaught = theHero.score;
-            } else {
-                for (var j = 0; j < players.length; j++) {
-                    if(players[j].id === theHero.id){
-                       players[j].entity.x = theHero.x;
-                       players[j].entity.y = theHero.y;
-                    }
+    var theHero = ldState.hero;
+    if((null !== ldState.hero) && (typeof ldState.hero != 'undefined')){
+        if(myId === theHero.id){
+            hero = theHero;
+            monstersCaught = theHero.score;
+        } else {
+            // update the competing hero's position on screen.
+            for (var j = 0; j < players.length; j++) {
+                if(players[j].id === theHero.id){
+                   players[j].entity = theHero;
                 }
             }
-        }else{
-            myId = theHero.id;
-            hero.x = theHero.x;
-	    hero.y = theHero.y;
-            hero.score = monstersCaught = theHero.score;
         }
     }
     
-    var theMonster = e.source.monster;
+    var theMonster = ldState.monster;
     if((null !== theMonster) && (typeof theMonster != 'undefined')){
-        monster.x = theMonster.x;
-        monster.y = theMonster.y;
+        monster = theMonster;
     }
     
 	if (bgReady) {
@@ -428,17 +438,17 @@ var render = function (e) {
 	}
 
 	if (heroReady) {
-		ctx.drawImage(heroImage, hero.x, hero.y);
+		drawEntity(heroImage, hero);
 	}
 
 	if (monsterReady) {
-		ctx.drawImage(monsterImage, monster.x, monster.y);
+		drawEntity(monsterImage, monster);
 	}
 
     // load all other players
     if (heroCompeterReady) {
         for (var k = 0; k < players.length; k++) {
-            ctx.drawImage(heroCompeterImage, players[k].entity.x ,players[k].entity.y);
+            drawEntity(heroCompeterImage, players[k].entity);
         }
     }
     
@@ -450,6 +460,24 @@ var render = function (e) {
 	ctx.textBaseline = "top";
 	ctx.fillText("Goblins caught: " + monstersCaught, 32, 32);
 };
+
+function initHero(e){
+    var ldState = e.source;
+    if((null !== ldState.hero) && (typeof ldState.hero != 'undefined')){
+        hero = ldState.hero;
+        monstersCaught = ldState.hero.score;
+        myId = hero.id;
+        return true;
+    }else{
+        console.log("Unable to initialize app");
+        e.target.close();// target is the session.
+        return false;
+    }
+}
+
+function drawEntity(img, entity){
+    ctx.drawImage(img, entity.x, entity.y);
+}
 
 // The main game loop
 var main = function (session) {
@@ -470,6 +498,8 @@ var config = {
 
 var then;
 
+// This is the callback function that gets invoked 
+// when session is connected to jet server.
 function sessionCB(session){
     // Let's play this game!
     //reset();

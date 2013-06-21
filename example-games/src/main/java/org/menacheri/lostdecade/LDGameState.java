@@ -35,6 +35,8 @@ public class LDGameState
 
 	public void addEntitiy(Entity hero)
 	{
+		// only the id will match, but other values maybe different.
+		entities.remove(hero);
 		entities.add(hero);
 	}
 	
