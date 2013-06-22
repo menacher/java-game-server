@@ -54,7 +54,7 @@ public class NettyTCPClient
 	 * the client gracefully.
 	 */
 	public static final ChannelGroup ALL_CHANNELS = new DefaultChannelGroup(
-			"JET-CLIENT-CONNECTIONS", GlobalEventExecutor.INSTANCE);
+			"NAD-CLIENT-CONNECTIONS", GlobalEventExecutor.INSTANCE);
 
 	/**
 	 * Creates an instance of a Netty TCP client which can then be used to

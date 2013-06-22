@@ -11,7 +11,7 @@ import java.net.UnknownHostException;
 
 
 /**
- * A simple test class for connecting jetclient to a remote nadron server. This does
+ * A simple test class for connecting Nad client to a remote nadron server. This does
  * not have any game logic and will just print out events coming from the
  * server.
  * 

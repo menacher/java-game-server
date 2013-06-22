@@ -62,7 +62,7 @@ public class NettyUDPClient
 
 	/**
 	 * Creates an instance of a Netty UDP client which can then be used to
-	 * connect to a remote jet-server. This constructor delegates to
+	 * connect to a remote Nadron server. This constructor delegates to
 	 * {@link #NettyUDPClient(InetSocketAddress, ChannelInitializer, String)}
 	 * constructor after creating a {@link InetSocketAddress} instance based on
 	 * the host and port number passed in.
@@ -201,7 +201,7 @@ public class NettyUDPClient
 	 * 
 	 * @param localhostName
 	 *            The host machine (for e.g. 'localhost') to which it needs to
-	 *            bind to. This is <b>Not</b> the remote jet-server hostname.
+	 *            bind to. This is <b>Not</b> the remote Nadron server hostname.
 	 * @return The newly created instance of the datagram channel.
 	 * @throws UnknownHostException
 	 */

@@ -22,7 +22,7 @@
 			<scope>test</scope>
 		</dependency>
 
-		<!-- jet server dependency -->
+		<!-- Nadron server dependency -->
 		<dependency>
 			<groupId>io.nadron</groupId>
 			<artifactId>nadron</artifactId>
@@ -30,7 +30,7 @@
 			<type>jar</type>
 		</dependency>
 		
-		<!-- jet client dependency -->
+		<!-- Nad client dependency -->
 		<dependency>
 			<groupId>io.nadron</groupId>
 			<artifactId>client</artifactId>

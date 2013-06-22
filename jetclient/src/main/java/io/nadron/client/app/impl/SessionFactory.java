@@ -28,7 +28,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
- * Class used to create a session in jetclient. SessionFactory will also create
+ * Class used to create a session in Nad client. SessionFactory will also create
  * the actual connection to the nadron server by initializing {@link NettyTCPClient}
  * and {@link NettyUDPClient} and using their connect methods.
  * 
