@@ -7,8 +7,8 @@ import java.io.Serializable;
 
 /**
  * Instances of this class are used to hold events that come in from remote
- * jetserver, for communicating between sessions and also for transmitting
- * messages to the remote jetserver from client.
+ * nadron server, for communicating between sessions and also for transmitting
+ * messages to the remote nadron server from client.
  * 
  * @author Abraham Menacherry
  * 

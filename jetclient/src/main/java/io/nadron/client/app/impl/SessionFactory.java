@@ -29,7 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Class used to create a session in jetclient. SessionFactory will also create
- * the actual connection to the jetserver by initializing {@link NettyTCPClient}
+ * the actual connection to the nadron server by initializing {@link NettyTCPClient}
  * and {@link NettyUDPClient} and using their connect methods.
  * 
  * @author Abraham Menacherry
@@ -40,7 +40,7 @@ public class SessionFactory
 
 	/**
 	 * This class holds a number of variables like username, password etc which
-	 * are necessary for creating connections to remote jetserver.
+	 * are necessary for creating connections to remote nadron server.
 	 */
 	private LoginHelper loginHelper;
 	private final NettyTCPClient tcpClient;
@@ -75,9 +75,9 @@ public class SessionFactory
 	}
 
 	/**
-	 * Creates a {@link Session} and connects it to the remote jetserver.
+	 * Creates a {@link Session} and connects it to the remote nadron server.
 	 * 
-	 * @return The session instance created and connected to remote jetserver.
+	 * @return The session instance created and connected to remote nadron server.
 	 * @throws InterruptedException
 	 * @throws Exception
 	 */
@@ -89,12 +89,12 @@ public class SessionFactory
 
 	/**
 	 * Creates a {@link Session}, adds the event handlers to the session and
-	 * then connects it to the remote jetserver. This way events will not be
+	 * then connects it to the remote nadron server. This way events will not be
 	 * lost on connect.
 	 * 
 	 * @param eventHandlers
 	 *            The handlers to be added to listen to session.
-	 * @return The session instance created and connected to remote jetserver.
+	 * @return The session instance created and connected to remote nadron server.
 	 * @throws InterruptedException
 	 * @throws Exception
 	 */
@@ -118,12 +118,12 @@ public class SessionFactory
 	}
 
 	/**
-	 * Connects the session to remote jetserver. Depending on the connection
+	 * Connects the session to remote nadron server. Depending on the connection
 	 * parameters provided to LoginHelper, it can connect both TCP and UDP
 	 * transports.
 	 * 
 	 * @param session
-	 *            The session to be connected to remote jetserver.
+	 *            The session to be connected to remote nadron server.
 	 * @throws InterruptedException
 	 * @throws Exception
 	 */
@@ -134,12 +134,12 @@ public class SessionFactory
 	}
 
 	/**
-	 * Connects the session to remote jetserver. Depending on the connection
+	 * Connects the session to remote nadron server. Depending on the connection
 	 * parameters provided to LoginHelper, it can connect both TCP and UDP
 	 * transports.
 	 * 
 	 * @param session
-	 *            The session to be connected to remote jetserver.
+	 *            The session to be connected to remote nadron server.
 	 * @param eventHandlers
 	 *            The handlers to be added to session.
 	 * @throws InterruptedException
@@ -211,7 +211,7 @@ public class SessionFactory
 	protected void doTcpConnection(final Session session, Event event)
 			throws Exception, InterruptedException
 	{
-		// Connect session using tcp to remote jetserver
+		// Connect session using tcp to remote nadron server
 		TCPPipelineFactory tcpFactory = new TCPPipelineFactory(session);
 
 		// This will in turn invoke the startEventHandler when server sends

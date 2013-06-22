@@ -8,7 +8,7 @@ import io.netty.buffer.Unpooled;
 import java.net.InetSocketAddress;
 
 /**
- * The creation of a connection to a remote jetserver requires multiple
+ * The creation of a connection to a remote nadron server requires multiple
  * parameters, for e.g. username, password etc. These parameters are stored in
  * this class which uses a builder pattern to create an instance. This instance
  * is then passed on to {@link SessionFactory} to actually create the sessions,
@@ -40,9 +40,9 @@ public class LoginHelper
 		private String username;
 		private String password;
 		private String connectionKey;
-		private String jetserverTcpHostName;
+		private String nadronTcpHostName;
 		private Integer tcpPort;
-		private String jetserverUdpHostName;
+		private String nadronUdpHostName;
 		private Integer udpPort;
 		private InetSocketAddress tcpServerAddress;
 		private InetSocketAddress udpServerAddress;
@@ -80,14 +80,14 @@ public class LoginHelper
 			return this;
 		}
 
-		public String getJetserverTcpHostName()
+		public String getNadronTcpHostName()
 		{
-			return jetserverTcpHostName;
+			return nadronTcpHostName;
 		}
 
-		public LoginBuilder nadronTcpHostName(String jetserverTcpHostName)
+		public LoginBuilder nadronTcpHostName(String nadronTcpHostName)
 		{
-			this.jetserverTcpHostName = jetserverTcpHostName;
+			this.nadronTcpHostName = nadronTcpHostName;
 			return this;
 		}
 
@@ -102,14 +102,14 @@ public class LoginHelper
 			return this;
 		}
 
-		public String getJetserverUdpHostName()
+		public String getNadronUdpHostName()
 		{
-			return jetserverUdpHostName;
+			return nadronUdpHostName;
 		}
 
-		public LoginBuilder nadronUdpHostName(String jetserverUdpHostName)
+		public LoginBuilder nadronUdpHostName(String nadronUdpHostName)
 		{
-			this.jetserverUdpHostName = jetserverUdpHostName;
+			this.nadronUdpHostName = nadronUdpHostName;
 			return this;
 		}
 
@@ -174,7 +174,7 @@ public class LoginHelper
 						"ConnectionKey cannot be null");
 			}
 			if (null == tcpServerAddress
-					&& (null == jetserverTcpHostName || null == tcpPort))
+					&& (null == nadronTcpHostName || null == tcpPort))
 			{
 				throw new IllegalArgumentException(
 						"tcpServerAddress cannot be null");
@@ -182,16 +182,16 @@ public class LoginHelper
 
 			if (null == tcpServerAddress)
 			{
-				tcpServerAddress = new InetSocketAddress(jetserverTcpHostName,
+				tcpServerAddress = new InetSocketAddress(nadronTcpHostName,
 						tcpPort);
 			}
 
 			if (null == udpServerAddress)
 			{
-				if (null != jetserverUdpHostName && null != udpPort)
+				if (null != nadronUdpHostName && null != udpPort)
 				{
 					udpServerAddress = new InetSocketAddress(
-							jetserverUdpHostName, udpPort);
+							nadronUdpHostName, udpPort);
 				}
 			}
 		}
@@ -203,7 +203,7 @@ public class LoginHelper
 	 * 
 	 * @param localUDPAddress
 	 *            <b>optional</b> If passed in, then this address is passed on
-	 *            to jetserver, so that it can associate this address with its
+	 *            to nadron server, so that it can associate this address with its
 	 *            session.
 	 * @return Returns the ByteBuf representation of username, password,
 	 *         connection key, udp local bind address etc.

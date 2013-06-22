@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * This interface abstracts a session in jetclient. A session can be thought of
- * as a high level connection to a remote jetserver. Internally it can have TCP
+ * as a high level connection to a remote nadron server. Internally it can have TCP
  * as well as UDP connections. The session also has event dispatching
  * capabilities. So when an event comes into the session, it will get dispatched
  * to the appropriate {@link EventHandler}.

@@ -12,9 +12,9 @@ import io.netty.handler.codec.LengthFieldPrepender;
 
 /**
  * This pipeline factory can be considered the default 'protocol' for client
- * side communication with jetserver. For other protocols, different
+ * side communication with nadron server. For other protocols, different
  * {@link ChannelInitializer}s, with different encoders and decoders in its
- * pipeline should be used to connect to remote jetserver.
+ * pipeline should be used to connect to remote nadron server.
  * 
  * @author Abraham Menacherry.
  * 
@@ -23,18 +23,18 @@ public class TCPPipelineFactory extends ChannelInitializer<SocketChannel>
 {
 	/**
 	 * Prepends the length of transmitted message before sending to remote
-	 * jetserver.
+	 * nadron server.
 	 */
 	private static final LengthFieldPrepender LENGTH_FIELD_PREPENDER = new LengthFieldPrepender(
 			2);
 	/**
-	 * Decodes incoming messages from remote jetserver to {@link MessageBuffer}
+	 * Decodes incoming messages from remote nadron server to {@link MessageBuffer}
 	 * type, puts this as the payload for an {@link Event} and passes this
 	 * {@link Event} instance to the next decoder/handler in the chain.
 	 */
 	private static final MessageBufferEventDecoder EVENT_DECODER = new MessageBufferEventDecoder();
 	/**
-	 * Decodes incoming messages from remote jetserver to {@link MessageBuffer}
+	 * Decodes incoming messages from remote nadron server to {@link MessageBuffer}
 	 * type, puts this as the payload for an {@link Event} and passes this
 	 * {@link Event} instance to the next decoder/handler in the chain.
 	 */

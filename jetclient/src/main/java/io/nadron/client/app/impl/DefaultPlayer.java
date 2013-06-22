@@ -8,7 +8,7 @@ import java.util.Set;
 
 
 /**
- * A class used to represent a human player who connects to jetserver.
+ * A class used to represent a human player who connects to nadron server.
  * 
  * @author Abraham Menacherry
  * 

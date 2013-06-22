@@ -63,15 +63,15 @@ public class NettyTCPClient
 	 * {@link InetSocketAddress} instance based on the host and port number
 	 * passed in.
 	 * 
-	 * @param jetserverHost
-	 *            The host name of the remote server on which jetserver is
+	 * @param nadronHost
+	 *            The host name of the remote server on which nadron server is
 	 *            running.
 	 * @param port
 	 *            The port to connect to, on the remote server.
 	 */
-	public NettyTCPClient(String jetserverHost, int port)
+	public NettyTCPClient(String nadronHost, int port)
 	{
-		this(new InetSocketAddress(jetserverHost, port));
+		this(new InetSocketAddress(nadronHost, port));
 	}
 
 	public NettyTCPClient(final InetSocketAddress serverAddress)
@@ -134,11 +134,11 @@ public class NettyTCPClient
 	 *            for each {@link Channel} that it creates on connection.
 	 * @param loginEvent
 	 *            The event contains the {@link ByteBuf} to be transmitted
-	 *            to jetserver for logging in. Values inside this buffer include
+	 *            to nadron server for logging in. Values inside this buffer include
 	 *            username, password, connection key, <b>optional</b> local
 	 *            address of the UDP channel used by this session.
 	 * @return Returns the Netty {@link Channel} which is the connection to the
-	 *         remote jetserver.
+	 *         remote nadron server.
 	 * @throws InterruptedException
 	 */
 	public Channel connect(final ChannelInitializer<SocketChannel> pipelineFactory,
@@ -149,14 +149,14 @@ public class NettyTCPClient
 
 	/**
 	 * Method that is used to create the connection or {@link Channel} to
-	 * communicated with the remote jetserver.
+	 * communicated with the remote nadron server.
 	 * 
 	 * @param pipelineFactory
 	 *            The factory used to create a pipeline of decoders and encoders
 	 *            for each {@link Channel} that it creates on connection.
 	 * @param loginEvent
 	 *            The event contains the {@link ByteBuf} to be transmitted
-	 *            to jetserver for logging in. Values inside this buffer include
+	 *            to nadron server for logging in. Values inside this buffer include
 	 *            username, password, connection key, <b>optional</b> local
 	 *            address of the UDP channel used by this session.
 	 * @param timeout
@@ -166,7 +166,7 @@ public class NettyTCPClient
 	 *            The unit of timeout SECONDS, MILLISECONDS etc. Default is 5
 	 *            seconds.
 	 * @return Returns the Netty {@link Channel} which is the connection to the
-	 *         remote jetserver.
+	 *         remote nadron server.
 	 * @throws InterruptedException
 	 */
 	public Channel connect(final ChannelInitializer<SocketChannel> pipelineFactory,

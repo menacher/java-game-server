@@ -67,8 +67,8 @@ public class NettyUDPClient
 	 * constructor after creating a {@link InetSocketAddress} instance based on
 	 * the host and port number passed in.
 	 * 
-	 * @param jetserverHost
-	 *            The host name of the remote server on which jetserver is
+	 * @param nadronHost
+	 *            The host name of the remote server on which nadron server is
 	 *            running.
 	 * @param port
 	 *            The port to connect to, on the remote server.
@@ -78,11 +78,11 @@ public class NettyUDPClient
 	 * @throws UnknownHostException
 	 * @throws Exception
 	 */
-	public NettyUDPClient(String jetserverHost, int port,
+	public NettyUDPClient(String nadronHost, int port,
 			final ChannelInitializer<DatagramChannel> pipelineFactory)
 			throws UnknownHostException, Exception
 	{
-		this(new InetSocketAddress(jetserverHost, port), pipelineFactory, null);
+		this(new InetSocketAddress(nadronHost, port), pipelineFactory, null);
 	}
 
 	/**
