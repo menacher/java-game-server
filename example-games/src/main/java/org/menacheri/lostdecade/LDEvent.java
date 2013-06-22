@@ -1,6 +1,6 @@
 package org.menacheri.lostdecade;
 
-import org.menacheri.jetserver.event.impl.DefaultEvent;
+import io.nadron.event.impl.DefaultEvent;
 
 public class LDEvent extends DefaultEvent
 {

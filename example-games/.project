@@ -1,6 +1,6 @@
 <projectDescription>
   <name>example-games</name>
-  <comment>This project holds some example multiplayer games that uses the jetserver library. The server part is in src/main/java and the client part of the game is in src/test/java. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
+  <comment>This project holds some example multiplayer games that uses the nadron library. The server part is in src/main/java and the client part of the game is in src/test/java. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
   <projects/>
   <buildSpec>
     <buildCommand>

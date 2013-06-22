@@ -1,4 +1,4 @@
-This project holds some example multi-player games that uses the [jetserver](https://github.com/menacher/java-game-server/tree/master/jetserver) library. The server part is in src/main/java and the client part of the games are in src/test/java.
+This project holds some example multi-player games that uses the [nadron](https://github.com/menacher/java-game-server/tree/master/nadron) library. The server part is in src/main/java and the client part of the games are in src/test/java.
 
 Starting the Server
 ==================
@@ -9,10 +9,10 @@ Pointers on main classes, classpaths and command line flags.
 
 **To start the game server**    
 Set the classpath and provide the log4jconfiguration flag.    
-set serverclasspath = ./jetserver-0.1.jar;./....    
+set serverclasspath = ./nadron-0.1.jar;./....    
 java -cp $serverclasspath -Dlog4j.configuration=GameServerLog4j.properties org.menacheri.GameServer    
 **To start the zombie client**    
-set clientclasspath = ./jetserver-0.1.jar;./netty-3.2.4.Final.jar....    
+set clientclasspath = ./nadron-0.1.jar;./netty-3.2.4.Final.jar....    
 java -cp clientclasspath org.menacheri.ZombieClient   
 
 Jar Dependencies
@@ -24,7 +24,7 @@ blazeds-core-3.2.0.3978.jar
 cglib-nodep-2.1_3.jar    
 commons-logging-1.1.1.jar    
 jetlang-0.2.9.jar    
-jetserver-0.1.jar    
+nadron-0.1.jar    
 log4j-1.2.16.jar    
 netty-3.3.1.Final.jar    
 slf4j-api-1.6.1.jar    
@@ -42,7 +42,7 @@ If you get the following property access exception
     PropertyAccessException 2: org.springframework.beans.MethodInvocationException:    
     Property 'undead' threw exception; nested exception is java.lang.NoSuchMethodError:
     org.menacheri.aspect.AppManagedAspect.ajc$if$ac5(Lorg/menacheri/aspect/AppManaged;)Z   
-This is mostly because of the eclipse project not having proper binaries compiled to its target. Just goto Project->clean for both the jetserver as well as client project **without** doing a maven clean and it should 
+This is mostly because of the eclipse project not having proper binaries compiled to its target. Just goto Project->clean for both the nadron as well as client project **without** doing a maven clean and it should 
 work the second time.    
     
 If you get the following log4j configuration error, then it is mostly probably because you have not set 

@@ -1,8 +1,9 @@
 package org.menacheri.lostdecade;
 
+import io.nadron.app.GameRoom;
+
 import java.util.Set;
 
-import org.menacheri.jetserver.app.GameRoom;
 
 
 /**

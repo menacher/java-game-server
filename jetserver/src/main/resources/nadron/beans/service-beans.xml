@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+	<!-- Configure all properties files here, wildcards like *.properties are 
+		also allowed -->
+	<context:property-placeholder location="nadron/props/nadron.properties" />
+
+	<bean id="taskManagerService"
+		class="io.nadron.service.impl.SimpleTaskManagerService"
+		destroy-method="shutdown">
+		<constructor-arg type="int" index="0" value="2" />
+	</bean>
+
+	<bean id="gameAdminService"
+		class="io.nadron.service.impl.SimpleGameAdminService">
+		<property name="games">
+			<set></set>
+		</property>
+	</bean>
+
+	<bean id="udpSessionRegistry" class="io.nadron.service.impl.SessionRegistry" />
+
+	<bean id="reconnectSessionRegistry"
+		class="io.nadron.service.impl.ReconnectSessionRegistry">
+		<property name="taskManagerService" ref="taskManagerService" />
+		<property name="reconnectDelay" value="${reconnect.delay}" />
+	</bean>
+
+	<bean id="simpleUniqueIdGenerator" class="io.nadron.service.impl.SimpleUniqueIdGenerator" />
+
+	<bean id="jackson" class="org.codehaus.jackson.map.ObjectMapper" />
+
+</beans>

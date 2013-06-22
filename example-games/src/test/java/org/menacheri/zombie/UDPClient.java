@@ -1,5 +1,8 @@
 package org.menacheri.zombie;
 
+import io.nadron.event.Events;
+import io.nadron.handlers.netty.EventDecoder;
+import io.nadron.util.NettyUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
@@ -19,9 +22,6 @@ import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 
-import org.menacheri.jetserver.event.Events;
-import org.menacheri.jetserver.handlers.netty.EventDecoder;
-import org.menacheri.jetserver.util.NettyUtils;
 import org.menacheri.zombie.domain.IAM;
 
 

@@ -1,13 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.menacheri</groupId>
-	<artifactId>jetserver</artifactId>
+	<groupId>io.nadron</groupId>
+	<artifactId>nadron</artifactId>
 	<packaging>jar</packaging>
 	<version>0.1</version>
-	<name>jetserver</name>
-	<url>https://github.com/menacher/java-game-server/tree/master/jetserver</url>
-	<description>Jetserver is a high speed socket based java game server written using JBoss Netty and Mike Rettig's Jetlang.It is specifically tuned for network based multiplayer games and supports TCP and UDP network protocols.</description>
+	<name>nadron</name>
+	<url>https://github.com/menacher/java-game-server/tree/master/nadron</url>
+	<description>Nadron is a high speed socket based java game server written using JBoss Netty and Mike Rettig's Jetlang.It is specifically tuned for network based multiplayer games and supports TCP and UDP network protocols.</description>
 
 	<parent>
         <groupId>org.sonatype.oss</groupId>
@@ -189,7 +189,7 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.15</version>
 				<configuration>
-					<excludedGroups>org.menacheri.jetserver.junitcategories.Performance</excludedGroups>
+					<excludedGroups>io.nadron.junitcategories.Performance</excludedGroups>
 				</configuration>
 			</plugin>
 	

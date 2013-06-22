@@ -1,16 +1,16 @@
 <?xml version="1.0"?>
 <project name="example-games" default="jar" basedir=".">
 	<!-- Assumption is that server source is in same eclipse workspace -->
-	<property name="jetserver" value="${basedir}/../jetserver" />
-	<property name="ant-dependency" value="${jetserver}" />
+	<property name="nadron" value="${basedir}/../nadron" />
+	<property name="ant-dependency" value="${nadron}" />
 	<property name="src" value="${basedir}/src/main/java" />
 	<property name="beans-dir" value="${basedir}/src/main/resources" />
 	<property name="build" value="${basedir}/build" />
 	<property name="classes" value="${build}/classes" />
 	<property name="binaries" value="binaries" />
-	<property name="lib" value="${jetserver}/lib" />
+	<property name="lib" value="${nadron}/lib" />
 	<property name="jar-file" value="${binaries}/${ant.project.name}.jar" />
-	<property name="server-jar" value="${jetserver}/${binaries}/jetserver-0.1.jar" />
+	<property name="server-jar" value="${nadron}/${binaries}/nadron-0.1.jar" />
 	<property name="aspectj" value="${lib}" />
 	<property name="aspectjrt" value="${aspectj}/aspectjrt-1.6.1.jar" />
 	<property name="aspectjtools" value="${aspectj}/aspectjtools-1.6.1.jar" />
@@ -61,7 +61,7 @@
 		<mkdir dir="${build}" />
 		<mkdir dir="${classes}" />
 		<mkdir dir="${binaries}" />
-		<!-- Only necessary if working from source. Otherwise use downloaded jetserver jar  
+		<!-- Only necessary if working from source. Otherwise use downloaded nadron jar  
 		<ant dir="${ant-dependency}" inheritAll="false" />
 		-->
 	</target>

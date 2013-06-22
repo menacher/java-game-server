@@ -1,18 +1,19 @@
 package org.menacheri.zombie.game;
 
+import io.nadron.app.Game;
+import io.nadron.app.GameRoom;
+import io.nadron.app.impl.SimpleGame;
+import io.nadron.app.impl.GameRoomSession.GameRoomSessionBuilder;
+import io.nadron.handlers.netty.TextWebsocketEncoder;
+import io.nadron.protocols.Protocol;
+import io.nadron.service.LookupService;
+import io.nadron.service.impl.SimpleLookupService;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.menacheri.jetserver.app.Game;
-import org.menacheri.jetserver.app.GameRoom;
-import org.menacheri.jetserver.app.impl.GameRoomSession.GameRoomSessionBuilder;
-import org.menacheri.jetserver.app.impl.SimpleGame;
-import org.menacheri.jetserver.handlers.netty.TextWebsocketEncoder;
-import org.menacheri.jetserver.protocols.Protocol;
-import org.menacheri.jetserver.service.LookupService;
-import org.menacheri.jetserver.service.impl.SimpleLookupService;
 import org.menacheri.lostdecade.LDRoom;
 import org.menacheri.zombie.domain.Defender;
 import org.menacheri.zombie.domain.World;
@@ -24,7 +25,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportResource;
 
 /**
- * This class contains the spring configuration for the jetserver library user.
+ * This class contains the spring configuration for the nadron library user.
  * The only bean that should compulsorily be declared is lookupService bean.
  * Otherwise the program will terminate with a context load error from spring
  * framework. The other beans declared can also be created using **new**

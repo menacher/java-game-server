@@ -1,5 +1,7 @@
 package org.menacheri.zombie;
 
+import io.nadron.event.Events;
+import io.nadron.util.NettyUtils;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -18,8 +20,6 @@ import java.util.Map;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
-import org.menacheri.jetserver.event.Events;
-import org.menacheri.jetserver.util.NettyUtils;
 
 public class ZombieClient
 {

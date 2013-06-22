@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="jetserver" default="deploy" basedir=".">
+<project name="nadron" default="deploy" basedir=".">
 	<property name="src" value="${basedir}/src/main/java" />
 	<property name="build" value="${basedir}/build" />
 	<property name="classes" value="${build}/classes" />

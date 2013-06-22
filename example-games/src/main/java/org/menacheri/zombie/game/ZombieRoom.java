@@ -1,7 +1,8 @@
 package org.menacheri.zombie.game;
 
-import org.menacheri.jetserver.app.PlayerSession;
-import org.menacheri.jetserver.app.impl.GameRoomSession;
+import io.nadron.app.PlayerSession;
+import io.nadron.app.impl.GameRoomSession;
+
 import org.menacheri.zombie.domain.Defender;
 import org.menacheri.zombie.domain.IAM;
 import org.menacheri.zombie.domain.World;

@@ -1,5 +1,9 @@
 package org.menacheri.zombie;
 
+import io.nadron.event.Event;
+import io.nadron.event.Events;
+import io.nadron.handlers.netty.EventDecoder;
+import io.nadron.handlers.netty.MessageBufferEventEncoder;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
@@ -12,10 +16,6 @@ import io.netty.handler.codec.MessageToMessageDecoder;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.menacheri.jetserver.event.Event;
-import org.menacheri.jetserver.event.Events;
-import org.menacheri.jetserver.handlers.netty.EventDecoder;
-import org.menacheri.jetserver.handlers.netty.MessageBufferEventEncoder;
 
 
 public class PipelineFactory extends ChannelInitializer<SocketChannel>

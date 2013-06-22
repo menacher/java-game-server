@@ -1,5 +1,7 @@
 package org.menacheri.zombie;
 
+import io.nadron.event.Event;
+import io.nadron.event.Events;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -14,8 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.menacheri.jetserver.event.Event;
-import org.menacheri.jetserver.event.Events;
 import org.menacheri.zombie.domain.IAM;
 
 public class DefenderHandler extends ChannelInboundHandlerAdapter

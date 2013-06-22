@@ -1,5 +1,6 @@
 package org.menacheri.zombie;
 
+import io.nadron.event.Events;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
@@ -8,7 +9,6 @@ import io.netty.channel.socket.DatagramChannel;
 import java.net.SocketAddress;
 import java.util.TimerTask;
 
-import org.menacheri.jetserver.event.Events;
 import org.menacheri.zombie.domain.IAM;
 import org.menacheri.zombie.domain.ZombieCommands;
 
