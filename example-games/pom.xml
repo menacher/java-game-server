@@ -6,8 +6,8 @@
 	<packaging>jar</packaging>
 	<version>0.1</version>
 	<name>example-games</name>
-	<url>http://maven.apache.org</url>
-	<description>This project holds some example multiplayer games that uses the nadron library. The server part is in src/main/java and the client part of the game is in src/test/java</description>
+	<url>https://github.com/menacher/java-game-server/tree/netty4/example-games</url>
+	<description>This project holds some example multiplayer games that uses the Nadron library. The server part is in src/main/java and the client part of the game is in src/test/java</description>
 
 	<!-- Shared version number properties -->
 	<properties>
@@ -33,7 +33,7 @@
 		<!-- Nad client dependency -->
 		<dependency>
 			<groupId>io.nadron</groupId>
-			<artifactId>client</artifactId>
+			<artifactId>nadclient</artifactId>
 			<version>0.1</version>
 			<type>jar</type>
 		</dependency>
