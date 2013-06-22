@@ -99,7 +99,7 @@
 
 	<!-- Execute the application from ant, note the use of jvm arg to provide log4j props -->
 	<target name="ExampleGamesServer" depends="jar">
-		<java classname="org.menacheri.GameServer" failonerror="true" fork="yes">
+		<java classname="io.nadron.GameServer" failonerror="true" fork="yes">
 			<jvmarg line="-Dlog4j.configuration=GameServerLog4j.properties" />
 			<classpath refid="runpath" />
 		</java>

@@ -11,6 +11,11 @@
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/com/adobe/blazeds/blazeds-common/3.2.0.3978/blazeds-common-3.2.0.3978.jar" sourcepath="M2_REPO/com/adobe/blazeds/blazeds-common/3.2.0.3978/blazeds-common-3.2.0.3978-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/adobe/blazeds/blazeds-core/3.2.0.3978/blazeds-core-3.2.0.3978.jar" sourcepath="M2_REPO/com/adobe/blazeds/blazeds-core/3.2.0.3978/blazeds-core-3.2.0.3978-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/io/nadron/client/0.1/client-0.1.jar" sourcepath="M2_REPO/io/nadron/client/0.1/client-0.1-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/C:/Users/aby/.m2/repository/io/nadron/client/0.1/client-0.1-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
   <classpathentry kind="var" path="M2_REPO/org/codehaus/jackson/jackson-core-asl/1.9.12/jackson-core-asl-1.9.12.jar" sourcepath="M2_REPO/org/codehaus/jackson/jackson-core-asl/1.9.12/jackson-core-asl-1.9.12-sources.jar">
     <attributes>
       <attribute value="jar:file:/C:/Users/aby/.m2/repository/org/codehaus/jackson/jackson-core-asl/1.9.12/jackson-core-asl-1.9.12-javadoc.jar!/" name="javadoc_location"/>
@@ -24,11 +29,6 @@
   <classpathentry kind="var" path="M2_REPO/org/slf4j/jcl-over-slf4j/1.7.2/jcl-over-slf4j-1.7.2.jar" sourcepath="M2_REPO/org/slf4j/jcl-over-slf4j/1.7.2/jcl-over-slf4j-1.7.2-sources.jar">
     <attributes>
       <attribute value="jar:file:/C:/Users/aby/.m2/repository/org/slf4j/jcl-over-slf4j/1.7.2/jcl-over-slf4j-1.7.2-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/menacheri/jetclient/0.1/jetclient-0.1.jar" sourcepath="M2_REPO/org/menacheri/jetclient/0.1/jetclient-0.1-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/C:/Users/aby/.m2/repository/org/menacheri/jetclient/0.1/jetclient-0.1-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/org/jetlang/jetlang/0.2.9/jetlang-0.2.9.jar" sourcepath="M2_REPO/org/jetlang/jetlang/0.2.9/jetlang-0.2.9-sources.jar">

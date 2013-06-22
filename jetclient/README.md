@@ -2,14 +2,14 @@ This is a client project for [jetserver](https://github.com/menacher/java-game-s
 
 About the Client
 ================
-Execute org.menacheri.TestClass from command line or eclipse and it will connect to remote jetserver and start receiving events. Assumption is that TestClass using accurate hostname and port number.
+Execute io.nadron.TestClass from command line or eclipse and it will connect to remote jetserver and start receiving events. Assumption is that TestClass using accurate hostname and port number.
 Execution  
 ---------
 Pointers on main classes, classpaths and command line flags.    
 
 **To start the client **    
 jetclient can be executed from console using below command.        
-java -cp ./jetclient-0.1.jar;./netty-3.3.1.Final.jar  org.menacheri.TestClass  
+java -cp ./jetclient-0.1.jar;./netty-3.3.1.Final.jar  io.nadron.TestClass  
 
 Usage as game client
 ====================

@@ -1,13 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.menacheri</groupId>
-	<artifactId>jetclient</artifactId>
+	<groupId>io.nadron</groupId>
+	<artifactId>client</artifactId>
 	<packaging>jar</packaging>
 	<version>0.1</version>
-	<name>jetclient</name>
-	<url>https://github.com/menacher/java-game-server/tree/master/jetclient</url>
-	<description>This is a client library for jetserver https://github.com/menacher/java-game-server/tree/master/jetserver. Java clients can use this program to connect and interact with jetserver.</description>
+	<name>client</name>
+	<url>https://github.com/menacher/java-game-server/tree/netty4/client</url>
+	<description>This is a client library for jetserver https://github.com/menacher/java-game-server/tree/netty4/nadron. Java clients can use this program to connect and interact with nadron server.</description>
 	
 	<parent>
         <groupId>org.sonatype.oss</groupId>

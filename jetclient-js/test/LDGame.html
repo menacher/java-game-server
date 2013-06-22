@@ -228,7 +228,7 @@
 				    //reset();
 				    session.onmessage = render;
 				    // Send the java event class name for Jackson to work properly.
-				    session.send(jet.CNameEvent("org.menacheri.lostdecade.LDEvent"));
+				    session.send(jet.CNameEvent("io.nadron.example.lostdecade.LDEvent"));
 				    then = Date.now();
 				    setInterval(main.bind(null, session), 30); // Gives around 33 fps.
 				}

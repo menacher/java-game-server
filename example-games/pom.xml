@@ -1,7 +1,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.menacheri</groupId>
+	<groupId>io.nadron</groupId>
 	<artifactId>example-games</artifactId>
 	<packaging>jar</packaging>
 	<version>0.1</version>
@@ -32,8 +32,8 @@
 		
 		<!-- jet client dependency -->
 		<dependency>
-			<groupId>org.menacheri</groupId>
-			<artifactId>jetclient</artifactId>
+			<groupId>io.nadron</groupId>
+			<artifactId>client</artifactId>
 			<version>0.1</version>
 			<type>jar</type>
 		</dependency>
