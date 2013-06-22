@@ -103,7 +103,7 @@
 				      "hero": hero
 				    };
 				    // send new position to gameroom
-				    session.send(jet.NEvent(jet.NETWORK_MESSAGE, message));
+				    session.send(nad.NEvent(nad.NETWORK_MESSAGE, message));
 
 				};
 
@@ -222,20 +222,20 @@
 				var then;
 
 				// This is the callback function that gets invoked
-				// when session is connected to jet server.
+				// when session is connected to Nadron server.
 				function sessionCB(session){
 				    // Let's play this game!
 				    //reset();
 				    session.onmessage = render;
 				    // Send the java event class name for Jackson to work properly.
-				    session.send(jet.CNameEvent("io.nadron.example.lostdecade.LDEvent"));
+				    session.send(nad.CNameEvent("io.nadron.example.lostdecade.LDEvent"));
 				    then = Date.now();
 				    setInterval(main.bind(null, session), 30); // Gives around 33 fps.
 				}
 		</script>
 		<script>
 			function startGame(){
-				jet.sessionFactory("ws://localhost:18090/nadsocket", config, sessionCB);
+				nad.sessionFactory("ws://localhost:18090/nadsocket", config, sessionCB);
 			}
 		</script>
 		<button type="button" onclick="startGame()">Start Game!</button>
