@@ -84,6 +84,7 @@ public class UDPUpstreamHandler extends ChannelInboundHandlerAdapter
 						remoteAddress);
 			}
 		}
+		msgs.releaseAll();
 	}
 
 	public Event getUDPConnectEvent(Event event, SocketAddress remoteAddress,
