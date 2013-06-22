@@ -9,7 +9,7 @@ Pointers on main classes, classpaths and command line flags.
 
 **To start the client **    
 client can be executed from console using below command.        
-java -cp ./client-0.1.jar;./netty-3.3.1.Final.jar  io.nadron.TestClass  
+java -cp ./client-0.1.jar;./netty-all-4.0.0.CR5.jar  io.nadron.TestClass  
 
 Usage as game client
 ====================

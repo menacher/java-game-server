@@ -11,11 +11,6 @@
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/com/adobe/blazeds/blazeds-common/3.2.0.3978/blazeds-common-3.2.0.3978.jar" sourcepath="M2_REPO/com/adobe/blazeds/blazeds-common/3.2.0.3978/blazeds-common-3.2.0.3978-sources.jar"/>
   <classpathentry kind="var" path="M2_REPO/com/adobe/blazeds/blazeds-core/3.2.0.3978/blazeds-core-3.2.0.3978.jar" sourcepath="M2_REPO/com/adobe/blazeds/blazeds-core/3.2.0.3978/blazeds-core-3.2.0.3978-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/io/nadron/client/0.1/client-0.1.jar" sourcepath="M2_REPO/io/nadron/client/0.1/client-0.1-sources.jar">
-    <attributes>
-      <attribute value="jar:file:/C:/Users/aby/.m2/repository/io/nadron/client/0.1/client-0.1-javadoc.jar!/" name="javadoc_location"/>
-    </attributes>
-  </classpathentry>
   <classpathentry kind="var" path="M2_REPO/org/codehaus/jackson/jackson-core-asl/1.9.12/jackson-core-asl-1.9.12.jar" sourcepath="M2_REPO/org/codehaus/jackson/jackson-core-asl/1.9.12/jackson-core-asl-1.9.12-sources.jar">
     <attributes>
       <attribute value="jar:file:/C:/Users/aby/.m2/repository/org/codehaus/jackson/jackson-core-asl/1.9.12/jackson-core-asl-1.9.12-javadoc.jar!/" name="javadoc_location"/>
@@ -44,6 +39,11 @@
   <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.16/log4j-1.2.16.jar" sourcepath="M2_REPO/log4j/log4j/1.2.16/log4j-1.2.16-sources.jar">
     <attributes>
       <attribute value="jar:file:/C:/Users/aby/.m2/repository/log4j/log4j/1.2.16/log4j-1.2.16-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/io/nadron/nadclient/0.1/nadclient-0.1.jar" sourcepath="M2_REPO/io/nadron/nadclient/0.1/nadclient-0.1-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/C:/Users/aby/.m2/repository/io/nadron/nadclient/0.1/nadclient-0.1-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/io/nadron/nadron/0.1/nadron-0.1.jar" sourcepath="M2_REPO/io/nadron/nadron/0.1/nadron-0.1-sources.jar">

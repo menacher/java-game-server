@@ -58,7 +58,7 @@ public class NettyTCPClient
 
 	/**
 	 * Creates an instance of a Netty TCP client which can then be used to
-	 * connect to a remote jet-server. This constructor delegates to
+	 * connect to a remote Nadron server. This constructor delegates to
 	 * {@link #NettyTCPClient(InetSocketAddress)} constructor after creating a
 	 * {@link InetSocketAddress} instance based on the host and port number
 	 * passed in.

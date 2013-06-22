@@ -1,6 +1,6 @@
 <projectDescription>
-  <name>client</name>
-  <comment>This is a client library for jetserver https://github.com/menacher/java-game-server/tree/netty4/nadron. Java clients can use this program to connect and interact with nadron server. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
+  <name>nadclient</name>
+  <comment>This is a client library for Nadron server https://github.com/menacher/java-game-server/tree/netty4/nadron. Java clients can use this program to connect and interact with nadron server. NO_M2ECLIPSE_SUPPORT: Project files created with the maven-eclipse-plugin are not supported in M2Eclipse.</comment>
   <projects/>
   <buildSpec>
     <buildCommand>
