@@ -125,7 +125,7 @@ public class SpringConfig
 	GameRoom ldGameRoom()
 	{
 		GameRoomSessionBuilder sessionBuilder = new GameRoomSessionBuilder();
-		sessionBuilder.parentGame(zombieGame()).gameRoomName("LDGameRoom")
+		sessionBuilder.parentGame(ldGame()).gameRoomName("LDGameRoom")
 				.protocol(webSocketProtocol);
 		LDRoom room = new LDRoom(sessionBuilder);
 		return room;
