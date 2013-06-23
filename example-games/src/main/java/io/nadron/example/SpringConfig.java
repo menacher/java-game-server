@@ -1,4 +1,4 @@
-package io.nadron.example.zombie.game;
+package io.nadron.example;
 
 import io.nadron.app.Game;
 import io.nadron.app.GameRoom;
@@ -8,6 +8,7 @@ import io.nadron.example.lostdecade.LDRoom;
 import io.nadron.example.zombie.domain.Defender;
 import io.nadron.example.zombie.domain.World;
 import io.nadron.example.zombie.domain.Zombie;
+import io.nadron.example.zombie.game.ZombieRoom;
 import io.nadron.handlers.netty.TextWebsocketEncoder;
 import io.nadron.protocols.Protocol;
 import io.nadron.service.LookupService;
@@ -36,7 +37,7 @@ import org.springframework.context.annotation.ImportResource;
  */
 @Configuration
 @ImportResource("classpath:/beans/beans.xml")
-public class ZombieSpringConfig
+public class SpringConfig
 {
 	@Autowired
 	@Qualifier("messageBufferProtocol")
@@ -115,7 +116,7 @@ public class ZombieSpringConfig
 	}
 
 	public @Bean(name = "LDGame")
-	Game LDGame()
+	Game ldGame()
 	{
 		return new SimpleGame(2, "LDGame");
 	}

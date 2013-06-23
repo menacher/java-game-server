@@ -213,19 +213,11 @@
 					then = now;
 				};
 
-				var config = {
-				    user: "user",
-				    pass: "pass",
-				    connectionKey: "LDGameRoom"
-				};
-
 				var then;
 
 				// This is the callback function that gets invoked
 				// when session is connected to Nadron server.
-				function sessionCB(session){
-				    // Let's play this game!
-				    //reset();
+				function sessionCreationCallback(session){
 				    session.onmessage = render;
 				    // Send the java event class name for Jackson to work properly.
 				    session.send(nad.CNameEvent("io.nadron.example.lostdecade.LDEvent"));
@@ -234,9 +226,16 @@
 				}
 		</script>
 		<script>
-			function startGame(){
-				nad.sessionFactory("ws://localhost:18090/nadsocket", config, sessionCB);
-			}
+				// simple object used to store credentials for logging in to remote Nadron server.
+				var config = {
+					user: "user",
+					pass: "pass",
+					connectionKey: "LDGameRoom"
+				};
+				// connect to remote Nadron server.
+				function startGame(){
+					nad.sessionFactory("ws://localhost:18090/nadsocket", config, sessionCreationCallback);
+				}
 		</script>
 		<button type="button" onclick="startGame()">Start Game!</button>
 	</body>

@@ -5,7 +5,6 @@ import io.nadron.app.Task;
 import io.nadron.example.zombie.domain.World;
 import io.nadron.example.zombie.domain.WorldMonitor;
 import io.nadron.example.zombie.game.ZombieRoom;
-import io.nadron.example.zombie.game.ZombieSpringConfig;
 import io.nadron.server.ServerManager;
 import io.nadron.service.TaskManagerService;
 
@@ -26,7 +25,7 @@ public class GameServer
 	{
 		PropertyConfigurator.configure(System
 				.getProperty("log4j.configuration"));
-		AbstractApplicationContext ctx = new AnnotationConfigApplicationContext(ZombieSpringConfig.class);
+		AbstractApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
 		// For the destroy method to work.
 		ctx.registerShutdownHook();
 		
