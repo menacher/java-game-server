@@ -5,8 +5,7 @@ import io.nadron.client.app.Session;
 import io.nadron.client.event.Event;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.MessageList;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.DatagramPacket;
 
 
@@ -21,7 +20,7 @@ import io.netty.channel.socket.DatagramPacket;
  * 
  */
 @Sharable
-public class UDPUpstreamHandler extends ChannelInboundHandlerAdapter
+public class UDPUpstreamHandler extends SimpleChannelInboundHandler<DatagramPacket>
 {
 	private final MessageBufferEventDecoder decoder;
 	
@@ -33,19 +32,15 @@ public class UDPUpstreamHandler extends ChannelInboundHandlerAdapter
 
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx,
-			MessageList<Object> msgs) throws Exception
+			DatagramPacket packet) throws Exception
 	{
-		MessageList<DatagramPacket> packets = msgs.cast();
-		for(DatagramPacket msg: packets){
-			Session session = NettyUDPClient.CLIENTS.get(ctx.channel().localAddress());
-			if (null != session)
-			{
-				Event event = (Event)decoder.decode(null, msg.content());
-				// Pass the event on to the session
-				session.onEvent(event);
-			}
+		Session session = NettyUDPClient.CLIENTS.get(ctx.channel().localAddress());
+		if (null != session)
+		{
+			Event event = (Event)decoder.decode(null, packet.content());
+			// Pass the event on to the session
+			session.onEvent(event);
 		}
-		msgs.releaseAll();
 	}
 	
 }

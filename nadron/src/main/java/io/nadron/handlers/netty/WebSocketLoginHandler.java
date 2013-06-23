@@ -20,8 +20,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.MessageList;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 
 import java.util.List;
@@ -40,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * 
  */
 @Sharable
-public class WebSocketLoginHandler extends ChannelInboundHandlerAdapter
+public class WebSocketLoginHandler extends SimpleChannelInboundHandler<TextWebSocketFrame>
 {
 	private static final Logger LOG = LoggerFactory
 			.getLogger(WebSocketLoginHandler.class);
@@ -54,41 +53,37 @@ public class WebSocketLoginHandler extends ChannelInboundHandlerAdapter
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx,
-			MessageList<Object> msgs) throws Exception
+			TextWebSocketFrame frame) throws Exception
 	{
-		if(msgs.size() > 0){
-			TextWebSocketFrame frame = (TextWebSocketFrame)msgs.get(0);
-			Channel channel = ctx.channel();
-			String data = frame.text();
-			LOG.trace("From websocket: " + data);
-			Event event = jackson.readValue(data, DefaultEvent.class);
-			int type = event.getType();
-			if (Events.LOG_IN == type)
-			{
-				LOG.trace("Login attempt from {}", channel.remoteAddress());
-				List<String> credList = null;
-				credList = (List) event.getSource();
-				Player player = lookupPlayer(credList.get(0), credList.get(1));
-				handleLogin(player, channel);
-				handleGameRoomJoin(player, channel, credList.get(2));
-			}
-			else if (type == Events.RECONNECT)
-			{
-				LOG.debug("Reconnect attempt from {}", channel.remoteAddress());
-				PlayerSession playerSession = lookupSession((String)event.getSource());
-				handleReconnect(playerSession, channel);
-			}
-			else
-			{
-				LOG.error(
-						"Invalid event {} sent from remote address {}. "
-								+ "Going to close channel {}",
-						new Object[] { event.getType(),
-								channel.remoteAddress(), channel.id() });
-				closeChannelWithLoginFailure(channel);
-			}
+		Channel channel = ctx.channel();
+		String data = frame.text();
+		LOG.trace("From websocket: " + data);
+		Event event = jackson.readValue(data, DefaultEvent.class);
+		int type = event.getType();
+		if (Events.LOG_IN == type)
+		{
+			LOG.trace("Login attempt from {}", channel.remoteAddress());
+			List<String> credList = null;
+			credList = (List) event.getSource();
+			Player player = lookupPlayer(credList.get(0), credList.get(1));
+			handleLogin(player, channel);
+			handleGameRoomJoin(player, channel, credList.get(2));
 		}
-		msgs.releaseAll();
+		else if (type == Events.RECONNECT)
+		{
+			LOG.debug("Reconnect attempt from {}", channel.remoteAddress());
+			PlayerSession playerSession = lookupSession((String)event.getSource());
+			handleReconnect(playerSession, channel);
+		}
+		else
+		{
+			LOG.error(
+					"Invalid event {} sent from remote address {}. "
+							+ "Going to close channel {}",
+					new Object[] { event.getType(),
+							channel.remoteAddress(), channel.id() });
+			closeChannelWithLoginFailure(channel);
+		}
 	}
 	
 	public PlayerSession lookupSession(final String reconnectKey)

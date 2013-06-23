@@ -5,8 +5,7 @@ import io.nadron.app.PlayerSession;
 import io.nadron.event.Event;
 import io.nadron.event.Events;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.MessageList;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.handler.timeout.IdleStateEvent;
 
 import org.slf4j.Logger;
@@ -20,7 +19,7 @@ import org.slf4j.LoggerFactory;
  * @author Abraham Menacherry
  * 
  */
-public class DefaultToServerHandler extends ChannelInboundHandlerAdapter
+public class DefaultToServerHandler extends SimpleChannelInboundHandler<Event>
 {
 	private static final Logger LOG = LoggerFactory.getLogger(DefaultToServerHandler.class);
 	
@@ -37,13 +36,9 @@ public class DefaultToServerHandler extends ChannelInboundHandlerAdapter
 
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx,
-			MessageList<Object> msgs) throws Exception
+			Event msg) throws Exception
 	{
-		MessageList<Event> events = msgs.cast();
-		for(Event event:events){
-			playerSession.onEvent(event);
-		}
-		msgs.releaseAll();
+		playerSession.onEvent(msg);
 	}
 
 	@Override

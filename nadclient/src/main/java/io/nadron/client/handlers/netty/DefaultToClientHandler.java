@@ -5,9 +5,8 @@ import io.nadron.client.app.Session;
 import io.nadron.client.event.Event;
 import io.nadron.client.event.Events;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
 import io.netty.channel.ChannelPipeline;
-import io.netty.channel.MessageList;
+import io.netty.channel.SimpleChannelInboundHandler;
 
 
 /**
@@ -17,7 +16,7 @@ import io.netty.channel.MessageList;
  * @author Abraham Menacherry.
  * 
  */
-public class DefaultToClientHandler extends ChannelInboundHandlerAdapter
+public class DefaultToClientHandler extends SimpleChannelInboundHandler<Event>
 {
 	static final String NAME = "defaultHandler";
 	private final Session session;
@@ -29,13 +28,9 @@ public class DefaultToClientHandler extends ChannelInboundHandlerAdapter
 
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx,
-			MessageList<Object> msgs) throws Exception
+			Event event) throws Exception
 	{
-		MessageList<Event> events = msgs.cast();
-		for(Event event : events){
-			session.onEvent(event);
-		}
-		msgs.releaseAll();
+		session.onEvent(event);
 	}
 	
 	// TODO check what other methods need to be caught.

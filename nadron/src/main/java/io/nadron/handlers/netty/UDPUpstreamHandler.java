@@ -1,15 +1,14 @@
 package io.nadron.handlers.netty;
 
 import io.nadron.app.Session;
-import io.nadron.communication.NettyUDPMessageSender;
 import io.nadron.communication.MessageSender.Fast;
+import io.nadron.communication.NettyUDPMessageSender;
 import io.nadron.event.Event;
 import io.nadron.event.Events;
 import io.nadron.service.SessionRegistryService;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.MessageList;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.DatagramPacket;
 
@@ -18,7 +17,7 @@ import java.net.SocketAddress;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class UDPUpstreamHandler extends ChannelInboundHandlerAdapter
+public class UDPUpstreamHandler extends SimpleChannelInboundHandler<DatagramPacket>
 {
 	private static final Logger LOG = LoggerFactory.getLogger(UDPUpstreamHandler.class);
 	private static final String UDP_CONNECTING = "UDP_CONNECTING";
@@ -32,59 +31,55 @@ public class UDPUpstreamHandler extends ChannelInboundHandlerAdapter
 	
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx,
-			MessageList<Object> msgs) throws Exception
+			DatagramPacket packet) throws Exception
 	{
-		MessageList<DatagramPacket> packets = msgs.cast();
-		for(DatagramPacket packet: packets){
-			// Get the session using the remoteAddress.
-			SocketAddress remoteAddress = packet.sender();
-			Session session = udpSessionRegistry.getSession(remoteAddress);
-			if (null != session) 
-			{
-				ByteBuf buffer = packet.content();
-				Event event = (Event) messageBufferEventDecoder
-						.decode(null, buffer);
+		// Get the session using the remoteAddress.
+		SocketAddress remoteAddress = packet.sender();
+		Session session = udpSessionRegistry.getSession(remoteAddress);
+		if (null != session) 
+		{
+			ByteBuf buffer = packet.content();
+			Event event = (Event) messageBufferEventDecoder
+					.decode(null, buffer);
 
-				// If the session's UDP has not been connected yet then send a
-				// CONNECT event.
-				if (!session.isUDPEnabled()) 
+			// If the session's UDP has not been connected yet then send a
+			// CONNECT event.
+			if (!session.isUDPEnabled()) 
+			{
+				if (null == session.getAttribute(UDP_CONNECTING)
+						|| (!(Boolean) session.getAttribute(UDP_CONNECTING))) 
 				{
-					if (null == session.getAttribute(UDP_CONNECTING)
-							|| (!(Boolean) session.getAttribute(UDP_CONNECTING))) 
-					{
-						session.setAttribute(UDP_CONNECTING, true);
-						event = getUDPConnectEvent(event, remoteAddress,
-								(DatagramChannel) ctx.channel());
-						// Pass the connect event on to the session
-						session.onEvent(event);
-					}
-					else
-					{
-						LOG.info("Going to discard UDP Message Event with type {} "
-								+ "the UDP MessageSender is not initialized fully",
-								event.getType());
-					}
-				} 
-				else if (event.getType() == Events.CONNECT) 
-				{
-					// Duplicate connect just discard.
-					LOG.trace("Duplicate CONNECT {} received in UDP channel, "
-							+ "for session: {} going to discard", event, session);
-				} 
-				else 
-				{
-					// Pass the original event on to the session
+					session.setAttribute(UDP_CONNECTING, true);
+					event = getUDPConnectEvent(event, remoteAddress,
+							(DatagramChannel) ctx.channel());
+					// Pass the connect event on to the session
 					session.onEvent(event);
 				}
+				else
+				{
+					LOG.info("Going to discard UDP Message Event with type {} "
+							+ "the UDP MessageSender is not initialized fully",
+							event.getType());
+				}
+			} 
+			else if (event.getType() == Events.CONNECT) 
+			{
+				// Duplicate connect just discard.
+				LOG.trace("Duplicate CONNECT {} received in UDP channel, "
+						+ "for session: {} going to discard", event, session);
 			} 
 			else 
 			{
-				LOG.trace(
-						"Packet received from unknown source address: {}, going to discard",
-						remoteAddress);
+				// Pass the original event on to the session
+				session.onEvent(event);
 			}
+		} 
+		else 
+		{
+			LOG.trace(
+					"Packet received from unknown source address: {}, going to discard",
+					remoteAddress);
 		}
-		msgs.releaseAll();
 	}
 
 	public Event getUDPConnectEvent(Event event, SocketAddress remoteAddress,

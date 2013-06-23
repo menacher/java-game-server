@@ -24,8 +24,7 @@ import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.MessageList;
+import io.netty.channel.SimpleChannelInboundHandler;
 
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
@@ -36,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 
 @Sharable
-public class LoginHandler extends ChannelInboundHandlerAdapter
+public class LoginHandler extends SimpleChannelInboundHandler<Event>
 {
 	private static final Logger LOG = LoggerFactory
 			.getLogger(LoginHandler.class);
@@ -54,38 +53,32 @@ public class LoginHandler extends ChannelInboundHandlerAdapter
 
 	@Override
 	public void messageReceived(ChannelHandlerContext ctx,
-			MessageList<Object> msgs) throws Exception
+			Event event) throws Exception
 	{
-		MessageList<Event> events = msgs.cast();
-		
-		if(events.size() > 0){
-			Event event = events.get(0);
-			final ByteBuf buffer = (ByteBuf) event.getSource();
-			final Channel channel =  ctx.channel();
-			int type = event.getType();
-			if (Events.LOG_IN == type)
-			{
-				LOG.debug("Login attempt from {}", channel.remoteAddress());
-				Player player = lookupPlayer(buffer, channel);
-				handleLogin(player, ctx, buffer);
-			}
-			else if (Events.RECONNECT == type)
-			{
-				LOG.debug("Reconnect attempt from {}", channel.remoteAddress());
-				String reconnectKey = NettyUtils.readString(buffer);
-				PlayerSession playerSession = lookupSession(reconnectKey);
-				handleReconnect(playerSession, ctx, buffer);
-			}
-			else
-			{
-				LOG.error("Invalid event {} sent from remote address {}. "
-						+ "Going to close channel {}",
-						new Object[] { event.getType(), channel.remoteAddress(),
-								channel.id() });
-				closeChannelWithLoginFailure(channel);
-			}
+		final ByteBuf buffer = (ByteBuf) event.getSource();
+		final Channel channel =  ctx.channel();
+		int type = event.getType();
+		if (Events.LOG_IN == type)
+		{
+			LOG.debug("Login attempt from {}", channel.remoteAddress());
+			Player player = lookupPlayer(buffer, channel);
+			handleLogin(player, ctx, buffer);
 		}
-		msgs.releaseAll();
+		else if (Events.RECONNECT == type)
+		{
+			LOG.debug("Reconnect attempt from {}", channel.remoteAddress());
+			String reconnectKey = NettyUtils.readString(buffer);
+			PlayerSession playerSession = lookupSession(reconnectKey);
+			handleReconnect(playerSession, ctx, buffer);
+		}
+		else
+		{
+			LOG.error("Invalid event {} sent from remote address {}. "
+					+ "Going to close channel {}",
+					new Object[] { event.getType(), channel.remoteAddress(),
+							channel.id() });
+			closeChannelWithLoginFailure(channel);
+		}
 	}
 	
 	@Override
