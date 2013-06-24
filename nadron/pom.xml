@@ -208,17 +208,6 @@
 				</executions>
 			</plugin>
 
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.4.1</version>
-				<configuration>
-					<arguments>-P release,sonatype-oss-release,full,no-osgi</arguments>
-					<autoVersionSubmodules>true</autoVersionSubmodules>
-					<allowTimestampedSnapshots>false</allowTimestampedSnapshots>
-					<tagNameFormat>nadron-@{project.version}</tagNameFormat>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
 </project>
