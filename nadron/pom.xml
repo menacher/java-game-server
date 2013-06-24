@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.menacher</groupId>
 	<artifactId>nadron</artifactId>
@@ -203,6 +204,23 @@
 						<goals>
 							<goal>sign</goal>
 						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.4.1</version>
+				<executions>
+					<execution>
+						<id>default</id>
+						<goals>
+							<goal>perform</goal>
+						</goals>
+						<configuration>
+							<pomFileName>C:/Users/aby/Documents/GitHub/java-game-server/nadron/target/checkout/nadron/pom.xml</pomFileName>
+						</configuration>
 					</execution>
 				</executions>
 			</plugin>
