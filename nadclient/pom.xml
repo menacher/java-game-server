@@ -109,7 +109,24 @@
 				<artifactId>maven-surefire-plugin</artifactId>
 				<version>2.15</version>
 			</plugin>
-
+	
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.4.1</version>
+				<executions>
+					<execution>
+						<id>default</id>
+						<goals>
+							<goal>perform</goal>
+						</goals>
+						<configuration>
+							<pomFileName>C:/Users/aby/Documents/GitHub/java-game-server/nadclient/target/checkout/nadclient/pom.xml</pomFileName>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
 		</plugins>
 	</build>
 
