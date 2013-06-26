@@ -2,12 +2,23 @@ JetServer is a java nio based server specifically designed for mutliplayer games
 
 Wiki
 ====
-The [wiki](https://github.com/menacher/java-game-server/wiki) provides implementation level details and answers to general questions that a developer starting to use jetserver might have about it.
+The [wiki](https://github.com/menacher/java-game-server/wiki) provides implementation level details and answers to general questions that a developer starting to use jetserver might have about it. The following [blog](http://nerdronix.blogspot.com/2013/06/creating-multiplayer-game-using-html-5.html) has post on game creation.
 Support Group
 =============
 For general discussion please use the [jetserver google group](https://groups.google.com/forum/#!forum/jetserver). Issues and bugs can be raised directly in github.
 Installation
 ============
+Maven
+-----
+```xml
+<dependency>
+    <groupId>com.github.menacher</groupId>
+    <artifactId>nadron</artifactId>
+    <version>0.2</version>
+</dependency>
+```
+From Source
+-----------
 Using pre-built jar files
 -------------------------
 The pre-built jar files of this project are located in the jetserver/binaries directory. All dependant jars are located in the jetserver/lib directory. You can just add them to your classpath in your favorite IDE and start coding. If you want to compile from source, then follow steps below.
