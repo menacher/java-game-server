@@ -12,7 +12,7 @@ import io.netty.handler.timeout.IdleStateHandler;
 /**
  * @author <a href="http://www.waywardmonkeys.com/">Bruce Mitchener</a>
  */
-public class FlashPolicyServerPipelineFactory extends ChannelInitializer<SocketChannel>
+public class FlashPolicyServerChannelInitalizer extends ChannelInitializer<SocketChannel>
 {
 
 	// TODO make this configurable from spring.

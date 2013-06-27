@@ -56,7 +56,6 @@ public class NettyUDPServer extends AbstractNettyServer
 					.channel(NioDatagramChannel.class)
 					.handler(getChannelInitializer())
 					.bind(nettyConfig.getSocketAddress()).channel();
-			// Check if all channels need be closed.
 			ALL_CHANNELS.add(channel);
 		} 
 		catch (Exception e) 

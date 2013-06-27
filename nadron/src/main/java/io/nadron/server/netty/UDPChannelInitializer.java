@@ -8,7 +8,7 @@ import io.netty.channel.socket.DatagramChannel;
 
 
 
-public class UDPChannelPipelineFactory extends ChannelInitializer<DatagramChannel>
+public class UDPChannelInitializer extends ChannelInitializer<DatagramChannel>
 {
 	/**
 	 * This pipeline will be shared across all the channels. In Netty UDP
@@ -21,12 +21,12 @@ public class UDPChannelPipelineFactory extends ChannelInitializer<DatagramChanne
 	// Create a default pipeline implementation.
 	private UDPUpstreamHandler upstream;
 
-	public UDPChannelPipelineFactory()
+	public UDPChannelInitializer()
 	{
 
 	}
 
-	public UDPChannelPipelineFactory(UDPUpstreamHandler upstream)
+	public UDPChannelInitializer(UDPUpstreamHandler upstream)
 	{
 		this.upstream = upstream;
 	}
