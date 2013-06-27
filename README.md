@@ -2,12 +2,21 @@ Nadron is a java nio based server specifically designed for mutliplayer games. I
 
 Wiki
 ====
-The [wiki](https://github.com/menacher/java-game-server/wiki) provides implementation level details and answers to general questions that a developer starting to use Nadron server might have about it. This [blog post](http://nerdronix.blogspot.com/2013/06/creating-multiplayer-game-using-html-5.html) contains a decent tutorial on creating a multiplayer game using this server.
+The [wiki](https://github.com/menacher/java-game-server/wiki) provides implementation level details and answers to general questions that a developer starting to use Nadron server might have about it. This [blog post](http://nerdronix.blogspot.com/2013/06/creating-multiplayer-game-using-html-5.html) contains a decent tutorial on creating a multiplayer game using this server. 
 Support Group
 =============
 For general discussion please use the [Nadron server google group](https://groups.google.com/forum/#!forum/jetserver). Issues and bugs can be raised directly in github.
 Installation
 ============
+Maven
+-----
+```xml
+<dependency>
+    <groupId>com.github.menacher</groupId>
+    <artifactId>nadron</artifactId>
+    <version>0.2</version>
+</dependency>
+```
 Using pre-built jar files
 -------------------------
 The pre-built jar files of this project are located in the nadron/binaries directory. All dependant jars are located in the nadron/lib directory. You can just add them to your classpath in your favorite IDE and start coding. If you want to compile from source, then follow steps below.
