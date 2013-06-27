@@ -2,9 +2,9 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
 	xmlns:util="http://www.springframework.org/schema/util"
-	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
-	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd 
-	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.0.xsd">
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd 
+	http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd 
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd">
 
 	<import resource="service-beans.xml" />
 
@@ -64,12 +64,12 @@
 		<property name="jackson" ref="jackson" />
 	</bean>
 
-	<bean id="bossGroup" class="io.netty.channel.nio.NioEventLoopGroup">
+	<bean id="bossGroup" class="io.netty.channel.nio.NioEventLoopGroup" destroy-method="shutdownGracefully">
 		<constructor-arg type="int" index="0" value="${bossThreadCount}" />
 		<constructor-arg index="1" ref="bossThreadFactory" />
 	</bean>
 
-	<bean id="workerGroup" class="io.netty.channel.nio.NioEventLoopGroup">
+	<bean id="workerGroup" class="io.netty.channel.nio.NioEventLoopGroup" destroy-method="shutdownGracefully">
 		<constructor-arg type="int" index="0"
 			value="${workerThreadCount}" />
 		<constructor-arg index="1" ref="workerThreadFactory" />
