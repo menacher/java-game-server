@@ -31,7 +31,7 @@ public class UDPUpstreamHandler extends SimpleChannelInboundHandler<DatagramPack
 	}
 
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx,
+	public void channelRead0(ChannelHandlerContext ctx,
 			DatagramPacket packet) throws Exception
 	{
 		Session session = NettyUDPClient.CLIENTS.get(ctx.channel().localAddress());

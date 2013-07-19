@@ -7,8 +7,9 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.MessageList;
 import io.netty.handler.codec.MessageToMessageDecoder;
+
+import java.util.List;
 
 
 /**
@@ -27,7 +28,7 @@ public class MessageBufferEventDecoder extends MessageToMessageDecoder<ByteBuf>
 
 	@Override
 	protected void decode(ChannelHandlerContext ctx, ByteBuf buffer,
-			MessageList<Object> out) throws Exception
+			List<Object> out) throws Exception
 	{
 		out.add(decode(ctx, buffer));
 	}

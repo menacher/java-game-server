@@ -5,8 +5,9 @@ import io.nadron.event.Event;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.MessageList;
 import io.netty.handler.codec.MessageToMessageEncoder;
+
+import java.util.List;
 
 
 
@@ -16,7 +17,7 @@ public class MessageBufferEventEncoder extends MessageToMessageEncoder<Event>
 
 	@Override
 	protected void encode(ChannelHandlerContext ctx, Event event,
-			MessageList<Object> out) throws Exception
+			List<Object> out) throws Exception
 	{
 		out.add(encode(ctx, event));
 	}

@@ -55,7 +55,7 @@ public class NettyUDPMessageSender implements Fast
 		if(message instanceof Event){
 			((Event)message).setEventContext(eventContext);
 		}
-		return channel.write(message);
+		return channel.writeAndFlush(message);
 	}
 
 	@Override
@@ -92,10 +92,10 @@ public class NettyUDPMessageSender implements Fast
 	@Override
 	public String toString()
 	{
-		String channelId = "UDP Channel with id: ";
+		String channelId = "UDP Channel: ";
 		if (null != channel)
 		{
-			channelId += channel.id();
+			channelId += channel.toString();
 		}
 		else
 		{

@@ -4,13 +4,12 @@ import flex.messaging.io.SerializationContext;
 import io.nadron.convert.Transform;
 import io.nadron.convert.flex.AMFDeSerializer;
 import io.netty.buffer.ByteBuf;
-import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.MessageList;
 import io.netty.handler.codec.ByteToMessageDecoder;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,14 +21,13 @@ import org.slf4j.LoggerFactory;
  * @author Abraham Menacherry.
  * 
  */
-@Sharable
 public class AMF3ToJavaObjectDecoder extends ByteToMessageDecoder implements Transform<ByteBuf, Object>
 {
 	private static final Logger LOG = LoggerFactory.getLogger(AMF3ToJavaObjectDecoder.class);
 	
 	@Override
 	protected void decode(ChannelHandlerContext ctx, ByteBuf in,
-			MessageList<Object> out) throws Exception
+			List<Object> out) throws Exception
 	{
 		if(null == in)
 		{

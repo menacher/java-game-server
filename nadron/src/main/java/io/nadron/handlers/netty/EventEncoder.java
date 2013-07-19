@@ -5,8 +5,9 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.MessageList;
 import io.netty.handler.codec.MessageToMessageEncoder;
+
+import java.util.List;
 
 
 
@@ -26,7 +27,7 @@ public class EventEncoder extends MessageToMessageEncoder<Event>
 	
 	@Override
 	protected void encode(ChannelHandlerContext ctx, Event event,
-			MessageList<Object> out) throws Exception
+			List<Object> out) throws Exception
 	{
 		ByteBuf opcode = ctx.alloc().buffer(1);
 		opcode.writeByte(event.getType());

@@ -4,8 +4,9 @@ import io.nadron.util.BinaryUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
-import io.netty.channel.MessageList;
 import io.netty.handler.codec.ByteToMessageDecoder;
+
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +39,7 @@ public class ProtocolMultiplexerDecoder extends ByteToMessageDecoder
 
 	@Override
 	protected void decode(ChannelHandlerContext ctx, ByteBuf in,
-			MessageList<Object> out) throws Exception
+			List<Object> out) throws Exception
 	{
 		// Will use the first bytes to detect a protocol.
 		if (in.readableBytes() < bytesForProtocolCheck)
@@ -55,7 +56,7 @@ public class ProtocolMultiplexerDecoder extends ByteToMessageDecoder
 					bytesForProtocolCheck);
 			LOG.error(
 					"Unknown protocol, discard everything and close the connection {}. Incoming Bytes {}",
-					ctx.channel().id(),
+					ctx.channel(),
 					BinaryUtils.getHexString(headerBytes));
 			close(in, ctx);
 		}

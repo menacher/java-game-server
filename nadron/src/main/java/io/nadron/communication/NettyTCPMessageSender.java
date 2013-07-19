@@ -33,7 +33,7 @@ public class NettyTCPMessageSender implements Reliable
 	@Override
 	public Object sendMessage(Object message)
 	{
-		return channel.write(message);
+		return channel.writeAndFlush(message);
 	}
 
 	@Override
@@ -73,10 +73,10 @@ public class NettyTCPMessageSender implements Reliable
 	@Override
 	public String toString()
 	{
-		String channelId = "TCP channel with Id: ";
+		String channelId = "TCP channel: ";
 		if (null != channel)
 		{
-			channelId += channel.id().toString();
+			channelId += channel.toString();
 		}
 		else
 		{

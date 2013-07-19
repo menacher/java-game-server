@@ -57,7 +57,7 @@ public class FlashPolicyServerHandler extends SimpleChannelInboundHandler<Object
 	}
 
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx,
+	public void channelRead0(ChannelHandlerContext ctx,
 			Object msg) throws Exception
 	{
 		ChannelFuture f = null;

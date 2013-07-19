@@ -186,7 +186,7 @@ public class NettyTCPClient
 				{
 					if (future.isSuccess())
 					{
-						future.channel().write(loginEvent);
+						future.channel().writeAndFlush(loginEvent);
 					}
 					else
 					{

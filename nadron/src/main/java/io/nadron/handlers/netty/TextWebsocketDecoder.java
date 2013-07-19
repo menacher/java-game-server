@@ -5,11 +5,12 @@ import io.nadron.event.Events;
 import io.nadron.event.impl.DefaultEvent;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.MessageList;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
 import io.netty.util.Attribute;
 import io.netty.util.AttributeKey;
+
+import java.util.List;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -40,7 +41,7 @@ public class TextWebsocketDecoder extends
 
 	@Override
 	protected void decode(ChannelHandlerContext ctx, TextWebSocketFrame frame,
-			MessageList<Object> out) throws Exception
+			List<Object> out) throws Exception
 	{
 		// Get the existing class from the context. If not available, then
 		// default to DefaultEvent.class

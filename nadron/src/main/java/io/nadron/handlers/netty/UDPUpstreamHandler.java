@@ -30,7 +30,7 @@ public class UDPUpstreamHandler extends SimpleChannelInboundHandler<DatagramPack
 	}
 	
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx,
+	public void channelRead0(ChannelHandlerContext ctx,
 			DatagramPacket packet) throws Exception
 	{
 		// Get the session using the remoteAddress.
@@ -121,5 +121,6 @@ public class UDPUpstreamHandler extends SimpleChannelInboundHandler<DatagramPack
 	{
 		this.messageBufferEventDecoder = messageBufferEventDecoder;
 	}
+
 	
 }

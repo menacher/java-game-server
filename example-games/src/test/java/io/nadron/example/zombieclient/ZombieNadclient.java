@@ -24,7 +24,7 @@ public class ZombieNadclient
 				.nadronUdpHostName("255.255.255.255").udpPort(18090);
 		ScheduledExecutorService taskExecutor = Executors.newSingleThreadScheduledExecutor();
 		SessionFactory sessionFactory = null;
-		for(int i = 1; i<=5 ; i++)
+		for(int i = 1; i<= 5 ; i++)
 		{
 			builder.connectionKey("Zombie_ROOM_" + i);
 			LoginHelper loginHelper = builder.build();

@@ -5,14 +5,13 @@ import io.nadron.event.Events;
 import io.nadron.example.zombie.domain.ZombieCommands;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.MessageList;
+import io.netty.channel.SimpleChannelInboundHandler;
 
 import java.util.concurrent.ScheduledExecutorService;
 
 
 
-public class TimerCanceller extends ChannelInboundHandlerAdapter
+public class TimerCanceller extends SimpleChannelInboundHandler<Event>
 {
 	String type = null;
 	ScheduledExecutorService service = null;
@@ -23,28 +22,24 @@ public class TimerCanceller extends ChannelInboundHandlerAdapter
 	}
 	
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx,
-			MessageList<Object> msgs) throws Exception
+	public void channelRead0(ChannelHandlerContext ctx,
+			Event event) throws Exception
 	{
-		MessageList<Event> events = msgs.cast();
-		for(Event event: events){
-			if(Events.NETWORK_MESSAGE == event.getType())
+		if(Events.NETWORK_MESSAGE == event.getType())
+		{
+			ByteBuf apocalypse = (ByteBuf) event.getSource();
+			if(apocalypse.readableBytes()>=4)
 			{
-				ByteBuf apocalypse = (ByteBuf) event.getSource();
-				if(apocalypse.readableBytes()>=4)
+				int cmd = apocalypse.readInt();
+				ZombieCommands command = ZombieCommands.CommandsEnum.fromInt(cmd);
+				if(command == ZombieCommands.APOCALYPSE)
 				{
-					int cmd = apocalypse.readInt();
-					ZombieCommands command = ZombieCommands.CommandsEnum.fromInt(cmd);
-					if(command == ZombieCommands.APOCALYPSE)
-					{
-						System.out.println("Cancelling " + type +  " timer due to apocalypse");
-						service.shutdown();
-						ctx.channel().close();
-					}
+					System.out.println("Cancelling " + type +  " timer due to apocalypse");
+					service.shutdown();
+					ctx.channel().close();
 				}
 			}
 		}
-		msgs.releaseAll();
 	}
 	
 	@Override

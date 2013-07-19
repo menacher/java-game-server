@@ -6,8 +6,7 @@ import io.nadron.example.zombie.domain.IAM;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-import io.netty.channel.MessageList;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.DatagramChannel;
 
@@ -18,7 +17,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 
-public class ZombieHandler extends ChannelInboundHandlerAdapter
+public class ZombieHandler extends SimpleChannelInboundHandler<Event>
 {
 	private static final IAM I_AM = IAM.ZOMBIE;
 	private static final Map<InetSocketAddress, DatagramChannel> CLIENTS = new HashMap<InetSocketAddress, DatagramChannel>();
@@ -40,7 +39,7 @@ public class ZombieHandler extends ChannelInboundHandlerAdapter
 	
 	public void connectUDP(Channel channel)
 	{
-		InetSocketAddress address = ZombieClient.CHANNEL_ID_ADDRESS_MAP.get(channel.id());
+		InetSocketAddress address = ZombieClient.CHANNEL_ID_ADDRESS_MAP.get(channel);
 		System.out.println("UDP address for connect UDP: " + address);
 		final DatagramChannel c = CLIENTS.get(address);
 		if ((udpClient != null) && (c != null))
@@ -68,37 +67,33 @@ public class ZombieHandler extends ChannelInboundHandlerAdapter
 	}
 
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx,
-			MessageList<Object> msgs) throws Exception
+	public void channelRead0(ChannelHandlerContext ctx,
+			Event event) throws Exception
 	{
-		MessageList<Event> events = msgs.cast();
-		for(Event event: events){
-			if (Events.START == event.getType())
+		if (Events.START == event.getType())
+		{
+			// TCP write to server
+			WriteByte write = new WriteByte(ctx.channel(), null,
+					IAM.DEFENDER);
+			ZombieClient.SERVICE.scheduleAtFixedRate(write, 10000l, 500,
+					TimeUnit.MILLISECONDS);
+			// For UDP write to server
+			connectUDP(ctx.channel());
+		}
+		else if (Events.NETWORK_MESSAGE == event.getType())
+		{
+			ByteBuf buffer = (ByteBuf) event.getSource();
+			if (buffer.readableBytes() >= 4)
 			{
-				// TCP write to server
-				WriteByte write = new WriteByte(ctx.channel(), null,
-						IAM.DEFENDER);
-				ZombieClient.SERVICE.scheduleAtFixedRate(write, 10000l, 500,
-						TimeUnit.MILLISECONDS);
-				// For UDP write to server
-				connectUDP(ctx.channel());
+				System.out
+						.println("UDP event from server in DefenderHandler: "
+								+ buffer.readInt());
 			}
-			else if (Events.NETWORK_MESSAGE == event.getType())
+			else
 			{
-				ByteBuf buffer = (ByteBuf) event.getSource();
-				if (buffer.readableBytes() >= 4)
-				{
-					System.out
-							.println("UDP event from server in DefenderHandler: "
-									+ buffer.readInt());
-				}
-				else
-				{
-					System.out
-							.println("UDP Event does not have expected data in DefenderHandler");
-				}
+				System.out
+						.println("UDP Event does not have expected data in DefenderHandler");
 			}
 		}
-		msgs.releaseAll();
 	}
 }

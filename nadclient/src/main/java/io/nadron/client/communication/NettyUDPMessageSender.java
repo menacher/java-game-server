@@ -72,10 +72,10 @@ public class NettyUDPMessageSender implements Fast
 	@Override
 	public String toString()
 	{
-		String channelId = "UDP Channel with id: ";
+		String channelId = "UDP Channel: ";
 		if (null != channel)
 		{
-			channelId += channel.id();
+			channelId += channel.toString();
 		}
 		else
 		{

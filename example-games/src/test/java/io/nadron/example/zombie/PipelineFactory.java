@@ -8,12 +8,12 @@ import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelPipeline;
-import io.netty.channel.MessageList;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 import io.netty.handler.codec.MessageToMessageDecoder;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -50,7 +50,7 @@ public class PipelineFactory extends ChannelInitializer<SocketChannel>
 		
 		@Override
 		protected void decode(ChannelHandlerContext ctx, Event event,
-				MessageList<Object> out) throws Exception
+				List<Object> out) throws Exception
 		{
 			if(Events.START == event.getType())
 			{

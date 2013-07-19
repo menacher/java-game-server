@@ -3,9 +3,10 @@ package io.nadron.handlers.netty;
 import io.nadron.event.Event;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.MessageList;
 import io.netty.handler.codec.MessageToMessageEncoder;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+
+import java.util.List;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -26,7 +27,7 @@ public class TextWebsocketEncoder extends MessageToMessageEncoder<Event>
 
 	@Override
 	protected void encode(ChannelHandlerContext ctx, Event msg,
-			MessageList<Object> out) throws Exception
+			List<Object> out) throws Exception
 	{
 		String json = jackson.writeValueAsString(msg);
 		out.add(new TextWebSocketFrame(json));

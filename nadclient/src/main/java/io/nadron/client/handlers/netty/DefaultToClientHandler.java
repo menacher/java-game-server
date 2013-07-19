@@ -27,7 +27,7 @@ public class DefaultToClientHandler extends SimpleChannelInboundHandler<Event>
 	}
 
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx,
+	public void channelRead0(ChannelHandlerContext ctx,
 			Event event) throws Exception
 	{
 		session.onEvent(event);

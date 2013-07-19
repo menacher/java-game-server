@@ -52,7 +52,7 @@ public class WebSocketLoginHandler extends SimpleChannelInboundHandler<TextWebSo
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public void messageReceived(ChannelHandlerContext ctx,
+	public void channelRead0(ChannelHandlerContext ctx,
 			TextWebSocketFrame frame) throws Exception
 	{
 		Channel channel = ctx.channel();
@@ -81,7 +81,7 @@ public class WebSocketLoginHandler extends SimpleChannelInboundHandler<TextWebSo
 					"Invalid event {} sent from remote address {}. "
 							+ "Going to close channel {}",
 					new Object[] { event.getType(),
-							channel.remoteAddress(), channel.id() });
+							channel.remoteAddress(), channel });
 			closeChannelWithLoginFailure(channel);
 		}
 	}
@@ -112,7 +112,7 @@ public class WebSocketLoginHandler extends SimpleChannelInboundHandler<TextWebSo
 	{
 		if (null != playerSession)
 		{
-			channel.write(eventToFrame(Events.LOG_IN_SUCCESS, null));
+			channel.writeAndFlush(eventToFrame(Events.LOG_IN_SUCCESS, null));
 			GameRoom gameRoom = playerSession.getGameRoom();
 			gameRoom.disconnectSession(playerSession);
 			if (null != playerSession.getTcpSender())
@@ -134,7 +134,7 @@ public class WebSocketLoginHandler extends SimpleChannelInboundHandler<TextWebSo
 		playerSession.setTcpSender(sender);
 		// Connect the pipeline to the game room.
 		gameRoom.connectSession(playerSession);
-		channel.write(Events.GAME_ROOM_JOIN_SUCCESS, null);//assumes that the protocol applied will take care of event objects.
+		channel.writeAndFlush(Events.GAME_ROOM_JOIN_SUCCESS, null);//assumes that the protocol applied will take care of event objects.
 		playerSession.setWriteable(true);// TODO remove if unnecessary. It should be done in start event
 		// Send the re-connect event so that it will in turn send the START event.
 		playerSession.onEvent(new ReconnetEvent(sender));
@@ -155,7 +155,7 @@ public class WebSocketLoginHandler extends SimpleChannelInboundHandler<TextWebSo
 	{
 		if (null != player)
 		{
-			channel.write(eventToFrame(Events.LOG_IN_SUCCESS, null));
+			channel.writeAndFlush(eventToFrame(Events.LOG_IN_SUCCESS, null));
 		}
 		else
 		{
@@ -167,7 +167,7 @@ public class WebSocketLoginHandler extends SimpleChannelInboundHandler<TextWebSo
 	protected void closeChannelWithLoginFailure(Channel channel) throws Exception
 	{
 		// Close the connection as soon as the error message is sent.
-		channel.write(eventToFrame(Events.LOG_IN_FAILURE, null)).addListener(
+		channel.writeAndFlush(eventToFrame(Events.LOG_IN_FAILURE, null)).addListener(
 				ChannelFutureListener.CLOSE);
 	}
 
@@ -182,20 +182,20 @@ public class WebSocketLoginHandler extends SimpleChannelInboundHandler<TextWebSo
 			playerSession.setAttribute(NadronConfig.RECONNECT_KEY, reconnectKey);
 			playerSession.setAttribute(NadronConfig.RECONNECT_REGISTRY, reconnectRegistry);
 			LOG.trace("Sending GAME_ROOM_JOIN_SUCCESS to channel {}",
-					channel.id());
-			ChannelFuture future = channel.write(eventToFrame(
+					channel);
+			ChannelFuture future = channel.writeAndFlush(eventToFrame(
 					Events.GAME_ROOM_JOIN_SUCCESS, reconnectKey));
 			connectToGameRoom(gameRoom, playerSession, future);
 		}
 		else
 		{
 			// Write failure and close channel.
-			ChannelFuture future = channel.write(eventToFrame(
+			ChannelFuture future = channel.writeAndFlush(eventToFrame(
 					Events.GAME_ROOM_JOIN_FAILURE, null));
 			future.addListener(ChannelFutureListener.CLOSE);
 			LOG.error(
 					"Invalid ref key provided by client: {}. Channel {} will be closed",
-					refKey, channel.id());
+					refKey, channel);
 		}
 	}
 
@@ -211,7 +211,7 @@ public class WebSocketLoginHandler extends SimpleChannelInboundHandler<TextWebSo
 				Channel channel = future.channel();
 				LOG.trace(
 						"Sending GAME_ROOM_JOIN_SUCCESS to channel {} completed",
-						channel.id());
+						channel);
 				if (future.isSuccess())
 				{
 					// Set the tcp channel on the session.

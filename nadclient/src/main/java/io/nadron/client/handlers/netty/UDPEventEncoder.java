@@ -3,10 +3,10 @@ package io.nadron.client.handlers.netty;
 import io.nadron.client.event.Event;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.MessageList;
 import io.netty.channel.socket.DatagramPacket;
 
 import java.net.InetSocketAddress;
+import java.util.List;
 
 
 public class UDPEventEncoder extends MessageBufferEventEncoder 
@@ -20,10 +20,11 @@ public class UDPEventEncoder extends MessageBufferEventEncoder
 	
 	@Override
 	protected void encode(ChannelHandlerContext ctx, Event event,
-			MessageList<Object> out) throws Exception
+			List<Object> out) throws Exception
 	{
 		ByteBuf data = (ByteBuf)super.encode(ctx, event);
 		out.add(new DatagramPacket(data, udpServerAddress));
+		ctx.flush();
 	}
 	
 	public InetSocketAddress getUdpServerAddress() 

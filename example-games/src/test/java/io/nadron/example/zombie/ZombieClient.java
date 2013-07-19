@@ -24,11 +24,11 @@ import java.util.concurrent.ScheduledExecutorService;
 public class ZombieClient
 {
 	public static final ScheduledExecutorService SERVICE;
-	public static final Map<Integer, InetSocketAddress> CHANNEL_ID_ADDRESS_MAP;
+	public static final Map<Channel, InetSocketAddress> CHANNEL_ID_ADDRESS_MAP;
 	
 	static {
 		SERVICE = Executors.newSingleThreadScheduledExecutor();
-		CHANNEL_ID_ADDRESS_MAP = new HashMap<Integer, InetSocketAddress>();
+		CHANNEL_ID_ADDRESS_MAP = new HashMap<Channel, InetSocketAddress>();
 		Runtime.getRuntime().addShutdownHook(new Thread(){
 			@Override
 			public void run()
@@ -74,7 +74,7 @@ public class ZombieClient
 						ByteBuf loginBuffer = getLoginBuffer("Zombie_ROOM_1",
 								writeSocketAddressToBuffer(udpLocalAddress));
 						Channel channel = future.channel();
-						CHANNEL_ID_ADDRESS_MAP.put(channel.id(),
+						CHANNEL_ID_ADDRESS_MAP.put(channel,
 								udpLocalAddress);
 						ChannelFuture writeFuture = channel.write(loginBuffer);
 						writeFuture.addListener(new ChannelFutureListener() 

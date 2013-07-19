@@ -30,7 +30,7 @@ public class NettyTCPMessageSender implements Reliable
 	@Override
 	public Object sendMessage(Object message)
 	{
-		return channel.write(message);
+		return channel.writeAndFlush(message);
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class NettyTCPMessageSender implements Reliable
 		closeFuture.awaitUninterruptibly();
 		if (!closeFuture.isSuccess())
 		{
-			System.err.println("TCP channel " + channel.id()
+			System.err.println("TCP channel " + channel
 					+ " did not close successfully");
 		}
 		isClosed = true;
@@ -95,7 +95,7 @@ public class NettyTCPMessageSender implements Reliable
 		String channelId = "TCP channel with Id: ";
 		if (null != channel)
 		{
-			channelId += channel.id().toString();
+			channelId += channel.toString();
 		}
 		else
 		{
