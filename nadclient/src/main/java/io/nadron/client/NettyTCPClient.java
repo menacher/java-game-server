@@ -190,6 +190,7 @@ public class NettyTCPClient
 					}
 					else
 					{
+						future.cause().printStackTrace();
 						throw new RuntimeException(future.cause()
 								.getMessage());
 					}

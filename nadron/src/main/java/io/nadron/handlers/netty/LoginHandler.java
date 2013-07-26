@@ -275,10 +275,10 @@ public class LoginHandler extends SimpleChannelInboundHandler<Event>
 	 */
 	protected void loginUdp(PlayerSession playerSession, ByteBuf buffer)
 	{
-		InetSocketAddress remoteAdress = NettyUtils.readSocketAddress(buffer);
-		if(null != remoteAdress)
+		InetSocketAddress remoteAddress = NettyUtils.readSocketAddress(buffer);
+		if(null != remoteAddress)
 		{
-			udpSessionRegistry.putSession(remoteAdress, playerSession);
+			udpSessionRegistry.putSession(remoteAddress, playerSession);
 		}
 	}
 	

@@ -7,6 +7,7 @@ import io.nadron.client.event.Events;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelPipeline;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.channel.ChannelHandler.Sharable;
 
 
 /**
@@ -16,6 +17,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
  * @author Abraham Menacherry.
  * 
  */
+@Sharable
 public class DefaultToClientHandler extends SimpleChannelInboundHandler<Event>
 {
 	static final String NAME = "defaultHandler";

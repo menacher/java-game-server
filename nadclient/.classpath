@@ -7,9 +7,9 @@
       <attribute value="jar:file:/C:/Users/aby/.m2/repository/junit/junit/4.8.2/junit-4.8.2-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/io/netty/netty-all/4.0.0.Final/netty-all-4.0.0.Final.jar" sourcepath="M2_REPO/io/netty/netty-all/4.0.0.Final/netty-all-4.0.0.Final-sources.jar">
+  <classpathentry kind="var" path="M2_REPO/io/netty/netty-all/4.0.4.Final/netty-all-4.0.4.Final.jar" sourcepath="M2_REPO/io/netty/netty-all/4.0.4.Final/netty-all-4.0.4.Final-sources.jar">
     <attributes>
-      <attribute value="jar:file:/C:/Users/aby/.m2/repository/io/netty/netty-all/4.0.0.Final/netty-all-4.0.0.Final-javadoc.jar!/" name="javadoc_location"/>
+      <attribute value="jar:file:/C:/Users/aby/.m2/repository/io/netty/netty-all/4.0.4.Final/netty-all-4.0.4.Final-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>

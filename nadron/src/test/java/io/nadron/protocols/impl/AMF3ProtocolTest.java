@@ -4,9 +4,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import io.nadron.event.Event;
 import io.nadron.event.Events;
-import io.nadron.handlers.netty.AMF3ToJavaObjectDecoder;
 import io.nadron.handlers.netty.JavaObjectToAMF3Encoder;
-import io.nadron.protocols.impl.AMF3Protocol;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.embedded.EmbeddedChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
@@ -28,7 +26,6 @@ public class AMF3ProtocolTest
 	{
 		amf3Protocol = new AMF3Protocol();
 		frameDecoder = amf3Protocol.createLengthBasedFrameDecoder();
-		amf3Protocol.setAmf3ToJavaObjectDecoder(new AMF3ToJavaObjectDecoder());
 		amf3Protocol.setJavaObjectToAMF3Encoder(new JavaObjectToAMF3Encoder());
 		amf3Protocol
 				.setLengthFieldPrepender(new LengthFieldPrepender(2, false));
@@ -43,7 +40,7 @@ public class AMF3ProtocolTest
 				amf3Protocol.getLengthFieldPrepender(),
 				amf3Protocol.getJavaObjectToAMF3Encoder());
 		EmbeddedChannel inChannel = new EmbeddedChannel(frameDecoder,
-				amf3Protocol.getAmf3ToJavaObjectDecoder());
+				amf3Protocol.createAMF3ToJavaObjectDecoder());
 		Event event = Events.event(playerStats,Events.SESSION_MESSAGE);
 		outChannel.writeOutbound(event);
 		assertTrue(outChannel.finish());

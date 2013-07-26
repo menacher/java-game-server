@@ -32,12 +32,6 @@ public class TCPPipelineFactory extends ChannelInitializer<SocketChannel>
 	 * type, puts this as the payload for an {@link Event} and passes this
 	 * {@link Event} instance to the next decoder/handler in the chain.
 	 */
-	private static final MessageBufferEventDecoder EVENT_DECODER = new MessageBufferEventDecoder();
-	/**
-	 * Decodes incoming messages from remote nadron server to {@link MessageBuffer}
-	 * type, puts this as the payload for an {@link Event} and passes this
-	 * {@link Event} instance to the next decoder/handler in the chain.
-	 */
 	private static final MessageBufferEventEncoder EVENT_ENCODER = new MessageBufferEventEncoder();
 	/**
 	 * Used to transmit the message to {@link Session}.
@@ -54,7 +48,7 @@ public class TCPPipelineFactory extends ChannelInitializer<SocketChannel>
 		ChannelPipeline pipeline = ch.pipeline();
 		pipeline.addLast("lengthDecoder", new LengthFieldBasedFrameDecoder(
 				Integer.MAX_VALUE, 0, 2, 0, 2));
-		pipeline.addLast("eventDecoder", EVENT_DECODER);
+		pipeline.addLast("eventDecoder", new MessageBufferEventDecoder());
 		pipeline.addLast(DefaultToClientHandler.getName(),
 				defaultToClientHandler);
 		

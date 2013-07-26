@@ -36,12 +36,6 @@ public class AMF3StringProtocol extends AbstractNettyProtocol
 	 */
 	private Base64Decoder base64Decoder;
 	/**
-	 * This decoder will do the actual serialization to java object. Any game
-	 * handlers need to be added after this in the pipeline so that they can
-	 * operate on the java object.
-	 */
-	private AMF3ToJavaObjectDecoder amf3ToJavaObjectDecoder;
-	/**
 	 * Once the game handler is done with its operations, it writes back the
 	 * java object to the client. When writing back to flash client, it needs to
 	 * use this encoder to encode it to AMF3 format.
@@ -75,7 +69,7 @@ public class AMF3StringProtocol extends AbstractNettyProtocol
 		pipeline.addLast("framer", new DelimiterBasedFrameDecoder(maxFrameSize,
 				Delimiters.nulDelimiter()));
 		pipeline.addLast("base64Decoder", base64Decoder);
-		pipeline.addLast("amf3ToJavaObjectDecoder", amf3ToJavaObjectDecoder);
+		pipeline.addLast("amf3ToJavaObjectDecoder", createAMF3ToJavaObjectDecoder());
 
 		// Downstream handlers - Filter for data which flows from server to
 		// client. Note that the last handler added is actually the first
@@ -85,6 +79,11 @@ public class AMF3StringProtocol extends AbstractNettyProtocol
 		pipeline.addLast("javaObjectToAMF3Encoder", javaObjectToAMF3Encoder);
 	}
 
+	protected AMF3ToJavaObjectDecoder createAMF3ToJavaObjectDecoder()
+	{
+		return new AMF3ToJavaObjectDecoder();
+	}
+	
 	public int getMaxFrameSize()
 	{
 		return maxFrameSize;
@@ -103,17 +102,6 @@ public class AMF3StringProtocol extends AbstractNettyProtocol
 	public void setBase64Decoder(Base64Decoder base64Decoder)
 	{
 		this.base64Decoder = base64Decoder;
-	}
-
-	public AMF3ToJavaObjectDecoder getAmf3ToJavaObjectDecoder()
-	{
-		return amf3ToJavaObjectDecoder;
-	}
-
-	public void setAmf3ToJavaObjectDecoder(
-			AMF3ToJavaObjectDecoder amf3ToJavaObjectDecoder)
-	{
-		this.amf3ToJavaObjectDecoder = amf3ToJavaObjectDecoder;
 	}
 
 	public JavaObjectToAMF3Encoder getJavaObjectToAMF3Encoder()

@@ -22,12 +22,6 @@ import io.netty.handler.codec.LengthFieldPrepender;
  */
 public class AMF3Protocol extends AbstractNettyProtocol
 {
-	/**
-	 * This decoder will do the actual serialization to java object. Any game
-	 * handlers need to be added after this in the pipeline so that they can
-	 * operate on the java object.
-	 */
-	private AMF3ToJavaObjectDecoder amf3ToJavaObjectDecoder;
 	
 	/**
 	 * Once the game handler is done with its operations, it writes back the
@@ -57,7 +51,7 @@ public class AMF3Protocol extends AbstractNettyProtocol
 		// Upstream handlers or encoders (i.e towards server) are added to
 		// pipeline now.
 		pipeline.addLast("lengthDecoder", createLengthBasedFrameDecoder());
-		pipeline.addLast("amf3ToJavaObjectDecoder", amf3ToJavaObjectDecoder);
+		pipeline.addLast("amf3ToJavaObjectDecoder", createAMF3ToJavaObjectDecoder());
 		pipeline.addLast("eventHandler", new DefaultToServerHandler(
 				playerSession));
 		
@@ -67,17 +61,11 @@ public class AMF3Protocol extends AbstractNettyProtocol
 		pipeline.addLast("javaObjectToAMF3Encoder", javaObjectToAMF3Encoder);
 	}
 
-	public AMF3ToJavaObjectDecoder getAmf3ToJavaObjectDecoder() 
+	protected AMF3ToJavaObjectDecoder createAMF3ToJavaObjectDecoder()
 	{
-		return amf3ToJavaObjectDecoder;
+		return new AMF3ToJavaObjectDecoder();
 	}
-
-	public void setAmf3ToJavaObjectDecoder(
-			AMF3ToJavaObjectDecoder amf3ToJavaObjectDecoder) 
-	{
-		this.amf3ToJavaObjectDecoder = amf3ToJavaObjectDecoder;
-	}
-
+	
 	public JavaObjectToAMF3Encoder getJavaObjectToAMF3Encoder() 
 	{
 		return javaObjectToAMF3Encoder;

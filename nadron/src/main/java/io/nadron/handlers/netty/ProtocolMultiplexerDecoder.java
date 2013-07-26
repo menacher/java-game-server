@@ -1,5 +1,6 @@
 package io.nadron.handlers.netty;
 
+import io.nadron.server.netty.ProtocolMultiplexerChannelInitializer;
 import io.nadron.util.BinaryUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -15,8 +16,11 @@ import org.slf4j.LoggerFactory;
  * This class can be used to switch login-protocol based on the incoming bytes
  * sent by a client. So, based on the incoming bytes, it is possible to set SSL
  * enabled, normal HTTP, default nadron protocol, or custom user protocol for
- * allowing client to login to nadron. The appropriate protocol searcher
- * needs to be injected via spring to this class.
+ * allowing client to login to nadron. The appropriate protocol searcher needs
+ * to be injected to this class. Since this class is a non-singleton, the
+ * protocol searchers and other dependencies should actually be injected to
+ * {@link ProtocolMultiplexerChannelInitializer} class and then passed in while
+ * instantiating this class.
  * 
  * @author Abraham Menacherry
  * 
