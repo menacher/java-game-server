@@ -4,7 +4,7 @@
 	<groupId>com.github.menacher</groupId>
 	<artifactId>example-games</artifactId>
 	<packaging>jar</packaging>
-	<version>0.1-SNAPSHOT</version>
+	<version>0.4-SNAPSHOT</version>
 	<name>example-games</name>
 	<url>https://github.com/menacher/java-game-server/tree/netty4/example-games</url>
 	<description>This project holds some example multiplayer games that uses the Nadron library. The server part is in src/main/java and the client part of the game is in src/test/java</description>
@@ -26,7 +26,7 @@
 		<dependency>
 			<groupId>com.github.menacher</groupId>
 			<artifactId>nadron</artifactId>
-			<version>0.3-SNAPSHOT</version>
+			<version>0.3</version>
 			<type>jar</type>
 		</dependency>
 		
@@ -34,7 +34,7 @@
 		<dependency>
 			<groupId>com.github.menacher</groupId>
 			<artifactId>nadclient</artifactId>
-			<version>0.3-SNAPSHOT</version>
+			<version>0.3</version>
 			<type>jar</type>
 		</dependency>
 		
