@@ -3,7 +3,7 @@
 	<groupId>com.github.menacher</groupId>
 	<artifactId>nadron</artifactId>
 	<packaging>jar</packaging>
-	<version>0.3-SNAPSHOT</version>
+	<version>0.3</version>
 	<name>nadron</name>
 	<url>https://github.com/menacher/java-game-server/tree/netty4/nadron</url>
 	<description>Nadron is a high speed socket based java game server written using Netty and Mike Rettig's Jetlang. It is specifically tuned for network based multiplayer games and supports TCP and UDP network protocols.</description>
@@ -26,7 +26,7 @@
 		<connection>scm:git:git://github.com/menacher/java-game-server.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com/menacher/java-game-server.git</developerConnection>
 		<url>https://github.com/menacher/java-game-server.git</url>
-		<tag>HEAD</tag>
+		<tag>nadron-0.3</tag>
 	</scm>
 
 	<developers>
