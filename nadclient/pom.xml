@@ -3,7 +3,7 @@
 	<groupId>com.github.menacher</groupId>
 	<artifactId>nadclient</artifactId>
 	<packaging>jar</packaging>
-	<version>0.3</version>
+	<version>0.4-SNAPSHOT</version>
 	<name>client</name>
 	<url>https://github.com/menacher/java-game-server/tree/netty4/client</url>
 	<description>This is a client library for Nadron server https://github.com/menacher/java-game-server/tree/netty4/nadron. Java clients can use this program to connect and interact with nadron server.</description>
@@ -26,7 +26,7 @@
 		<connection>scm:git:git://github.com/menacher/java-game-server.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com/menacher/java-game-server.git</developerConnection>
 		<url>https://github.com/menacher/java-game-server.git</url>
-		<tag>nadclient-0.3</tag>
+		<tag>HEAD</tag>
 	</scm>
 
 	<developers>
