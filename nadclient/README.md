@@ -8,7 +8,7 @@ Maven
 <dependency>
     <groupId>com.github.menacher</groupId>
     <artifactId>nadclient</artifactId>
-    <version>0.2</version>
+    <version>0.4</version>
 </dependency>
 ```
 Execution
