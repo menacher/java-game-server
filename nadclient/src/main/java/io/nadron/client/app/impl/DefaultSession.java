@@ -8,6 +8,7 @@ import io.nadron.client.event.Event;
 import io.nadron.client.event.EventDispatcher;
 import io.nadron.client.event.EventHandler;
 import io.nadron.client.event.impl.DefaultEventDispatcher;
+import io.nadron.client.protocol.Protocol;
 import io.nadron.client.util.Config;
 import io.nadron.client.util.LoginHelper;
 
@@ -375,6 +376,11 @@ public class DefaultSession implements Session
 	}
 
 	@Override
+	public void resetProtocol(Protocol protocol) {
+		protocol.applyProtocol(this);
+	}
+	
+	@Override
 	public int hashCode()
 	{
 		final int prime = 31;
@@ -412,4 +418,5 @@ public class DefaultSession implements Session
 	{
 		this.reconnectPolicy = reconnectPolicy;
 	}
+	
 }

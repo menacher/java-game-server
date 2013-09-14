@@ -11,6 +11,7 @@ import io.nadron.example.zombie.domain.Zombie;
 import io.nadron.example.zombie.game.ZombieRoom;
 import io.nadron.handlers.netty.TextWebsocketEncoder;
 import io.nadron.protocols.Protocol;
+import io.nadron.protocols.impl.NettyObjectProtocol;
 import io.nadron.service.LookupService;
 import io.nadron.service.impl.SimpleLookupService;
 
@@ -51,6 +52,10 @@ public class SpringConfig
 	@Qualifier("textWebsocketEncoder")
 	private TextWebsocketEncoder textWebsocketEncoder;
 
+	@Autowired
+	@Qualifier("nettyObjectProtocol")
+	private NettyObjectProtocol nettyObjectProtocol;
+	
 	public @Bean
 	Game zombieGame()
 	{
@@ -131,6 +136,16 @@ public class SpringConfig
 		return room;
 	}
 
+	public @Bean(name = "LDGameRoomForNettyClient")
+	GameRoom ldGameRoomForNettyClient()
+	{
+		GameRoomSessionBuilder sessionBuilder = new GameRoomSessionBuilder();
+		sessionBuilder.parentGame(ldGame()).gameRoomName("LDGameRoom")
+				.protocol(nettyObjectProtocol);
+		LDRoom room = new LDRoom(sessionBuilder);
+		return room;
+	}
+	
 	public @Bean(name = "lookupService")
 	LookupService lookupService()
 	{

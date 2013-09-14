@@ -20,7 +20,9 @@ import io.nadron.client.handlers.netty.UDPPipelineFactory;
 import io.nadron.client.util.LoginHelper;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelInitializer;
 import io.netty.channel.socket.DatagramChannel;
+import io.netty.channel.socket.SocketChannel;
 
 import java.net.InetSocketAddress;
 import java.net.UnknownHostException;
@@ -46,7 +48,9 @@ public class SessionFactory
 	private final NettyTCPClient tcpClient;
 	private final NettyUDPClient udpClient;
 	private static final AtomicInteger sessionId = new AtomicInteger(0);
-
+	
+	private ChannelInitializer<SocketChannel> channelInitializer;
+	
 	/**
 	 * This constructor will take a {@link LoginHelper} and initialize the
 	 * {@link NettyTCPClient} and {@link NettyUDPClient}s using the connection
@@ -211,12 +215,9 @@ public class SessionFactory
 	protected void doTcpConnection(final Session session, Event event)
 			throws Exception, InterruptedException
 	{
-		// Connect session using tcp to remote nadron server
-		TCPPipelineFactory tcpFactory = new TCPPipelineFactory(session);
-
 		// This will in turn invoke the startEventHandler when server sends
 		// Events.START event.
-		Channel channel = tcpClient.connect(tcpFactory, event);
+		Channel channel = tcpClient.connect(getTCPPipelineFactory(session), event);
 		if (null != channel)
 		{
 			Reliable tcpMessageSender = new NettyTCPMessageSender(channel);
@@ -228,6 +229,31 @@ public class SessionFactory
 		}
 	}
 
+	/**
+	 * Return the pipeline factory or create the default messagebufferprotocol.
+	 * 
+	 * @param session
+	 *            The final handler in the protocol chain needs the session so
+	 *            that it can send messages to it.
+	 * @return
+	 */
+	protected synchronized ChannelInitializer<SocketChannel> getTCPPipelineFactory(
+			final Session session) {
+		if (null == channelInitializer) {
+			channelInitializer = new TCPPipelineFactory(session);
+		}
+		return channelInitializer;
+	}
+	
+	/**
+	 * Set the channel initializer. This will be used when connecting the session.
+	 * @param channelInitializer
+	 */
+	protected synchronized void setTCPChannelInitializer(
+			ChannelInitializer<SocketChannel> channelInitializer) {
+		this.channelInitializer = channelInitializer;
+	}
+	
 	protected InetSocketAddress doUdpConnection(final Session session)
 			throws UnknownHostException, InterruptedException
 	{

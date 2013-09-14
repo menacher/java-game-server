@@ -8,6 +8,7 @@ import io.nadron.client.event.Event;
 import io.nadron.client.event.EventDispatcher;
 import io.nadron.client.event.EventHandler;
 import io.nadron.client.event.Events;
+import io.nadron.client.protocol.Protocol;
 import io.nadron.client.util.LoginHelper;
 
 import java.util.List;
@@ -98,6 +99,14 @@ public interface Session
 	void setTcpMessageSender(Reliable tcpMessageSender);
 
 	Reliable getTcpMessageSender();
+	
+	/**
+	 * Implementations will generally clear the internal netty pipeline and
+	 * apply new set of handlers
+	 * 
+	 * @param protocol
+	 */
+	void resetProtocol(Protocol protocol);
 	
 	void reconnect(LoginHelper loginHelper);
 	

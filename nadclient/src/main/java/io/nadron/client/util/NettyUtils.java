@@ -1,6 +1,8 @@
 package io.nadron.client.util;
 
 import static io.netty.buffer.Unpooled.copiedBuffer;
+import io.nadron.client.app.Session;
+import io.nadron.client.communication.NettyTCPMessageSender;
 import io.nadron.convert.Transform;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -22,6 +24,21 @@ public class NettyUtils
 {
 	public static final String NETTY_CHANNEL = "NETTY_CHANNEL";
 
+	public static ChannelPipeline getPipeLineOfConnection(
+			NettyTCPMessageSender messageSender)
+	{
+		if(null != messageSender){
+	        return messageSender.getChannel().pipeline();
+	    }
+	    return null;
+	}
+	
+	public static ChannelPipeline getPipeLineOfSession(
+			Session playerSession)
+	{
+		return getPipeLineOfConnection((NettyTCPMessageSender)playerSession.getTcpMessageSender());
+	}
+	
 	/**
 	 * A utility method to clear the netty pipeline of all handlers.
 	 * 

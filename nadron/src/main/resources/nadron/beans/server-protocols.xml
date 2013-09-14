@@ -47,6 +47,8 @@
 		<property name="textWebsocketEncoder" ref="textWebsocketEncoder" />
 	</bean>
 	
+	<bean id="nettyObjectProtocol" class="io.nadron.protocols.impl.NettyObjectProtocol" />
+	
 	<!-- Login Protocols these decide what handlers are in the pipeline during 
 		login of a client to nadron -->
 	<bean id="httpLoginProtocol" class="io.nadron.handlers.netty.LoginProtocol.HTTPProtocol">
