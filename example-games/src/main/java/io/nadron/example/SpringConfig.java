@@ -140,7 +140,7 @@ public class SpringConfig
 	GameRoom ldGameRoomForNettyClient()
 	{
 		GameRoomSessionBuilder sessionBuilder = new GameRoomSessionBuilder();
-		sessionBuilder.parentGame(ldGame()).gameRoomName("LDGameRoom")
+		sessionBuilder.parentGame(ldGame()).gameRoomName("LDGameRoomForNettyClient")
 				.protocol(nettyObjectProtocol);
 		LDRoom room = new LDRoom(sessionBuilder);
 		return room;
@@ -157,6 +157,7 @@ public class SpringConfig
 		}
 		refKeyGameRoomMap.put("Zombie_ROOM_1_REF_KEY_2", zombieRoom2());
 		refKeyGameRoomMap.put("LDGameRoom", ldGameRoom());
+		refKeyGameRoomMap.put("LDGameRoomForNettyClient", ldGameRoomForNettyClient());
 		LookupService service = new SimpleLookupService(refKeyGameRoomMap);
 		return service;
 	}

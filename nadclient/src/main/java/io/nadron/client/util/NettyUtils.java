@@ -45,11 +45,20 @@ public class NettyUtils
 	 * @param pipeline
 	 */
 	public static void clearPipeline(ChannelPipeline pipeline)
-			throws NoSuchElementException
 	{
-		while (pipeline.first() != null)
+		if(null == pipeline){
+			return;
+		}
+		try
 		{
-			pipeline.removeFirst();
+			while (pipeline.first() != null)
+			{
+				pipeline.removeFirst();
+			}
+		}
+		catch (NoSuchElementException e)
+		{
+			// all elements removed.
 		}
 	}
 
