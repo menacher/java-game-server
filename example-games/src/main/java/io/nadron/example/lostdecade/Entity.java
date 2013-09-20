@@ -1,13 +1,20 @@
 package io.nadron.example.lostdecade;
 
+import java.io.Serializable;
+
 /**
  * A hero, monster or any other "living" character on the gameboard.
  * 
  * @author Abraham Menacherry
  * 
  */
-public class Entity
+public class Entity implements Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;

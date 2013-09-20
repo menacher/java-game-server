@@ -2,6 +2,7 @@ package io.nadron.example.lostdecade;
 
 import io.nadron.app.GameRoom;
 
+import java.io.Serializable;
 import java.util.Set;
 
 
@@ -13,8 +14,12 @@ import java.util.Set;
  * @author Abraham Menacherry
  * 
  */
-public class LDGameState
+public class LDGameState implements Serializable
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private Set<Entity> entities;
 	private Entity monster;
 	private Entity hero;
