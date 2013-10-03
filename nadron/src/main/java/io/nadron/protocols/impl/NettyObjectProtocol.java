@@ -29,18 +29,20 @@ public class NettyObjectProtocol extends AbstractNettyProtocol {
 				playerSession);
 		ChannelPipeline pipeline = NettyUtils.getPipeLineOfConnection(playerSession);
 		NettyUtils.clearPipeline(pipeline);
-		pipeline.addLast(createEventObjectDecoder());
-		pipeline.addLast(new DefaultToServerHandler(playerSession));
 		
+		// Upstream handlers or encoders (i.e towards server) are added to
+		// pipeline now.
+		pipeline.addLast("lengthDecoder", createLengthBasedFrameDecoder());
+		pipeline.addLast("eventDecoder",  new EventObjectDecoder());
+		pipeline.addLast("eventHandler",new DefaultToServerHandler(playerSession));
+		
+		// Downstream handlers - Filter for data which flows from server to
+		// client. Note that the last handler added is actually the first
+		// handler for outgoing data.
 		pipeline.addLast("lengthFieldPrepender", lengthFieldPrepender);
-		pipeline.addLast(new EventObjectEncoder());
+		pipeline.addLast("eventEncoder", new EventObjectEncoder());
 	}
 
-	protected EventObjectDecoder createEventObjectDecoder()
-	{
-		return new EventObjectDecoder(Integer.MAX_VALUE, 0, 2, 0, 2);
-	}
-	
 	public LengthFieldPrepender getLengthFieldPrepender() 
 	{
 		return lengthFieldPrepender;

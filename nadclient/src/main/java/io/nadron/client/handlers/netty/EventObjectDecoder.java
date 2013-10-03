@@ -4,61 +4,33 @@ import io.nadron.client.event.Events;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
-import io.netty.handler.codec.TooLongFrameException;
+import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 
-public class EventObjectDecoder extends LengthFieldBasedFrameDecoder 
+import java.util.List;
+
+public class EventObjectDecoder extends MessageToMessageDecoder<ByteBuf> 
 {
-	
-	/**
-     * Creates a new instance.
-     *
-     * @param maxFrameLength
-     *        the maximum length of the frame.  If the length of the frame is
-     *        greater than this value, {@link TooLongFrameException} will be
-     *        thrown.
-     * @param lengthFieldOffset
-     *        the offset of the length field
-     * @param lengthFieldLength
-     *        the length of the length field
-     * @param lengthAdjustment
-     *        the compensation value to add to the value of the length field
-     * @param initialBytesToStrip
-     *        the number of first bytes to strip out from the decoded frame
-     */
-	public EventObjectDecoder(int maxFrameLength, int lengthFieldOffset,
-			int lengthFieldLength, int lengthAdjustment, int initialBytesToStrip) 
-	{
-		super(maxFrameLength, lengthFieldOffset, lengthFieldLength, lengthAdjustment,
-				initialBytesToStrip);
-	}
 
 	@Override
-	protected Object decode(ChannelHandlerContext ctx, ByteBuf in)
-			throws Exception 
+	protected void decode(ChannelHandlerContext ctx, ByteBuf in,
+			List<Object> out) throws Exception 
 	{
-		
-		ByteBuf frame = (ByteBuf) super.decode(ctx, in);
-        if (frame == null) {
-            return null;
-        }
-        
-        if (frame.readableBytes() > 0) 
+		if(null != in)
 		{
-			byte opcode = frame.readByte();
+			byte opcode = in.readByte();
 			if (opcode == Events.NETWORK_MESSAGE) 
 			{
 				opcode = Events.SESSION_MESSAGE;
 			}
-			ByteBuf data = Unpooled.buffer(frame.readableBytes()).writeBytes(frame);
+			ByteBuf data = Unpooled.buffer(in.readableBytes()).writeBytes(in);
+			// TODO check if creating a new object is necessary each time
 			Object obj = new SourceDecoder().decode(ctx, data);
-			return Events.event(obj, opcode);
+			out.add(Events.event(obj, opcode));
 		}
-		return null;
 	}
-
+	
 	public static class SourceDecoder extends ObjectDecoder
 	{
 		public SourceDecoder() 
@@ -73,4 +45,5 @@ public class EventObjectDecoder extends LengthFieldBasedFrameDecoder
 			return super.decode(ctx, in);
 		}
 	}
+
 }
