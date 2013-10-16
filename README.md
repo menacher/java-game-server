@@ -14,7 +14,7 @@ Maven
 <dependency>
     <groupId>com.github.menacher</groupId>
     <artifactId>nadron</artifactId>
-    <version>0.4.2</version>
+    <version>0.5</version>
 </dependency>
 ```
 Using pre-built jar files

@@ -56,14 +56,14 @@
       <attribute value="jar:file:/C:/Users/aby/.m2/repository/org/msgpack/msgpack/0.6.8/msgpack-0.6.8-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/com/github/menacher/nadclient/0.4.3-SNAPSHOT/nadclient-0.4.3-SNAPSHOT.jar" sourcepath="M2_REPO/com/github/menacher/nadclient/0.4.3-SNAPSHOT/nadclient-0.4.3-SNAPSHOT-sources.jar">
+  <classpathentry kind="var" path="M2_REPO/com/github/menacher/nadclient/0.5/nadclient-0.5.jar" sourcepath="M2_REPO/com/github/menacher/nadclient/0.5/nadclient-0.5-sources.jar">
     <attributes>
-      <attribute value="jar:file:/C:/Users/aby/.m2/repository/com/github/menacher/nadclient/0.4.3-SNAPSHOT/nadclient-0.4.3-SNAPSHOT-javadoc.jar!/" name="javadoc_location"/>
+      <attribute value="jar:file:/C:/Users/aby/.m2/repository/com/github/menacher/nadclient/0.5/nadclient-0.5-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/com/github/menacher/nadron/0.4.3-SNAPSHOT/nadron-0.4.3-SNAPSHOT.jar" sourcepath="M2_REPO/com/github/menacher/nadron/0.4.3-SNAPSHOT/nadron-0.4.3-SNAPSHOT-sources.jar">
+  <classpathentry kind="var" path="M2_REPO/com/github/menacher/nadron/0.5/nadron-0.5.jar" sourcepath="M2_REPO/com/github/menacher/nadron/0.5/nadron-0.5-sources.jar">
     <attributes>
-      <attribute value="jar:file:/C:/Users/aby/.m2/repository/com/github/menacher/nadron/0.4.3-SNAPSHOT/nadron-0.4.3-SNAPSHOT-javadoc.jar!/" name="javadoc_location"/>
+      <attribute value="jar:file:/C:/Users/aby/.m2/repository/com/github/menacher/nadron/0.5/nadron-0.5-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/io/netty/netty-all/4.0.10.Final/netty-all-4.0.10.Final.jar" sourcepath="M2_REPO/io/netty/netty-all/4.0.10.Final/netty-all-4.0.10.Final-sources.jar">

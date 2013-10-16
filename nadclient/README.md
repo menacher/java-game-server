@@ -8,7 +8,7 @@ Maven
 <dependency>
     <groupId>com.github.menacher</groupId>
     <artifactId>nadclient</artifactId>
-    <version>0.4.2</version>
+    <version>0.5</version>
 </dependency>
 ```
 Execution
@@ -20,7 +20,7 @@ Pointers on main classes, classpaths and command line flags.
 
 **To start the client **    
 client can be executed from console using below command.        
-java -cp ./client-0.1.jar;./netty-all-4.0.0.CR6.jar  io.nadron.TestClass  
+java -cp ./client-0.1.jar;./netty-all-4.0.10.Final.jar  io.nadron.TestClass  
 
 Usage as game client
 ====================
@@ -33,4 +33,4 @@ The general usage steps could be as outlined below.
 
 Jar Dependencies
 ----------------
-netty-all-4.0.0.CR6.jar         
+netty-all-4.0.10.Final.jar         

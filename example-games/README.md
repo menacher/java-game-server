@@ -9,10 +9,10 @@ Pointers on main classes, classpaths and command line flags.
 
 **To start the game server**    
 Set the classpath and provide the log4jconfiguration flag.    
-set serverclasspath = ./nadron-0.4.2.jar;./....    
+set serverclasspath = ./nadron-0.5.jar;./....    
 java -cp $serverclasspath -Dlog4j.configuration=GameServerLog4j.properties io.nadron.GameServer    
 **To start the zombie client**    
-set clientclasspath = ./nadclient-0.4.2.jar;./netty-all-4.0.4.Final.jar....    
+set clientclasspath = ./nadclient-0.5.jar;./netty-all-4.0.10.Final.jar....    
 java -cp clientclasspath io.nadron.ZombieClient   
 
 Jar Dependencies
@@ -24,10 +24,12 @@ blazeds-core-3.2.0.3978.jar
 cglib-nodep-2.1_3.jar    
 commons-logging-1.1.1.jar    
 jetlang-0.2.9.jar    
-nadron-0.4.2.jar 
-nadclient-0.4.2.jar   
+nadron-0.5.jar 
+nadclient-0.5.jar   
 log4j-1.2.16.jar    
-netty-all-4.0.4.Final.jar    
+netty-all-4.0.10.Final.jar
+msgpack-0.6.8.jar
+json-simple-1.1.1.jar              
 slf4j-api-1.6.1.jar    
 slf4j-log4j12-1.6.1.jar    
 spring-aop-3.1.0.RELEASE.jar    
