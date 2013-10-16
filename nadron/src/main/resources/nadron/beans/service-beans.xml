@@ -30,4 +30,6 @@
 
 	<bean id="jackson" class="org.codehaus.jackson.map.ObjectMapper" />
 
+	<bean id="msgPack" class="org.msgpack.MessagePack" />
+	
 </beans>

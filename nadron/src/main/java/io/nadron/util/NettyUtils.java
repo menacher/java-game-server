@@ -411,4 +411,22 @@ public class NettyUtils
 		return socketAddressBuffer;
 	}
 	
+	/**
+	 * converts a bytebuf to byte array.
+	 * @param buf
+	 * @param isReadDestroy if true then the reader index of the bytebuf will be modified. 
+	 * @return
+	 */
+	public static byte[] toByteArray(ByteBuf buf, boolean isReadDestroy){
+		byte[] arr = new byte[buf.readableBytes()];
+		if(isReadDestroy)
+		{
+			buf.readBytes(arr);
+		}
+		else
+		{
+			buf.getBytes(buf.readerIndex(), arr);
+		}
+		return arr;
+	}
 }

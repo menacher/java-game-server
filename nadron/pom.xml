@@ -94,7 +94,7 @@
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-all</artifactId>
-			<version>4.0.4.Final</version>
+			<version>4.0.10.Final</version>
 		</dependency>
 
 		<!-- Blazeds dependency is there for converting java objects to AMF3 format 
@@ -117,7 +117,13 @@
 			<artifactId>jackson-mapper-asl</artifactId>
 			<version>1.9.12</version>
 		</dependency>
-
+		
+		<dependency>
+			<groupId>org.msgpack</groupId>
+			<artifactId>msgpack</artifactId>
+			<version>0.6.8</version>
+		</dependency>
+		
 	</dependencies>
 
 	<build>

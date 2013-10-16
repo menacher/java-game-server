@@ -3,6 +3,7 @@ package io.nadron.handlers.netty;
 import io.nadron.communication.MessageBuffer;
 import io.nadron.event.Event;
 import io.netty.buffer.ByteBuf;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageEncoder;
@@ -42,9 +43,9 @@ public class MessageBufferEventEncoder extends MessageToMessageEncoder<Event>
 			@SuppressWarnings("unchecked")
 			MessageBuffer<ByteBuf> msgBuffer = (MessageBuffer<ByteBuf>)event.getSource();
 			ByteBuf data = msgBuffer.getNativeBuffer();
-			msg = ctx.alloc().buffer(1 + data.readableBytes());
-			msg.writeByte(event.getType());
-			msg.writeBytes(data);
+			ByteBuf opcode = ctx.alloc().buffer(1);
+			opcode.writeByte(event.getType());
+			msg = Unpooled.wrappedBuffer(opcode, data);
 		}
 		else
 		{

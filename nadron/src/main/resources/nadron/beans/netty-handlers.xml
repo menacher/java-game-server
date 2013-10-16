@@ -63,7 +63,13 @@
 	<bean id="textWebsocketDecoder" class="io.nadron.handlers.netty.TextWebsocketDecoder">
 		<property name="jackson" ref="jackson" />
 	</bean>
-
+	<bean id="msgPackDecoder" class="io.nadron.handlers.netty.MsgPackDecoder">
+		<property name="msgPack" ref="msgPack" />
+	</bean>
+	<bean id="msgPackEncoder" class="io.nadron.handlers.netty.MsgPackEncoder">
+		<property name="msgPack" ref="msgPack" />
+	</bean>
+	
 	<bean id="bossGroup" class="io.netty.channel.nio.NioEventLoopGroup" destroy-method="shutdownGracefully">
 		<constructor-arg type="int" index="0" value="${bossThreadCount}" />
 		<constructor-arg index="1" ref="bossThreadFactory" />

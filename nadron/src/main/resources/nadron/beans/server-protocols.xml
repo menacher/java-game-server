@@ -51,6 +51,12 @@
 		<property name="lengthFieldPrepender" ref="lengthFieldPrepender" />
 	</bean>
 	
+	<bean id="msgPackProtocol" class="io.nadron.protocols.impl.MsgPackProtocol">
+		<property name="lengthFieldPrepender" ref="lengthFieldPrepender" />
+		<property name="msgPackDecoder" ref="msgPackDecoder" />
+		<property name="msgPackEncoder" ref="msgPackEncoder" />
+	</bean>
+	
 	<!-- Login Protocols these decide what handlers are in the pipeline during 
 		login of a client to nadron -->
 	<bean id="httpLoginProtocol" class="io.nadron.handlers.netty.LoginProtocol.HTTPProtocol">

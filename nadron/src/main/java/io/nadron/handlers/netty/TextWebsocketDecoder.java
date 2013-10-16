@@ -34,7 +34,7 @@ public class TextWebsocketDecoder extends
 
 	/**
 	 * This will be put into the {@link ChannelHandlerContext} the first time
-	 * attr method is invoed on it. The get is also a set.
+	 * attr method is invoked on it. The get is also a set.
 	 */
 	private final AttributeKey<Class<? extends Event>> eventClass = new AttributeKey<Class<? extends Event>>(
 			"eventClass");

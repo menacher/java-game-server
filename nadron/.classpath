@@ -21,6 +21,11 @@
       <attribute value="jar:file:/C:/Users/aby/.m2/repository/org/codehaus/jackson/jackson-mapper-asl/1.9.12/jackson-mapper-asl-1.9.12-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/org/javassist/javassist/3.16.1-GA/javassist-3.16.1-GA.jar" sourcepath="M2_REPO/org/javassist/javassist/3.16.1-GA/javassist-3.16.1-GA-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/C:/Users/aby/.m2/repository/org/javassist/javassist/3.16.1-GA/javassist-3.16.1-GA-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
   <classpathentry kind="var" path="M2_REPO/org/slf4j/jcl-over-slf4j/1.7.2/jcl-over-slf4j-1.7.2.jar" sourcepath="M2_REPO/org/slf4j/jcl-over-slf4j/1.7.2/jcl-over-slf4j-1.7.2-sources.jar">
     <attributes>
       <attribute value="jar:file:/C:/Users/aby/.m2/repository/org/slf4j/jcl-over-slf4j/1.7.2/jcl-over-slf4j-1.7.2-javadoc.jar!/" name="javadoc_location"/>
@@ -29,6 +34,11 @@
   <classpathentry kind="var" path="M2_REPO/org/jetlang/jetlang/0.2.9/jetlang-0.2.9.jar" sourcepath="M2_REPO/org/jetlang/jetlang/0.2.9/jetlang-0.2.9-sources.jar">
     <attributes>
       <attribute value="jar:file:/C:/Users/aby/.m2/repository/org/jetlang/jetlang/0.2.9/jetlang-0.2.9-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/com/googlecode/json-simple/json-simple/1.1.1/json-simple-1.1.1.jar" sourcepath="M2_REPO/com/googlecode/json-simple/json-simple/1.1.1/json-simple-1.1.1-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/C:/Users/aby/.m2/repository/com/googlecode/json-simple/json-simple/1.1.1/json-simple-1.1.1-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/junit/junit/4.8.2/junit-4.8.2.jar" sourcepath="M2_REPO/junit/junit/4.8.2/junit-4.8.2-sources.jar">
@@ -41,9 +51,14 @@
       <attribute value="jar:file:/C:/Users/aby/.m2/repository/log4j/log4j/1.2.16/log4j-1.2.16-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/io/netty/netty-all/4.0.4.Final/netty-all-4.0.4.Final.jar" sourcepath="M2_REPO/io/netty/netty-all/4.0.4.Final/netty-all-4.0.4.Final-sources.jar">
+  <classpathentry kind="var" path="M2_REPO/org/msgpack/msgpack/0.6.8/msgpack-0.6.8.jar" sourcepath="M2_REPO/org/msgpack/msgpack/0.6.8/msgpack-0.6.8-sources.jar">
     <attributes>
-      <attribute value="jar:file:/C:/Users/aby/.m2/repository/io/netty/netty-all/4.0.4.Final/netty-all-4.0.4.Final-javadoc.jar!/" name="javadoc_location"/>
+      <attribute value="jar:file:/C:/Users/aby/.m2/repository/org/msgpack/msgpack/0.6.8/msgpack-0.6.8-javadoc.jar!/" name="javadoc_location"/>
+    </attributes>
+  </classpathentry>
+  <classpathentry kind="var" path="M2_REPO/io/netty/netty-all/4.0.10.Final/netty-all-4.0.10.Final.jar" sourcepath="M2_REPO/io/netty/netty-all/4.0.10.Final/netty-all-4.0.10.Final-sources.jar">
+    <attributes>
+      <attribute value="jar:file:/C:/Users/aby/.m2/repository/io/netty/netty-all/4.0.10.Final/netty-all-4.0.10.Final-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
   <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.6.1/slf4j-api-1.6.1.jar" sourcepath="M2_REPO/org/slf4j/slf4j-api/1.6.1/slf4j-api-1.6.1-sources.jar">
