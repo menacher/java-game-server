@@ -12,6 +12,6 @@ The general usage steps could be as outlined below.
 2.  Create a session factory using this login helper instance.    
 3.  Create as many sessions as required using this factory. Generally only one is required for a client.    
 4.  Check the code in Main.as for more information on how to add an event listener to session to receive events.    
-5.  Main.as also has code on how to write back to JetServer. Mostly it is done using session.sendToServer(JetEvent).    
+5.  Main.as has code on how to write back to JetServer. Mostly it is done using session.sendToServer(JetEvent).    
 
         
