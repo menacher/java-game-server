@@ -23,6 +23,7 @@ public class SpringNettyServer
 		PropertyConfigurator.configure(System
 				.getProperty("log4j.configuration"));
 		AbstractApplicationContext context = new AnnotationConfigApplicationContext(JetServerSpringConfig.class);
+		
 		// For the destroy method to work.
 		context.registerShutdownHook();
 		
