@@ -14,7 +14,7 @@ Maven
 <dependency>
     <groupId>com.github.menacher</groupId>
     <artifactId>nadron</artifactId>
-    <version>0.2</version>
+    <version>0.5</version>
 </dependency>
 ```
 From Source
