@@ -64,11 +64,11 @@ public class FlashPolicyServerHandler extends SimpleChannelInboundHandler<Object
 
 		if (null != policyFile)
 		{
-			f = ctx.channel().write(policyFile);
+			f = ctx.channel().writeAndFlush(policyFile);
 		}
 		else
 		{
-			f = ctx.channel().write(this.getPolicyFileContents());
+			f = ctx.channel().writeAndFlush(this.getPolicyFileContents());
 		}
 		f.addListener(ChannelFutureListener.CLOSE);
 	}

@@ -1,4 +1,4 @@
-﻿package org.menacheri
+package org.menacheri
 {
 	import flash.display.Sprite;
 	import flash.events.Event;
@@ -31,7 +31,7 @@
 		{
 			removeEventListener(Event.ADDED_TO_STAGE, init);
 			// entry point
-			var loginHelper:LoginHelper = new LoginHelper("user", "pass", "Zombie_ROOM_1_REF_KEY_1", "localhost", 18090);
+			var loginHelper:LoginHelper = new LoginHelper("user", "pass", "Zombie_ROOM_1", "localhost", 18090);
 			var sessionFactory:SessionFactory = new SessionFactory(loginHelper);
 			for (var i:uint = 0; i < 50; i++)
 			{
