@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.menacher</groupId>
 	<artifactId>nadclient-as3</artifactId>
-	<version>0.4</version>
+	<version>0.5-SNAPSHOT</version>
 	<packaging>swc</packaging>
 	<name>nadclient-as3</name>
 	<url>https://github.com/menacher/java-game-server/tree/netty4/jetclient-as3</url>
@@ -29,7 +29,7 @@
 		<connection>scm:git:git://github.com/menacher/java-game-server.git</connection>
 		<developerConnection>scm:git:ssh://git@github.com/menacher/java-game-server.git</developerConnection>
 		<url>https://github.com/menacher/java-game-server.git</url>
-		<tag>nadclient-as3-0.4</tag>
+		<tag>HEAD</tag>
 	</scm>
 	
 	<developers>
