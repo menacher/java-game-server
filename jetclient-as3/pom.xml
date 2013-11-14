@@ -2,16 +2,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.menacheri</groupId>
-	<artifactId>jetclient-as3</artifactId>
-	<version>0.1</version>
+	<groupId>com.github.menacher</groupId>
+	<artifactId>nadclient</artifactId>
+	<version>0.2</version>
 	<packaging>swc</packaging>
-	<name>jetclient-as3</name>
-	<url>https://github.com/menacher/java-game-server/tree/master/jetclient-as3</url>
+	<name>nadclient-as3</name>
+	<url>https://github.com/menacher/java-game-server/tree/netty4/jetclient-as3</url>
 	<description>This is an action script client library for jetserver.
 		Flash/Air/Flex clients can use this library to connect and interact
-		with jetserver.</description>
+		with nadron server.</description>
 
+	<parent>
+		<groupId>org.sonatype.oss</groupId>
+		<artifactId>oss-parent</artifactId>
+		<version>7</version>
+	</parent>
+	
 	<licenses>
 		<license>
 			<name>GNU Lesser General Public License (LGPL), Version 2.1</name>
@@ -20,7 +26,21 @@
 		</license>
 	</licenses>
 
-	<!-- Shared version number properties -->
+	<scm>
+		<connection>scm:git:git://github.com/menacher/java-game-server.git</connection>
+		<developerConnection>scm:git:ssh://git@github.com/menacher/java-game-server.git</developerConnection>
+		<url>https://github.com/menacher/java-game-server.git</url>
+		<tag>HEAD</tag>
+	</scm>
+	
+	<developers>
+		<developer>
+			<id>menacher</id>
+			<name>Abraham Menacherry</name>
+			<email>abrahammenacherry@gmail.com</email>
+		</developer>
+	</developers>
+	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
@@ -29,6 +49,7 @@
 		<sourceDirectory>src/main/flex</sourceDirectory>
 		<testSourceDirectory>src/test/flex</testSourceDirectory>
 		<plugins>
+			
 			<plugin>
 				<groupId>org.sonatype.flexmojos</groupId>
 				<artifactId>flexmojos-maven-plugin</artifactId>
@@ -38,6 +59,24 @@
 					<debug>true</debug>
 				</configuration>
 			</plugin>
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.4.1</version>
+				<executions>
+					<execution>
+						<id>default</id>
+						<goals>
+							<goal>perform</goal>
+						</goals>
+						<configuration>
+							<pomFileName>C:/Users/aby/Documents/GitHub/java-game-server/jetclient-as3/target/checkout/jetclient-as3/pom.xml</pomFileName>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+			
 		</plugins>
 	</build>
 

@@ -4,8 +4,8 @@
 	<artifactId>nadclient</artifactId>
 	<packaging>jar</packaging>
 	<version>0.6-SNAPSHOT</version>
-	<name>client</name>
-	<url>https://github.com/menacher/java-game-server/tree/netty4/client</url>
+	<name>nadclient</name>
+	<url>https://github.com/menacher/java-game-server/tree/netty4/nadclient</url>
 	<description>This is a client library for Nadron server https://github.com/menacher/java-game-server/tree/netty4/nadron. Java clients can use this program to connect and interact with nadron server.</description>
 
 	<parent>
