@@ -58,4 +58,20 @@ public class AppTest
     	InetSocketAddress readAddress = NettyUtils.readSocketAddress(buffer);
     	assertEquals(socketAddress,readAddress);
     }
+    
+    @Test
+    public void readWriteEmptyString()
+    {
+    	String hello = "Hello";
+		String world = "World!";
+		String empty = "";
+    	String space = " ";
+		ByteBuf buffer = NettyUtils.writeStrings(hello, empty, space, world);
+    	String[] readStrings = NettyUtils.readStrings(buffer, 4);
+    	assertEquals(readStrings.length, 4);
+    	assertEquals(readStrings[0], hello);
+    	assertEquals(readStrings[1], empty);
+    	assertEquals(readStrings[2], space);
+    	assertEquals(readStrings[3], world);
+    }
 }

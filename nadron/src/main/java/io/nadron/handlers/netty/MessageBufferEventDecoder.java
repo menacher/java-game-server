@@ -4,7 +4,6 @@ import io.nadron.communication.NettyMessageBuffer;
 import io.nadron.event.Event;
 import io.nadron.event.Events;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -33,14 +32,13 @@ public class MessageBufferEventDecoder extends MessageToMessageDecoder<ByteBuf>
 		out.add(decode(ctx, buffer));
 	}
 	
-	public Event decode(ChannelHandlerContext ctx, ByteBuf buffer){
-		byte opcode = buffer.readByte();
+	public Event decode(ChannelHandlerContext ctx, ByteBuf in){
+		byte opcode = in.readByte();
 		if (opcode == Events.NETWORK_MESSAGE) 
 		{
 			opcode = Events.SESSION_MESSAGE;
 		}
-		ByteBuf data = Unpooled.buffer(buffer.readableBytes()).writeBytes(
-				buffer);
+		ByteBuf data = in.readBytes(in.readableBytes());
 		return Events.event(new NettyMessageBuffer(data), opcode);
 	}
 }

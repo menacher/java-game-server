@@ -2,7 +2,6 @@ package io.nadron.client.handlers.netty;
 
 import io.nadron.client.event.Events;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
 import io.netty.handler.codec.serialization.ClassResolvers;
@@ -24,7 +23,7 @@ public class EventObjectDecoder extends MessageToMessageDecoder<ByteBuf>
 			{
 				opcode = Events.SESSION_MESSAGE;
 			}
-			ByteBuf data = Unpooled.buffer(in.readableBytes()).writeBytes(in);
+			ByteBuf data = in.readBytes(in.readableBytes());
 			// TODO check if creating a new object is necessary each time
 			Object obj = new SourceDecoder().decode(ctx, data);
 			out.add(Events.event(obj, opcode));
