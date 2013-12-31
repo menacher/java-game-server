@@ -50,7 +50,7 @@ package io.nadron.codecs.impl
 					if( (length - currentReadLength) > bytesAvailable)
 					{
 						lengthToRead = bytesAvailable;
-						socket.readBytes(message, 0, lengthToRead);
+						socket.readBytes(message, currentReadLength, lengthToRead);
 						currentReadLength += lengthToRead;
 						return null;
 					}
@@ -58,7 +58,7 @@ package io.nadron.codecs.impl
 					{
 						// enough or more bytes are available return message
 						lengthToRead = (length - currentReadLength);
-						socket.readBytes(message, 0, lengthToRead);
+						socket.readBytes(message, currentReadLength, lengthToRead);
 						lengthRead = false;
 						length = 0;
 						currentReadLength = 0;
