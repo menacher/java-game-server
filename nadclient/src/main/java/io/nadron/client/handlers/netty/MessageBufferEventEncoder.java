@@ -61,6 +61,7 @@ public class MessageBufferEventEncoder extends MessageToMessageEncoder<Event>
 					.getSource();
 			ByteBuf data = msgBuffer.getNativeBuffer();
 			out.writeBytes(data);
+			data.release();
 		}
 		return out;
 	}

@@ -253,6 +253,7 @@ public class NettyMessageBuffer implements MessageBuffer<ByteBuf>
 	{
 		ByteBuf strMultiBuf = NettyUtils.writeStrings(messages);
 		buffer.writeBytes(strMultiBuf);
+		strMultiBuf.release();
 		return this;
 	}
 

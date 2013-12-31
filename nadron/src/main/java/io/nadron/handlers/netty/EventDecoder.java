@@ -2,7 +2,6 @@ package io.nadron.handlers.netty;
 
 import io.nadron.event.Events;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.Unpooled;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToMessageDecoder;
@@ -23,7 +22,7 @@ public class EventDecoder extends MessageToMessageDecoder<ByteBuf>
 		{
 			msg.readUnsignedByte();// To read-destroy the protocol version byte.
 		}
-		ByteBuf buffer = Unpooled.buffer(msg.readableBytes()).writeBytes(msg);
+		ByteBuf buffer = msg.readBytes(msg.readableBytes());
 		out.add(Events.event(buffer, opcode));
 	}
 	

@@ -26,4 +26,12 @@ public class LoginHelperTest {
 		assertEquals("Zombie_ROOM_1" , NettyUtils.readString(byteBuf));
 		assertEquals(new InetSocketAddress(18090) , NettyUtils.readSocketAddress(byteBuf));
 	}
+	
+	@Test
+	public void doManyLogins() throws Exception
+	{
+		for(int i = 1; i <1000; i++){
+			writeAndReadCredsTest();
+		}
+	}
 }

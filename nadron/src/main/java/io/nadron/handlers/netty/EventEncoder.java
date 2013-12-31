@@ -33,8 +33,8 @@ public class EventEncoder extends MessageToMessageEncoder<Event>
 		opcode.writeByte(event.getType());
 		if(null != event.getSource())
 		{
-			ByteBuf data = (ByteBuf)event.getSource();
-			ByteBuf compositeBuffer = Unpooled.wrappedBuffer(opcode,data);
+			ByteBuf data = (ByteBuf) event.getSource();
+			ByteBuf compositeBuffer = Unpooled.wrappedBuffer(opcode, data);
 			out.add(compositeBuffer);
 		}
 		else 
