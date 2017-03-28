@@ -8,7 +8,7 @@ import io.nadron.communication.NettyTCPMessageSender;
 import io.nadron.event.Event;
 import io.nadron.event.Events;
 import io.nadron.event.impl.DefaultEvent;
-import io.nadron.event.impl.ReconnetEvent;
+import io.nadron.event.impl.ReconnectEvent;
 import io.nadron.service.LookupService;
 import io.nadron.service.UniqueIDGeneratorService;
 import io.nadron.service.impl.ReconnectSessionRegistry;
@@ -137,7 +137,7 @@ public class WebSocketLoginHandler extends SimpleChannelInboundHandler<TextWebSo
 		channel.writeAndFlush(Events.GAME_ROOM_JOIN_SUCCESS, null);//assumes that the protocol applied will take care of event objects.
 		playerSession.setWriteable(true);// TODO remove if unnecessary. It should be done in start event
 		// Send the re-connect event so that it will in turn send the START event.
-		playerSession.onEvent(new ReconnetEvent(sender));
+		playerSession.onEvent(new ReconnectEvent(sender));
 	}
 	
 	public Player lookupPlayer(String username, String password) throws Exception

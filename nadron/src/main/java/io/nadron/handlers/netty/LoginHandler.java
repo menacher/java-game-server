@@ -7,7 +7,7 @@ import io.nadron.app.Session;
 import io.nadron.communication.NettyTCPMessageSender;
 import io.nadron.event.Event;
 import io.nadron.event.Events;
-import io.nadron.event.impl.ReconnetEvent;
+import io.nadron.event.impl.ReconnectEvent;
 import io.nadron.server.netty.AbstractNettyServer;
 import io.nadron.service.LookupService;
 import io.nadron.service.SessionRegistryService;
@@ -226,7 +226,7 @@ public class LoginHandler extends SimpleChannelInboundHandler<Event>
 		gameRoom.connectSession(playerSession);
 		playerSession.setWriteable(true);// TODO remove if unnecessary. It should be done in start event
 		// Send the re-connect event so that it will in turn send the START event.
-		playerSession.onEvent(new ReconnetEvent(sender));
+		playerSession.onEvent(new ReconnectEvent(sender));
 		loginUdp(playerSession, buffer);
 	}
 	

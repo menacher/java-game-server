@@ -94,7 +94,7 @@
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-all</artifactId>
-			<version>4.0.10.Final</version>
+			<version>4.1.2.Final</version>
 		</dependency>
 
 		<!-- Blazeds dependency is there for converting java objects to AMF3 format 

@@ -3,11 +3,11 @@ package io.nadron.event.impl;
 import io.nadron.communication.MessageSender.Reliable;
 import io.nadron.event.Events;
 
-public class ReconnetEvent extends DefaultConnectEvent
+public class ReconnectEvent extends DefaultConnectEvent
 {
 	private static final long serialVersionUID = 1L;
 
-	public ReconnetEvent(Reliable tcpSender)
+	public ReconnectEvent(Reliable tcpSender)
 	{
 		super(tcpSender, null);
 	}
