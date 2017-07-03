@@ -34,10 +34,10 @@ public class UDPUpstreamHandler extends SimpleChannelInboundHandler<DatagramPack
 	public void channelRead0(ChannelHandlerContext ctx,
 			DatagramPacket packet) throws Exception
 	{
-		Session session = NettyUDPClient.CLIENTS.get(ctx.channel().localAddress());
+		Event event = (Event)decoder.decode(null, packet.content());
+		Session session = NettyUDPClient.CLIENTS.get(event.getSessionId());
 		if (null != session)
 		{
-			Event event = (Event)decoder.decode(null, packet.content());
 			// Pass the event on to the session
 			session.onEvent(event);
 		}
