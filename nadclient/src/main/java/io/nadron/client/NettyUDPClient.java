@@ -254,7 +254,7 @@ public class NettyUDPClient
 					+ " Passed to connect method is not bound");
 		}
 
-		Event event = Events.event(null, Events.CONNECT);
+		Event event = Events.event(null, Events.CONNECT, session);
 		
 		ChannelFuture future = datagramChannel.write(event);
 		future.addListener(new ChannelFutureListener()
