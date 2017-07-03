@@ -21,7 +21,7 @@ public class UDPUpstreamHandler extends SimpleChannelInboundHandler<DatagramPack
 {
 	private static final Logger LOG = LoggerFactory.getLogger(UDPUpstreamHandler.class);
 	private static final String UDP_CONNECTING = "UDP_CONNECTING";
-	private SessionRegistryService<SocketAddress> udpSessionRegistry;
+	private SessionRegistryService<Object> udpSessionRegistry;
 	private MessageBufferEventDecoder messageBufferEventDecoder;
 	
 	public UDPUpstreamHandler()
@@ -33,48 +33,52 @@ public class UDPUpstreamHandler extends SimpleChannelInboundHandler<DatagramPack
 	public void channelRead0(ChannelHandlerContext ctx,
 			DatagramPacket packet) throws Exception
 	{
+		ByteBuf buffer = packet.content();
+		Event event = messageBufferEventDecoder.decode(null, buffer);
+		handleEvent(ctx, packet, event);
+	}
+
+	protected void handleEvent(ChannelHandlerContext ctx,
+							   DatagramPacket packet, Event event) {
 		// Get the session using the remoteAddress.
 		SocketAddress remoteAddress = packet.sender();
-		Session session = udpSessionRegistry.getSession(remoteAddress);
-		if (null != session) 
+		Session session = udpSessionRegistry.getSession((Object) event.getSessionId());
+		if (null != session)
 		{
-			ByteBuf buffer = packet.content();
-			Event event = (Event) messageBufferEventDecoder
-					.decode(null, buffer);
 
 			// If the session's UDP has not been connected yet then send a
 			// CONNECT event.
-			if (!session.isUDPEnabled()) 
+			if (!session.isUDPEnabled())
 			{
 				if (null == session.getAttribute(UDP_CONNECTING)
-						|| (!(Boolean) session.getAttribute(UDP_CONNECTING))) 
+						|| (!(Boolean) session.getAttribute(UDP_CONNECTING)))
 				{
 					session.setAttribute(UDP_CONNECTING, true);
 					event = getUDPConnectEvent(event, remoteAddress,
-							(DatagramChannel) ctx.channel());
+							(DatagramChannel) ctx.channel(), session);
 					// Pass the connect event on to the session
 					session.onEvent(event);
 				}
 				else
 				{
 					LOG.info("Going to discard UDP Message Event with type {} "
-							+ "the UDP MessageSender is not initialized fully",
+									+ "the UDP MessageSender is not initialized fully",
 							event.getType());
 				}
-			} 
-			else if (event.getType() == Events.CONNECT) 
+			}
+			else if (event.getType() == Events.CONNECT)
 			{
 				// Duplicate connect just discard.
 				LOG.trace("Duplicate CONNECT {} received in UDP channel, "
 						+ "for session: {} going to discard", event, session);
-			} 
-			else 
+			}
+			else
 			{
 				// Pass the original event on to the session
 				session.onEvent(event);
 			}
-		} 
-		else 
+		}
+		else
 		{
 			LOG.trace(
 					"Packet received from unknown source address: {}, going to discard",
@@ -83,7 +87,7 @@ public class UDPUpstreamHandler extends SimpleChannelInboundHandler<DatagramPack
 	}
 
 	public Event getUDPConnectEvent(Event event, SocketAddress remoteAddress,
-			DatagramChannel udpChannel)
+			DatagramChannel udpChannel, Session session)
 	{
 		LOG.debug("Incoming udp connection remote address : {}",
 				remoteAddress);
@@ -94,19 +98,19 @@ public class UDPUpstreamHandler extends SimpleChannelInboundHandler<DatagramPack
 					+ "event since the UDP MessageSender is not initialized till now",
 					event.getType());
 		}
-		Fast messageSender = new NettyUDPMessageSender(remoteAddress, udpChannel, udpSessionRegistry);
+		Fast messageSender = new NettyUDPMessageSender(remoteAddress, udpChannel, udpSessionRegistry, session);
 		Event connectEvent = Events.connectEvent(messageSender);
 		
 		return connectEvent;
 	}
 
-	public SessionRegistryService<SocketAddress> getUdpSessionRegistry()
+	public SessionRegistryService<Object> getUdpSessionRegistry()
 	{
 		return udpSessionRegistry;
 	}
 
 	public void setUdpSessionRegistry(
-			SessionRegistryService<SocketAddress> udpSessionRegistry)
+			SessionRegistryService<Object> udpSessionRegistry)
 	{
 		this.udpSessionRegistry = udpSessionRegistry;
 	}

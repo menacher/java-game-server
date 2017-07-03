@@ -1,5 +1,6 @@
 package io.nadron.client.event;
 
+import io.nadron.client.app.Session;
 import io.nadron.client.communication.DeliveryGuaranty;
 import io.nadron.client.communication.DeliveryGuaranty.DeliveryGuarantyOptions;
 import io.nadron.client.event.impl.AbstractSessionEventHandler;
@@ -117,13 +118,19 @@ public class Events
 		networkEvent.setDeliveryGuaranty(deliveryGuaranty);
 		return networkEvent;
 	}
-	
+
 	public static Event event(Object source, int eventType)
+	{
+		return event(source,eventType,(Session)null);
+	}
+
+	public static Event event(Object source, int eventType, Session session)
 	{
 		DefaultEvent event = new DefaultEvent();
 		event.setSource(source);
 		event.setType(eventType);
 		event.setTimeStamp(System.currentTimeMillis());
+		event.setSessionId(session.getId());
 		return event;
 	}
 

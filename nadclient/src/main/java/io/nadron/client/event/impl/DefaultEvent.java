@@ -62,6 +62,16 @@ public class DefaultEvent implements Event, Serializable
 	}
 
 	@Override
+	public Object getSessionId() {
+		return sessionId;
+	}
+
+	@Override
+	public void setSessionId(Object sessionId) {
+		this.sessionId = sessionId;
+	}
+
+	@Override
 	public String toString()
 	{
 		return "Event [type=" + type + ", source=" + source + ", timeStamp="
