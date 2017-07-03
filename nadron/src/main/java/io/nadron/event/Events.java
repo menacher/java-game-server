@@ -90,14 +90,19 @@ public class Events
 		return event(source,eventType,(Session)null);
 	}
 	
-	public static Event event(Object source, int eventType,Session session)
+	public static Event event(Object source, int eventType, Session session)
 	{
 		EventContext context = null;
 		if(null != session)
 		{
 			context = new DefaultEventContext();
 		}
-		return event(source,eventType,context);
+		Event event = event(source,eventType,context);
+		if(null != session)
+		{
+			event.setSessionId(session.getId());
+		}
+		return event;
 	}
 	
 	public static Event event(Object source, int eventType, EventContext context)
@@ -114,7 +119,7 @@ public class Events
 	 * Creates a network event with the source set to the object passed in as
 	 * parameter and the {@link DeliveryGuaranty} set to
 	 * {@link DeliveryGuarantyOptions#RELIABLE}. This method delegates to
-	 * {@link #networkEvent(Object, DeliveryGuaranty)}.
+	 * {@link #networkEvent(Object, Session, DeliveryGuaranty)}.
 	 * 
 	 * @param source
 	 *            The payload of the event. This is the actual data that gets
@@ -123,7 +128,7 @@ public class Events
 	 */
 	public static NetworkEvent networkEvent(Object source)
 	{
-		return networkEvent(source,DeliveryGuaranty.DeliveryGuarantyOptions.RELIABLE);
+		return networkEvent(source, null, DeliveryGuaranty.DeliveryGuarantyOptions.RELIABLE);
 	}
 	
 	/**
@@ -139,9 +144,9 @@ public class Events
 	 *            message to remote machine.
 	 * @return An instance of {@link NetworkEvent}
 	 */
-	public static NetworkEvent networkEvent(Object source, DeliveryGuaranty deliveryGuaranty)
+	public static NetworkEvent networkEvent(Object source, Session session, DeliveryGuaranty deliveryGuaranty)
 	{
-		Event event = event(source,Events.NETWORK_MESSAGE);
+		Event event = event(source, Events.NETWORK_MESSAGE, session);
 		NetworkEvent networkEvent = new DefaultNetworkEvent(event);
 		networkEvent.setDeliveryGuaranty(deliveryGuaranty);
 		return networkEvent;

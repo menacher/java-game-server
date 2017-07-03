@@ -58,7 +58,7 @@ public class NettyUDPClient
 	 * {@link UDPUpstreamHandler} will resolve which session to pass the event,
 	 * using this map.
 	 */
-	public static final Map<InetSocketAddress, Session> CLIENTS = new HashMap<InetSocketAddress, Session>();
+	public static final Map<Object, Session> CLIENTS = new HashMap<Object, Session>();
 
 	/**
 	 * Creates an instance of a Netty UDP client which can then be used to
@@ -269,7 +269,7 @@ public class NettyUDPClient
 				}
 			}
 		});
-		CLIENTS.put(datagramChannel.localAddress(), session);
+		CLIENTS.put(session.getId(), session);
 		return future;
 	}
 

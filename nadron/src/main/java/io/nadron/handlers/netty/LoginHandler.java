@@ -41,7 +41,7 @@ public class LoginHandler extends SimpleChannelInboundHandler<Event>
 			.getLogger(LoginHandler.class);
 
 	protected LookupService lookupService;
-	protected SessionRegistryService<SocketAddress> udpSessionRegistry;
+	protected SessionRegistryService<Object> udpSessionRegistry;
 	protected ReconnectSessionRegistry reconnectRegistry;
 	protected UniqueIDGeneratorService idGeneratorService;
 	
@@ -202,7 +202,7 @@ public class LoginHandler extends SimpleChannelInboundHandler<Event>
 							NettyUtils.writeString(reconnectKey));
 			ChannelFuture future = channel.writeAndFlush(reconnectKeyBuffer);
 			connectToGameRoom(gameRoom, playerSession, future);
-			loginUdp(playerSession, buffer);
+			loginUdp(playerSession);
 		}
 		else
 		{
@@ -226,8 +226,8 @@ public class LoginHandler extends SimpleChannelInboundHandler<Event>
 		gameRoom.connectSession(playerSession);
 		playerSession.setWriteable(true);// TODO remove if unnecessary. It should be done in start event
 		// Send the re-connect event so that it will in turn send the START event.
-		playerSession.onEvent(new ReconnetEvent(sender));
-		loginUdp(playerSession, buffer);
+		playerSession.onEvent(new ReconnectEvent(sender));
+		loginUdp(playerSession);
 	}
 	
 	public void connectToGameRoom(final GameRoom gameRoom, final PlayerSession playerSession, ChannelFuture future)
@@ -265,21 +265,13 @@ public class LoginHandler extends SimpleChannelInboundHandler<Event>
 	
 	/**
 	 * This method adds the player session to the
-	 * {@link SessionRegistryService}. The key being the remote udp address of
-	 * the client and the session being the value.
+	 * {@link SessionRegistryService}. The key being the sessionId and the session itself being the value.
 	 * 
 	 * @param playerSession
-	 * @param buffer
-	 *            Used to read the remote address of the client which is
-	 *            attempting to connect via udp.
 	 */
-	protected void loginUdp(PlayerSession playerSession, ByteBuf buffer)
+	protected void loginUdp(PlayerSession playerSession)
 	{
-		InetSocketAddress remoteAddress = NettyUtils.readSocketAddress(buffer);
-		if(null != remoteAddress)
-		{
-			udpSessionRegistry.putSession(remoteAddress, playerSession);
-		}
+		udpSessionRegistry.putSession(playerSession.getId(), playerSession);
 	}
 	
 	public LookupService getLookupService()
@@ -300,13 +292,13 @@ public class LoginHandler extends SimpleChannelInboundHandler<Event>
 		this.idGeneratorService = idGeneratorService;
 	}
 
-	public SessionRegistryService<SocketAddress> getUdpSessionRegistry()
+	public SessionRegistryService<Object> getUdpSessionRegistry()
 	{
 		return udpSessionRegistry;
 	}
 
 	public void setUdpSessionRegistry(
-			SessionRegistryService<SocketAddress> udpSessionRegistry)
+			SessionRegistryService<Object> udpSessionRegistry)
 	{
 		this.udpSessionRegistry = udpSessionRegistry;
 	}

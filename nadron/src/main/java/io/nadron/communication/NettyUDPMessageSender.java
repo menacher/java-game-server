@@ -33,16 +33,19 @@ public class NettyUDPMessageSender implements Fast
 	private static final Logger LOG = LoggerFactory
 			.getLogger(NettyUDPMessageSender.class);
 	private final SocketAddress remoteAddress;
+	private final Session session;
 	private final DatagramChannel channel;
-	private final SessionRegistryService<SocketAddress> sessionRegistryService;
+	private final SessionRegistryService<Object> sessionRegistryService;
 	private final EventContext eventContext;
 	private static final DeliveryGuaranty DELIVERY_GUARANTY = DeliveryGuarantyOptions.FAST;
 
 	public NettyUDPMessageSender(SocketAddress remoteAddress,
 			DatagramChannel channel,
-			SessionRegistryService<SocketAddress> sessionRegistryService)
+			SessionRegistryService<Object> sessionRegistryService,
+								 Session session)
 	{
 		this.remoteAddress = remoteAddress;
+		this.session = session;
 		this.channel = channel;
 		this.sessionRegistryService = sessionRegistryService;
 		this.eventContext = new EventContextImpl((InetSocketAddress)remoteAddress);
@@ -67,14 +70,13 @@ public class NettyUDPMessageSender implements Fast
 	@Override
 	public void close()
 	{
-		Session session = sessionRegistryService.getSession(remoteAddress);
-		if (sessionRegistryService.removeSession(remoteAddress))
+		if (sessionRegistryService.removeSession((String) session.getId()))
 		{
 			LOG.debug("Successfully removed session: {}", session);
 		}
 		else
 		{
-			LOG.trace("No udp session found for address: {}", remoteAddress);
+			LOG.trace("No udp session found for session: {}", session);
 		}
 
 	}
@@ -106,7 +108,7 @@ public class NettyUDPMessageSender implements Fast
 		return sender;
 	}
 
-	protected SessionRegistryService<SocketAddress> getSessionRegistryService()
+	protected SessionRegistryService<Object> getSessionRegistryService()
 	{
 		return sessionRegistryService;
 	}

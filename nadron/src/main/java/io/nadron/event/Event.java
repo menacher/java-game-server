@@ -17,4 +17,9 @@ public interface Event
 	long getTimeStamp();
 
 	void setTimeStamp(long timeStamp);
+
+	Object getSessionId();
+
+	void setSessionId(Object sessionId);
+
 }

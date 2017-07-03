@@ -18,6 +18,7 @@ public class DefaultEvent implements Event, Serializable
 	protected int type;
 	protected Object source;
 	protected long timeStamp;
+	protected Object sessionId;
 	private String cName;
 	
 	@Override
@@ -67,6 +68,16 @@ public class DefaultEvent implements Event, Serializable
 	{
 		this.timeStamp = timeStamp;
 
+	}
+
+	@Override
+	public Object getSessionId() {
+		return sessionId;
+	}
+
+	@Override
+	public void setSessionId(Object sessionId) {
+		this.sessionId = sessionId;
 	}
 
 	@Override
