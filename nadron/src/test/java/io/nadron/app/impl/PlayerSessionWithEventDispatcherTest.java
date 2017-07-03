@@ -27,7 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
 
-import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class PlayerSessionWithEventDispatcherTest
 {

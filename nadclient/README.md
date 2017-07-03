@@ -1,4 +1,6 @@
-This is a client project for [Nadron](https://github.com/menacher/java-game-server/tree/netty4/nadron) library. An example main class is provided in src/main/test folder.
+This is a client project for [Nadron](https://github.com/menacher/java-game-server/tree/netty4/nadron) library. An example main class is provided in src/main/test folder. 
+
+Another example main class called ProtobufTestClient is provided in the same folder, which shows a sample client that optionally uses Google's Protocol Buffers integration with Nadron. 
 
 About the Client
 ================

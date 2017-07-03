@@ -1,0 +1,63 @@
+// Server room framework related message containers
+syntax = "proto3";
+package loot;
+
+import "google/protobuf/any.proto";
+
+option java_package = "io.nadron.networking";
+option java_outer_classname = "NadronMessages";
+
+option csharp_namespace = "NadronMessages";
+
+enum EventType
+{
+    // Event code Constants
+    ANY = 0x00;
+    PROTOCOL_VERSION = 0x01;
+    CONNECT = 0x02;
+    RECONNECT = 0x03;
+    CONNECT_FAILED = 0x06;
+    LOG_IN = 0x08;
+    LOG_OUT = 0x0a;
+    LOG_IN_SUCCESS = 0x0b;
+    LOG_IN_FAILURE = 0x0c;
+    LOG_OUT_SUCCESS = 0x0e;
+    LOG_OUT_FAILURE = 0x0f;
+
+    GAME_LIST = 0x10;
+    ROOM_LIST = 0x12;
+    GAME_ROOM_JOIN = 0x14;
+    GAME_ROOM_LEAVE = 0x16;
+    GAME_ROOM_JOIN_SUCCESS = 0x18;
+    GAME_ROOM_JOIN_FAILURE = 0x19;
+
+    //Event sent from server to client to start message sending from client to server.
+    START = 0x1a;
+    // Event sent from server to client to stop messages from being sent to server.
+    STOP = 0x1b;
+    // Incoming data from server or from another session.
+    SESSION_MESSAGE = 0x1c;
+    // This event is used to send data from the current machine to remote server
+    NETWORK_MESSAGE = 0x1d;
+    CHANGE_ATTRIBUTE = 0x20;
+    // Use this one for handling close event of ws.
+    DISCONNECT = 0x22;
+    EXCEPTION = 0x24;
+}
+
+message ConnectionConfig {
+    string user = 1;
+    string pass = 2;
+    string connectionKey = 3;
+    string nadronTcpHostName = 4;
+    int32 tcpPort = 5;
+    string nadronUdpHostName = 6;
+    int32 udpPort = 7;
+}
+
+// Wrapper object that allows message to be consumed by the Nadron Server
+message NadronEvent {
+    EventType eventType = 1;
+    int64 timeStamp = 2;
+    google.protobuf.Any source = 3;
+}

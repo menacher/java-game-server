@@ -15,7 +15,7 @@ import org.slf4j.LoggerFactory;
 public class NettyObjectProtocol extends AbstractNettyProtocol {
 
 	private static final Logger LOG = LoggerFactory.getLogger(NettyObjectProtocol.class);
-	
+
 	private LengthFieldPrepender lengthFieldPrepender;
 	
 	public NettyObjectProtocol()

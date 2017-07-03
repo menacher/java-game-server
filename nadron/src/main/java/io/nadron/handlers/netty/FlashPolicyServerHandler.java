@@ -79,7 +79,7 @@ public class FlashPolicyServerHandler extends SimpleChannelInboundHandler<Object
             "<?xml version=\"1.0\"?>" + NEWLINE +
             "<!DOCTYPE cross-domain-policy SYSTEM \"/xml/dtds/cross-domain-policy.dtd\">" + NEWLINE +
             "" + NEWLINE +
-            "<!-- Policy file for xmlsocket://socks.example.com -->" + NEWLINE +
+            "<!-- Policy file for xmlsocket://socks.io.nadron.example.com -->" + NEWLINE +
             "<cross-domain-policy> " + NEWLINE +
             "" + NEWLINE +
             "   <!-- This is a master socket policy file -->" + NEWLINE +
