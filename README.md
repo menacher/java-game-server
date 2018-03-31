@@ -22,11 +22,11 @@ From Source
 -----------
 Using pre-built jar files
 -------------------------
-The pre-built jar files of this project are located in the jetserver/binaries directory. All dependant jars are located in the jetserver/lib directory. You can just add them to your classpath in your favorite IDE and start coding. If you want to compile from source, then follow steps below.
+The pre-built jar files of this project are located in the jetserver/binaries directory. All dependent jars are located in the jetserver/lib directory. You can add them to your favorite IDE’s classpath for coding. If you want to compile from source, then follow steps below.
 
 With Maven and using Eclipse
 ----------------------------
-**Pre-requisites**: Please have maven 3+ and [Spring source tool suite](http://www.springsource.com/developer/sts "STS") or eclipse installed. If you are using plain vanilla eclipse, then M2Eclipse and EGit plugins though not required will be helpful. If you are using another IDE then the maven-eclipse plugin part in the pom.xml needs to be modified. 
+**Pre-requisites**: Please have maven 3+ and [Spring source tool suite](http://www.springsource.com/developer/sts "STS") or eclipse installed. If you are using plain vanilla eclipse, then M2Eclipse and EGit plugins though not required will be helpful. The maven-eclipse plugin part of pom.xml should be modified when using another IDE. 
 
 Steps
 -----
