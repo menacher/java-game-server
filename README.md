@@ -1,14 +1,14 @@
 **Note** New version of Jetserver is called **Nadron** and is in a new [ netty 4 branch](https://github.com/menacher/java-game-server/tree/netty4) of this same repo.    
 JetServer is a java nio based server specifically designed for mutliplayer games. It supports UDP and TCP transports. It uses [Netty](http://netty.io/) for high speed network transmission and [Jetlang](http://code.google.com/p/jetlang/ "jetlang") for extremely fast in-vm message passing between player sessions and game rooms. The project also uses spring for its dependency injection. This way, it is highly configurable and you can swap out any part of the server with your own implementations.
 
-Wiki
-====
-The [wiki](https://github.com/menacher/java-game-server/wiki) provides implementation level details and answers to general questions that a developer starting to use jetserver might have about it. The following [blog](http://nerdronix.blogspot.com/2013/06/creating-multiplayer-game-using-html-5.html) has post on game creation.
-Support Group
-=============
+## Wiki
+The [wiki](https://github.com/menacher/java-game-server/wiki) provides implementation level details and answers to general questions that a developer starting to use jetserver might have about it. The following [blog](http://nerdronix.blogspot.com/2013/06/creating-multiplayer-game-using-html-5.html) has post on game creation.  
+
+## Support Group
 For general discussion please use the [jetserver google group](https://groups.google.com/forum/#!forum/jetserver). Issues and bugs can be raised directly in github.
-Installation
-============
+
+## Installation
+
 Maven
 -----
 ```xml
