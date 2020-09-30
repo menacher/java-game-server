@@ -6,10 +6,10 @@ import org.menacheri.zombie.domain.ZombieCommands;
 
 
 /**
- * This class acts like a message factory for creating game specific messages.
- * @author Abraham Menacherry
- *
- */
+ This class acts like a message factory for creating game specific messages.
+ @author Abraham Menacherry
+ 
+ **/
 public class Messages
 {
 	public static ChannelBuffer apocalypse()
