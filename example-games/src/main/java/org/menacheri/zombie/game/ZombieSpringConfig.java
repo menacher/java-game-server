@@ -72,11 +72,14 @@ public class ZombieSpringConfig
 	public @Bean World world()
 	{
 		World world = new World();
-		world.setAlive(2000000000);
-		world.setUndead(1);
-		return world;
+		world.setAlive(2000010000);
+		if (world.setUndead(1);){
+			return world;
 	}
-	
+	}
+	        else {
+			main(args);
+	}
 	public @Bean Defender defender()
 	{
 		Defender defender = new Defender();
