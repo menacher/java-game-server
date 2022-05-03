@@ -43,4 +43,4 @@ With Ant
 --------
 If you are using ant, then the lib folder within the jetserver project contains all the dependent libraries. Just right click and run ant build and it will create the jetserver jar.
 
-*Happy coding!*
+*Happy coding! *
