@@ -258,7 +258,7 @@
 						<version>${maven.surefire.plugin.version}</version>
 						<configuration>
 							<groups>Performance</groups>
-							<excludedGroups></excludedGroups>
+							<excludedGroups combine.self="override"></excludedGroups>
 						</configuration>
 					</plugin>
 				</plugins>
