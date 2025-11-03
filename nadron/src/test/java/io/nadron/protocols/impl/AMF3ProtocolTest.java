@@ -1,7 +1,7 @@
 package io.nadron.protocols.impl;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import io.nadron.event.Event;
 import io.nadron.event.Events;
 import io.nadron.handlers.netty.JavaObjectToAMF3Encoder;
@@ -12,8 +12,8 @@ import io.netty.handler.codec.LengthFieldPrepender;
 
 import java.io.Serializable;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class AMF3ProtocolTest
 {
@@ -21,7 +21,7 @@ public class AMF3ProtocolTest
 	private LengthFieldBasedFrameDecoder frameDecoder;
 	private PlayerStats playerStats;
 
-	@Before
+	@BeforeEach
 	public void setUp()
 	{
 		amf3Protocol = new AMF3Protocol();

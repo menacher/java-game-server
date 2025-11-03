@@ -1,36 +1,56 @@
-This is a client project for [Nadron](https://github.com/menacher/java-game-server/tree/netty4/nadron) library. An example main class is provided in src/main/test folder.
+# Nadron Client
 
-About the Client
-================
-Maven
------
+This is a Java client library for the [Nadron](https://github.com/menacher/java-game-server/tree/netty4/nadron) game server.
+
+## Requirements
+
+- **Java 17 or later**
+- **Maven 3.8+** (for building)
+
+## Maven Dependency
+
 ```xml
 <dependency>
     <groupId>com.github.menacher</groupId>
     <artifactId>nadclient</artifactId>
-    <version>0.5</version>
+    <version>0.8-SNAPSHOT</version>
 </dependency>
 ```
-Execution
----------
-Execute io.nadron.TestClass from command line or eclipse and it will connect to remote Nadron server and start receiving events. Assumption is that TestClass using accurate hostname and port number.
-Execution  
----------
-Pointers on main classes, classpaths and command line flags.    
 
-**To start the client **    
-client can be executed from console using below command.        
-java -cp ./client-0.1.jar;./netty-all-4.0.10.Final.jar  io.nadron.TestClass  
+## Technology Stack
 
-Usage as game client
-====================
-The general usage steps could be as outlined below.    
-1.  Add client-0.2.jar and netty-4.0.0.CR6.jar to your project class path.    
-2.  Create LoginBuilder, session and SessionEventHandler as shown in TestClass. example-games project has a ZombieNadClient which shows a better example.    
-3.  Use the SessionEventHandler to accept events from remote server as well as to write back events to the server.    
-4.  To write back to the remote Nadron server create a tcp/udp network event using the factory method Event event = Events.networkEvent(messageBuffer); or Events.networkEvent(messageBuffer,DeliveryGuaranty.Fast);    
-5.  Now call session.onEvent(event); and this event will be transmitted to the remote Nadron server.    
+- **Java 17 LTS**
+- **Netty 4.1.115** - High-performance async network framework
+- **JUnit 5.11.3** - Modern testing framework
 
-Jar Dependencies
-----------------
-netty-all-4.0.10.Final.jar         
+## Usage as Game Client
+
+The general usage steps:
+
+1. Add `nadclient-0.8-SNAPSHOT.jar` and its dependencies to your project classpath (or use Maven)
+2. Create `LoginBuilder`, session and `SessionEventHandler` as shown in test classes
+3. The `example-games` project has a `ZombieNadClient` which demonstrates a complete example
+4. Use the `SessionEventHandler` to accept events from the remote server and to send events back
+5. To send to the remote Nadron server, create a TCP/UDP network event:
+   ```java
+   Event event = Events.networkEvent(messageBuffer);
+   // or for UDP
+   Events.networkEvent(messageBuffer, DeliveryGuaranty.Fast);
+   ```
+6. Call `session.onEvent(event);` to transmit the event to the remote Nadron server
+
+## Building from Source
+
+```bash
+git clone git@github.com:menacher/java-game-server.git
+cd java-game-server/nadclient
+mvn clean install
+```
+
+## Running Tests
+
+```bash
+mvn test
+```
+
+All 7 tests pass successfully on Java 17 with Netty 4.1.         

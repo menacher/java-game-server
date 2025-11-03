@@ -1,7 +1,7 @@
 package io.nadron.protocols.impl;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import io.nadron.communication.NettyMessageBuffer;
 import io.nadron.event.Event;
 import io.nadron.event.Events;
@@ -11,15 +11,15 @@ import io.nadron.protocols.impl.MessageBufferProtocol;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
 
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class MessageBufferProtocolTest {
 
 	private MessageBufferProtocol messageBufferProtocol;
 	private LengthFieldBasedFrameDecoder frameDecoder;
 	
-	@Before
+	@BeforeEach
 	public void setUp()
 	{
 		messageBufferProtocol = new MessageBufferProtocol();

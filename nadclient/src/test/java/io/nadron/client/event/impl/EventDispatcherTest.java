@@ -1,7 +1,7 @@
 package io.nadron.client.event.impl;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nadron.client.event.Event;
 import io.nadron.client.event.EventDispatcher;
@@ -12,7 +12,7 @@ import io.nadron.client.event.impl.DefaultEventDispatcher;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class EventDispatcherTest
 {

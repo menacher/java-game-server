@@ -1,6 +1,6 @@
 package io.nadron.app.impl;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import io.nadron.app.Game;
 import io.nadron.app.GameRoom;
@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Tag;
 
 import edu.emory.mathcs.backport.java.util.concurrent.atomic.AtomicLong;
 
@@ -43,7 +43,7 @@ public class PlayerSessionWithEventDispatcherTest
 	private List<GameRoom> gameRoomList;
 	private List<Session> sessionList;
 
-	@Before
+	@BeforeEach
 	public void setUp()
 	{
 		game = new SimpleGame(1, "Test");
@@ -73,7 +73,7 @@ public class PlayerSessionWithEventDispatcherTest
 	}
 
 	@Test
-	@Category(Performance.class)
+	@Tag("Performance")
 	public void eventHandlingPerformance() throws InterruptedException
 	{
 		long start = System.nanoTime();

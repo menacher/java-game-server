@@ -1,27 +1,27 @@
 package io.nadron.protocols.impl;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import io.nadron.event.Event;
 import io.nadron.event.impl.DefaultEvent;
 import io.nadron.junitcategories.Performance;
 
-import org.codehaus.jackson.map.ObjectMapper;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Tag;
 
 public class WebsocketProtocolTest
 {
 	private ObjectMapper mapper;
 	
-	@Before
+	@BeforeEach
 	public void setUp()
 	{
 		 mapper = new ObjectMapper();
 	}
-	
+
 	@Test
-	@Category(Performance.class)
+	@Tag("Performance")
 	public void testJacksonConversion() throws Exception
 	{
 		PlayerStats stats = new PlayerStats(1, 2, 5, "ablajdlajldkfjaldjfcd");

@@ -10,7 +10,6 @@ import io.nadron.service.TaskManagerService;
 
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -20,11 +19,10 @@ import org.springframework.context.support.AbstractApplicationContext;
 public class GameServer
 {
 	private static final Logger LOG = LoggerFactory.getLogger(GameServer.class);
-	
+
 	public static void main(String[] args)
 	{
-		PropertyConfigurator.configure(System
-				.getProperty("log4j.configuration"));
+		// Log4j2 auto-configures from log4j2.xml in classpath
 		AbstractApplicationContext ctx = new AnnotationConfigApplicationContext(SpringConfig.class);
 		// For the destroy method to work.
 		ctx.registerShutdownHook();

@@ -1,6 +1,6 @@
 package io.nadron.client.util;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import io.nadron.client.util.LoginHelper;
 import io.nadron.client.util.NettyUtils;
 import io.nadron.client.util.LoginHelper.LoginBuilder;
@@ -8,7 +8,7 @@ import io.netty.buffer.ByteBuf;
 
 import java.net.InetSocketAddress;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class LoginHelperTest {
 

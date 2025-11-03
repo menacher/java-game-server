@@ -12,7 +12,7 @@ import io.netty.util.AttributeKey;
 
 import java.util.List;
 
-import org.codehaus.jackson.map.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * This class will convert an incoming {@link TextWebSocketFrame} to an
@@ -36,8 +36,7 @@ public class TextWebsocketDecoder extends
 	 * This will be put into the {@link ChannelHandlerContext} the first time
 	 * attr method is invoked on it. The get is also a set.
 	 */
-	private final AttributeKey<Class<? extends Event>> eventClass = new AttributeKey<Class<? extends Event>>(
-			"eventClass");
+	private final AttributeKey<Class<? extends Event>> eventClass = AttributeKey.valueOf("eventClass");
 
 	@Override
 	protected void decode(ChannelHandlerContext ctx, TextWebSocketFrame frame,

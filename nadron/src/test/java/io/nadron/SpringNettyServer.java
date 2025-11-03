@@ -2,7 +2,6 @@ package io.nadron;
 
 import io.nadron.server.ServerManager;
 
-import org.apache.log4j.PropertyConfigurator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
@@ -21,8 +20,7 @@ public class SpringNettyServer
 	private static final Logger LOG = LoggerFactory.getLogger(SpringNettyServer.class);
 	public static void main(String[] args)
 	{
-		PropertyConfigurator.configure(System
-				.getProperty("log4j.configuration"));
+		// Log4j2 auto-configures from log4j2.xml in classpath
 		AbstractApplicationContext context = new AnnotationConfigApplicationContext(NadronSpringConfig.class);
 		// For the destroy method to work.
 		context.registerShutdownHook();
