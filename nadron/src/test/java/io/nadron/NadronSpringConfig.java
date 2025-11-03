@@ -1,6 +1,7 @@
 package io.nadron;
 
 import io.nadron.app.GameRoom;
+import io.nadron.config.ServerConfig;
 import io.nadron.service.LookupService;
 import io.nadron.service.impl.SimpleLookupService;
 
@@ -9,10 +10,10 @@ import java.util.Map;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
+import org.springframework.context.annotation.Import;
 
 @Configuration
-@ImportResource("classpath:/nadron/beans/server-beans.xml")
+@Import(ServerConfig.class)
 public class NadronSpringConfig
 {
 

@@ -20,11 +20,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.nadron.config.ServerConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.ImportResource;
+import org.springframework.context.annotation.Import;
 
 /**
  * This class contains the spring configuration for the nadron library user.
@@ -32,12 +33,12 @@ import org.springframework.context.annotation.ImportResource;
  * Otherwise the program will terminate with a context load error from spring
  * framework. The other beans declared can also be created using **new**
  * operator as per programmer convenience.
- * 
+ *
  * @author Abraham Menacherry.
- * 
+ *
  */
 @Configuration
-@ImportResource("classpath:/beans/beans.xml")
+@Import(ServerConfig.class)
 public class SpringConfig
 {
 	@Autowired

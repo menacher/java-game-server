@@ -91,6 +91,5 @@ The project includes comprehensive unit tests using JUnit 5:
 - **13 regular tests** - Fast unit tests that run with every build
 - **4 performance tests** - Tagged separately for performance benchmarking
 
-All tests pass successfully on the modernized stack (Java 17, Spring 6, Netty 4.1).
 
 *Happy coding!*
